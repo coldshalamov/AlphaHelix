@@ -138,7 +138,7 @@ function spawnDrop(x, y) {
   state.drops.push({
     x,
     y,
-    size: 26,
+    size: 36,
     type: isHeart ? "heart" : "beer",
     vy: 35,
   });
@@ -302,9 +302,17 @@ function drawIsa() {
   const { x, y, w, h } = state.isa;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = "#ffb3c6";
-  ctx.strokeStyle = "#f978a9";
-  roundRect(ctx, 0, 0, w, h, 18, true, true);
+  ctx.fillStyle = "#f29ab4";
+  ctx.strokeStyle = "#eb7aa1";
+  ctx.beginPath();
+  ctx.moveTo(w * 0.16, 6);
+  ctx.lineTo(w * 0.84, 6);
+  ctx.lineTo(w * 0.9, h * 0.55);
+  ctx.lineTo(w * 0.5, h - 2);
+  ctx.lineTo(w * 0.1, h * 0.55);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
 
   // hair
   ctx.fillStyle = "#332424";
@@ -320,25 +328,25 @@ function drawIsa() {
   ctx.strokeStyle = "#2d1b1b";
   ctx.lineWidth = 2.3;
   ctx.beginPath();
-  ctx.arc(w * 0.32, h * 0.45, 8, Math.PI * 0.1, Math.PI * 0.9);
-  ctx.arc(w * 0.68, h * 0.45, 8, Math.PI * 0.1, Math.PI * 0.9);
+  ctx.arc(w * 0.32, h * 0.42, 8, Math.PI * 0.1, Math.PI * 0.9);
+  ctx.arc(w * 0.68, h * 0.42, 8, Math.PI * 0.1, Math.PI * 0.9);
   ctx.stroke();
   ctx.fillStyle = "#2d1b1b";
   ctx.beginPath();
-  ctx.ellipse(w * 0.32, h * 0.52, 3, 5, 0, 0, Math.PI * 2);
-  ctx.ellipse(w * 0.68, h * 0.52, 3, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.32, h * 0.5, 3, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.68, h * 0.5, 3, 5, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // blush & smile
   ctx.fillStyle = "#ff8fbf";
   ctx.beginPath();
-  ctx.ellipse(w * 0.26, h * 0.64, 6, 4, 0, 0, Math.PI * 2);
-  ctx.ellipse(w * 0.74, h * 0.64, 6, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.26, h * 0.62, 6, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.74, h * 0.62, 6, 4, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = "#2d1b1b";
   ctx.lineWidth = 2.4;
   ctx.beginPath();
-  ctx.arc(w * 0.5, h * 0.6, 14, Math.PI * 0.1, Math.PI * 0.9);
+  ctx.arc(w * 0.5, h * 0.58, 14, Math.PI * 0.1, Math.PI * 0.9);
   ctx.stroke();
 
   ctx.restore();
@@ -366,16 +374,29 @@ function drawGringo() {
 
   // beard + smile
   ctx.fillStyle = "#c9976b";
-  roundRect(ctx, 6, h * 0.58, w - 12, h * 0.36, 12, true, false);
+  roundRect(ctx, 4, h * 0.54, w - 8, h * 0.42, 14, true, false);
+  ctx.fillStyle = "#9e7654";
+  ctx.beginPath();
+  ctx.moveTo(w * 0.18, h * 0.62);
+  ctx.lineTo(w * 0.82, h * 0.62);
+  ctx.lineTo(w * 0.5, h * 0.94);
+  ctx.closePath();
+  ctx.fill();
   ctx.strokeStyle = "#47281d";
   ctx.lineWidth = 2.2;
   ctx.beginPath();
-  ctx.arc(w * 0.5, h * 0.62, 12, Math.PI * 0.1, Math.PI * 0.9);
+  ctx.arc(w * 0.5, h * 0.64, 12, Math.PI * 0.1, Math.PI * 0.9);
   ctx.stroke();
   ctx.strokeStyle = "#2b1a14";
   ctx.beginPath();
-  ctx.arc(w * 0.5, h * 0.74, 14, Math.PI * 0.2, Math.PI * 0.8);
+  ctx.arc(w * 0.5, h * 0.76, 14, Math.PI * 0.2, Math.PI * 0.8);
   ctx.stroke();
+  ctx.fillStyle = "#2b1a14";
+  ctx.beginPath();
+  ctx.moveTo(w * 0.38, h * 0.6);
+  ctx.quadraticCurveTo(w * 0.5, h * 0.56, w * 0.62, h * 0.6);
+  ctx.quadraticCurveTo(w * 0.5, h * 0.64, w * 0.38, h * 0.6);
+  ctx.fill();
 
   // eyebrows
   ctx.lineWidth = 3;
@@ -393,7 +414,7 @@ function drawChancla(c) {
   ctx.font = `${c.size}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("🩴", c.x + c.size / 2, c.y + c.size / 2);
+  ctx.fillText("🩴💨", c.x + c.size / 2, c.y + c.size / 2);
 }
 
 function drawBullet(b) {
@@ -411,19 +432,19 @@ function drawPet(p) {
 
 function drawDrop(d) {
   if (d.type === "heart") {
-    ctx.font = `22px "Apple Color Emoji", "Segoe UI Emoji"`;
+    ctx.font = `30px "Apple Color Emoji", "Segoe UI Emoji"`;
     ctx.textAlign = "center";
     ctx.fillText("❤️", d.x + d.size / 2, d.y + d.size / 2);
     ctx.fillStyle = "#ff7ab6";
-    ctx.font = "12px Fredoka";
-    ctx.fillText("I love you!", d.x + d.size / 2, d.y + d.size + 10);
+    ctx.font = "14px Fredoka";
+    ctx.fillText("I love you!", d.x + d.size / 2, d.y + d.size + 12);
   } else {
-    ctx.font = `22px "Apple Color Emoji", "Segoe UI Emoji"`;
+    ctx.font = `30px "Apple Color Emoji", "Segoe UI Emoji"`;
     ctx.textAlign = "center";
     ctx.fillText("🍺", d.x + d.size / 2, d.y + d.size / 2);
     ctx.fillStyle = "#f8d04c";
-    ctx.font = "12px Fredoka";
-    ctx.fillText("Slow-mo", d.x + d.size / 2, d.y + d.size + 10);
+    ctx.font = "14px Fredoka";
+    ctx.fillText("Slow-mo", d.x + d.size / 2, d.y + d.size + 12);
   }
 }
 
