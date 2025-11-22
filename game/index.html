@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Isa &amp; Gringo: Chancla Evasion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="frame">
+      <header class="hud">
+        <div class="brand">Isa &amp; Gringo</div>
+        <div class="stats">
+          <span id="score">Score: 0</span>
+          <span id="lives">Lives: ❤️❤️❤️</span>
+          <span id="status"></span>
+        </div>
+      </header>
+
+      <section class="game-shell">
+        <canvas id="game" aria-label="Isa throwing chanclas at the gringo"></canvas>
+        <div class="overlay">
+          <div class="legend">🩴 Dodge the chanclas, collect the love.</div>
+          <div class="controls" aria-hidden="true">
+            <button class="control" data-dir="left">⬅️</button>
+            <button class="control" data-action="shoot">🔥</button>
+            <button class="control" data-dir="right">➡️</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tips">
+        <div>Tap 🔥 or press Space to fling a comeback.</div>
+        <div>Pets drop ❤️ "I love you!" boosts and 🍺 beers that slow the chanclas.</div>
+        <div>Play with swipe, on-screen buttons, or a keyboard.</div>
+      </section>
+    </main>
+
+    <script type="module" src="game.js"></script>
+  </body>
+</html>
