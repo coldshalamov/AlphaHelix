@@ -81,7 +81,7 @@ contract HelixMarket is ReentrancyGuard, AccessControl {
         // I'll just transfer to address(0) to simulate burn, or keep in contract (but prompt says "Burn a fixed fee").
         // I will assume I can burn or just send to 0x0. Let's send to 0x0 for simplicity/safety without roles.
         // token.transfer(address(0), STATEMENT_FEE); -> We just did transferFrom to this, so now we move to 0.
-        token.transfer(address(0), STATEMENT_FEE);
+        token.transfer(address(0x000000000000000000000000000000000000dEaD), STATEMENT_FEE);
 
         uint256 marketId = marketCount++;
         Statement storage s = markets[marketId];
@@ -111,8 +111,7 @@ contract HelixMarket is ReentrancyGuard, AccessControl {
         // But under revealBet it says "Add funds to ... based on choice."
         // We need to know HOW MUCH funds.
         // I will store the amount in a mapping `committedAmount`.
-        bets[marketId][msg.sender][3] = amount; // Index 3 for 'committed but not revealed' placeholder?
-        // Or just a separate mapping. Let's use a separate mapping for clarity.
+        committedAmount[marketId][msg.sender] = amount;
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
     }
@@ -162,7 +161,6 @@ contract HelixMarket is ReentrancyGuard, AccessControl {
         s.resolved = true;
         uint256 totalPool = s.yesPool + s.noPool + s.unalignedPool;
         uint256 fee = totalPool / 100; // 1%
-        uint256 rewardPool = totalPool - fee;
 
         // Originator fee
         if (fee > 0) {
