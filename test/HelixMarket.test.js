@@ -35,6 +35,10 @@ describe("HelixMarket", function () {
     return ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [choice, salt, user.address]);
   }
 
+  function toWei(value) {
+    return typeof value === "bigint" ? value : ethers.parseEther(value);
+  }
+
   describe("Lifecycle and economics", function () {
     it("YES wins, sweeps unaligned, and originator receives 1% fee", async function () {
       const { market, token, owner, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
@@ -170,6 +174,144 @@ describe("HelixMarket", function () {
       await market.connect(userB).commitBet(0, hashA, amountA);
 
       await expect(market.connect(userB).withdrawUnrevealed(0)).to.be.revertedWith("Reveal phase not over");
+    });
+  });
+
+  describe("Invariant payouts and protections", function () {
+    const scenarios = [
+      {
+        name: "YES sweeps unaligned with modest fee",
+        yes: [{ user: "userB", amount: "2.0" }],
+        no: [{ user: "userC", amount: "1.0" }],
+        unaligned: [{ user: "owner", amount: "0.5" }],
+      },
+      {
+        name: "NO whale vs small YES",
+        yes: [{ user: "userB", amount: "0.5" }],
+        no: [{ user: "owner", amount: "50" }],
+        unaligned: [{ user: "userC", amount: "0.25" }],
+      },
+      {
+        name: "exact tie refunds everyone",
+        yes: [{ user: "userB", amount: "3" }],
+        no: [{ user: "userC", amount: "3" }],
+        unaligned: [{ user: "owner", amount: "1" }],
+      },
+      {
+        name: "multiple YES winners share pool",
+        yes: [
+          { user: "userB", amount: "1.25" },
+          { user: "userC", amount: "3" },
+        ],
+        no: [{ user: "owner", amount: "2" }],
+        unaligned: [{ user: "userA", amount: "1" }],
+      },
+      {
+        name: "very small stakes behave",
+        yes: [{ user: "userB", amount: 1n }],
+        no: [{ user: "userC", amount: 2n }],
+        unaligned: [{ user: "owner", amount: 5n }],
+      },
+    ];
+
+    for (const scenario of scenarios) {
+      it(`maintains pool accounting when ${scenario.name}`, async function () {
+        const { market, token, owner, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+        const actors = { owner, userA, userB, userC };
+        const originator = userA;
+        await market.connect(originator).submitStatement(`ipfs://${scenario.name}`, biddingDuration, revealDuration);
+
+        const stakes = [];
+        let yesPool = 0n;
+        let noPool = 0n;
+        let unalignedPool = 0n;
+
+        const registerStakes = async (entries, choice) => {
+          for (const entry of entries) {
+            const actor = actors[entry.user];
+            const amount = toWei(entry.amount);
+            const salt = BigInt(1000 + stakes.length);
+
+            await market.connect(actor).commitBet(0, buildCommit(choice, salt, actor), amount);
+            stakes.push({ actor, choice, amount, salt });
+
+            if (choice === 1) yesPool += amount;
+            else if (choice === 0) noPool += amount;
+            else unalignedPool += amount;
+          }
+        };
+
+        await registerStakes(scenario.yes, 1);
+        await registerStakes(scenario.no, 0);
+        await registerStakes(scenario.unaligned, 2);
+
+        await time.increase(biddingDuration + 1);
+        for (const stake of stakes) {
+          await market.connect(stake.actor).revealBet(0, stake.choice, stake.salt);
+        }
+        await time.increase(revealDuration + 1);
+
+        const originatorBalanceBefore = await token.balanceOf(originator.address);
+        await market.resolve(0);
+        const statement = await market.markets(0);
+        const originatorBalanceAfter = await token.balanceOf(originator.address);
+        const originatorFee = originatorBalanceAfter - originatorBalanceBefore;
+
+        const winners = stakes.filter((stake) => {
+          if (statement.tie) return true;
+          if (statement.outcome) return stake.choice === 1;
+          return stake.choice === 0;
+        });
+
+        let payoutTotal = 0n;
+        for (const stake of winners) {
+          const before = await token.balanceOf(stake.actor.address);
+          await market.connect(stake.actor).claim(0);
+          const after = await token.balanceOf(stake.actor.address);
+          const payout = after - before;
+          payoutTotal += payout;
+
+          if (statement.tie) {
+            expect(payout).to.equal(stake.amount);
+          } else {
+            const totalPool = yesPool + noPool + unalignedPool;
+            const rewardPool = totalPool - originatorFee;
+            const winningPool = statement.outcome ? yesPool : noPool;
+            const expected = (stake.amount * rewardPool) / winningPool;
+            expect(payout).to.equal(expected);
+          }
+        }
+
+        const totalPool = yesPool + noPool + unalignedPool;
+        const accounted = payoutTotal + originatorFee;
+        expect(accounted).to.be.at.most(totalPool);
+        expect(totalPool - accounted).to.be.lessThanOrEqual(BigInt(Math.max(1, winners.length)));
+      });
+    }
+
+    it("prevents losing side from withdrawing more than zero", async function () {
+      const { market, token, owner, userA, userB } = await loadFixture(deployHelixMarketFixture);
+      await market.connect(owner).submitStatement("ipfs://loss-check", biddingDuration, revealDuration);
+
+      const yesAmount = ethers.parseEther("10");
+      const noAmount = ethers.parseEther("1");
+
+      await market.connect(userA).commitBet(0, buildCommit(1, 99, userA), yesAmount);
+      await market.connect(userB).commitBet(0, buildCommit(0, 100, userB), noAmount);
+
+      await time.increase(biddingDuration + 1);
+      await market.connect(userA).revealBet(0, 1, 99);
+      await market.connect(userB).revealBet(0, 0, 100);
+
+      await time.increase(revealDuration + 1);
+      await market.resolve(0);
+
+      await expect(market.connect(userB).claim(0)).to.be.revertedWith("No winning bet");
+
+      const before = await token.balanceOf(userB.address);
+      await expect(market.connect(userB).withdrawUnrevealed(0)).to.be.revertedWith("No unrevealed stake");
+      const after = await token.balanceOf(userB.address);
+      expect(after).to.equal(before);
     });
   });
 });

@@ -13,6 +13,11 @@ AlphaHelix is a commit-reveal prediction market where HLX holders stake on the t
 - **No admin keys:** No pause, override, or admin-only payout paths exist; outcomes are immutable and mechanically determined.
 - **No external oracles:** Outcomes depend solely on on-chain stake balances; no off-chain data sources are consulted.
 
+## Checked Invariants
+- Winner payouts plus the originator fee never exceed the total pool collected for a market; any unallocated dust is bounded by expected integer rounding in pro-rata splits.
+- Pro-rata payouts match the on-chain formula across balanced, skewed, and minimal-stake markets, including when unaligned stake is swept to the winner.
+- Losing bettors cannot withdraw after resolution, and unrevealed withdrawals only operate on still-committed stakes and apply the burn penalty.
+
 ## HLX token and reserve
 - **AlphaHelixToken:** ERC20 with `MINTER_ROLE`/`DEFAULT_ADMIN_ROLE` controlling mint/burn capabilities. Used for market staking and reserve conversions.
 - **HelixReserve:** Fixed-rate AMM (1 ETH ↔ 1000 HLX). `buy` mints HLX for ETH; `sell` burns HLX in exchange for ETH (must convert to whole wei). Owner can seed downstream market AMMs via `seedMarket`.
