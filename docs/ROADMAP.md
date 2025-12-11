@@ -26,9 +26,11 @@
 - [ ] Claim/withdraw UX with clear tie/refund messaging and unrevealed withdrawal flow.
 
 ## Phase 5: Deployment config and scripts
-- [ ] Harden Hardhat network configs for Arbitrum Sepolia and local dev (RPC URLs, gas settings).
-- [ ] Add deployment scripts for token, reserve, and market with environment-driven addresses.
+- [x] Harden Hardhat network configs for Arbitrum Sepolia and local dev (RPC URLs, gas settings).
+- [x] Add deployment scripts for token, reserve, and market with environment-driven addresses.
 - [ ] Document environment variables and verification steps.
+- [ ] Add contract verification helpers for Arbitrum Sepolia deployments.
+- [ ] Wire CI to run Hardhat tests and lint configs before deploys.
 
 ## Phase 6 (optional): Analytics / subgraph / security
 - [ ] Draft subgraph schema for statements, commits, reveals, and claims.
