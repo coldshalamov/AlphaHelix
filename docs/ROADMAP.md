@@ -33,6 +33,7 @@
 - [ ] Wire CI to run Hardhat tests and lint configs before deploys.
 
 ## Phase 6 (optional): Analytics / subgraph / security
+- [x] Add lightweight off-chain indexer for markets and user bets (JSON snapshot for frontend/ops).
 - [ ] Draft subgraph schema for statements, commits, reveals, and claims.
 - [ ] Run an external security review and document threat model gaps.
 - [ ] Add minimal analytics hooks (events logging) without introducing oracles/admin keys.
