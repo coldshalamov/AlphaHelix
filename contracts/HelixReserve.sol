@@ -15,22 +15,26 @@ contract HelixReserve is ReentrancyGuard, Ownable {
     AlphaHelixToken public immutable token;
     uint256 public constant RATE = 1000; // 1 ETH = 1000 HLX
 
+    event Bought(address indexed buyer, uint256 ethIn, uint256 hlxOut);
+    event Sold(address indexed seller, uint256 hlxIn, uint256 ethOut);
+    event MarketSeeded(address indexed marketAMM, uint256 hlxAmount);
+
     constructor(address tokenAddress) Ownable(msg.sender) {
         require(tokenAddress != address(0), "Token address cannot be zero");
         token = AlphaHelixToken(tokenAddress);
     }
 
     function seedMarket(address marketAMM, uint256 hlxAmount) external onlyOwner nonReentrant {
+        require(marketAMM != address(0), "Market AMM cannot be zero");
         require(token.balanceOf(address(this)) >= hlxAmount, "Insufficient HLX reserve");
         require(token.approve(marketAMM, hlxAmount), "Approve failed");
         IMarketAMM(marketAMM).mint(hlxAmount);
+
+        emit MarketSeeded(marketAMM, hlxAmount);
     }
 
     function buy() public payable nonReentrant {
-        require(msg.value > 0, "No ETH sent");
-
-        uint256 hlxAmount = msg.value * RATE;
-        token.mint(msg.sender, hlxAmount);
+        _buy(msg.sender, msg.value);
     }
 
     function sell(uint256 hlxAmount) external nonReentrant {
@@ -46,9 +50,20 @@ contract HelixReserve is ReentrancyGuard, Ownable {
 
         (bool success, ) = msg.sender.call{value: ethAmount}("");
         require(success, "ETH transfer failed");
+
+        emit Sold(msg.sender, hlxAmount, ethAmount);
     }
 
-    receive() external payable {
-        buy();
+    receive() external payable nonReentrant {
+        _buy(msg.sender, msg.value);
+    }
+
+    function _buy(address buyer, uint256 ethIn) internal {
+        require(ethIn > 0, "No ETH sent");
+
+        uint256 hlxAmount = ethIn * RATE;
+        token.mint(buyer, hlxAmount);
+
+        emit Bought(buyer, ethIn, hlxAmount);
     }
 }
