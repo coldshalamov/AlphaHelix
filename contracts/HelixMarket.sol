@@ -24,13 +24,8 @@ contract HelixMarket is ReentrancyGuard {
         uint256 unalignedPool;
         bool resolved;
         bool outcome; // true = YES, false = NO (only valid if resolved and not tie)
+        bool tie; // true when yesPool == noPool at resolution time
         address originator;
-    }
-
-    struct Bet {
-        uint256 amount;
-        uint256 timestamp;
-        bool revealed;
     }
 
     mapping(uint256 => Statement) public markets;
@@ -114,6 +109,7 @@ contract HelixMarket is ReentrancyGuard {
 
         committedAmount[marketId][msg.sender] = 0;
 
+        require(choice <= 2, "Invalid choice");
         if (choice == 1) { // YES
             s.yesPool += amount;
             bets[marketId][msg.sender][1] += amount;
@@ -136,25 +132,16 @@ contract HelixMarket is ReentrancyGuard {
         require(!s.resolved, "Already resolved");
 
         s.resolved = true;
+        (s.tie, s.outcome) = _determineOutcome(s.yesPool, s.noPool);
+
         uint256 totalPool = s.yesPool + s.noPool + s.unalignedPool;
-        bool tie = false;
-        if (s.yesPool > s.noPool) {
-            s.outcome = true; // YES Wins
-        } else if (s.noPool > s.yesPool) {
-            s.outcome = false; // NO Wins
-        } else {
-            tie = true;
+        uint256 fee = s.tie ? 0 : _calculateFee(totalPool);
+
+        if (fee > 0) {
+            token.transfer(s.originator, fee);
         }
 
-        uint256 fee = 0;
-        if (!tie) {
-            fee = _calculateFee(totalPool);
-            if (fee > 0) {
-                token.transfer(s.originator, fee);
-            }
-        }
-
-        emit MarketResolved(marketId, s.outcome, tie, totalPool, fee);
+        emit MarketResolved(marketId, s.outcome, s.tie, totalPool, fee);
     }
 
     /// @notice Claim winnings (or refunds in a tie) after resolution.
@@ -163,29 +150,12 @@ contract HelixMarket is ReentrancyGuard {
         Statement storage s = markets[marketId];
         require(s.resolved, "Not resolved");
 
-        uint256 userBet = 0;
-        uint256 winningPool = 0;
-        uint256 totalPool = s.yesPool + s.noPool + s.unalignedPool;
-        bool tie = s.yesPool == s.noPool;
-        uint256 fee = tie ? 0 : _calculateFee(totalPool);
-        uint256 rewardPool = totalPool - fee;
-
-        if (tie) {
-            userBet = bets[marketId][msg.sender][0] + bets[marketId][msg.sender][1] + bets[marketId][msg.sender][2];
-            winningPool = totalPool;
-        } else if (s.outcome) { // YES Won
-            userBet = bets[marketId][msg.sender][1];
-            winningPool = s.yesPool;
-        } else { // NO Won
-            userBet = bets[marketId][msg.sender][0];
-            winningPool = s.noPool;
-        }
-
+        (uint256 userBet, uint256 winningPool, uint256 rewardPool) = _payoutInputs(s, marketId);
         require(userBet > 0, "No winning bet");
 
-        _clearUserBets(marketId, tie, s.outcome);
+        _clearUserBets(marketId, s.tie, s.outcome);
 
-        uint256 payout = tie ? userBet : (userBet * rewardPool) / winningPool;
+        uint256 payout = s.tie ? userBet : (userBet * rewardPool) / winningPool;
         require(token.transfer(msg.sender, payout), "Transfer failed");
     }
 
@@ -214,6 +184,36 @@ contract HelixMarket is ReentrancyGuard {
 
     function _calculateFee(uint256 totalPool) internal pure returns (uint256) {
         return (totalPool * ORIGINATOR_FEE_BPS) / 10000;
+    }
+
+    function _determineOutcome(uint256 yesPool, uint256 noPool) internal pure returns (bool tie, bool outcome) {
+        if (yesPool > noPool) {
+            return (false, true);
+        } else if (noPool > yesPool) {
+            return (false, false);
+        }
+        return (true, false);
+    }
+
+    function _payoutInputs(Statement storage s, uint256 marketId)
+        internal
+        view
+        returns (uint256 userBet, uint256 winningPool, uint256 rewardPool)
+    {
+        uint256 totalPool = s.yesPool + s.noPool + s.unalignedPool;
+        uint256 fee = s.tie ? 0 : _calculateFee(totalPool);
+        rewardPool = totalPool - fee;
+
+        if (s.tie) {
+            userBet = bets[marketId][msg.sender][0] + bets[marketId][msg.sender][1] + bets[marketId][msg.sender][2];
+            winningPool = totalPool;
+        } else if (s.outcome) {
+            userBet = bets[marketId][msg.sender][1];
+            winningPool = s.yesPool;
+        } else {
+            userBet = bets[marketId][msg.sender][0];
+            winningPool = s.noPool;
+        }
     }
 
     function _clearUserBets(uint256 marketId, bool tie, bool outcome) internal {
