@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/components/*": ["src/components/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/config/*": ["src/config/*"],
+      "@/styles/*": ["src/styles/*"],
+      "@/abis": ["src/abis/index.js"],
+      "@/abis/*": ["src/abis/*"],
+      "@/config": ["src/config"],
+      "@/styles": ["src/styles"],
+      "@/lib": ["src/lib"],
+      "@/components": ["src/components"]
+    }
+  }
+}
