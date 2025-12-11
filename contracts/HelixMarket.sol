@@ -58,7 +58,7 @@ contract HelixMarket is ReentrancyGuard {
     /// @param revealDuration Duration of the reveal phase in seconds.
     function submitStatement(string memory ipfsCid, uint256 biddingDuration, uint256 revealDuration) external nonReentrant {
         require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
-        token.transfer(BURN_ADDRESS, STATEMENT_FEE);
+        require(token.transfer(BURN_ADDRESS, STATEMENT_FEE), "Burn transfer failed");
 
         uint256 marketId = marketCount++;
         Statement storage s = markets[marketId];
