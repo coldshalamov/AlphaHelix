@@ -1,143 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
-import { parseEther, keccak256, encodePacked, toBytes } from 'viem'; // utility from viem
-import contracts from '../config/contracts.json';
+import { useEffect, useMemo, useState } from 'react';
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { encodePacked, keccak256, parseEther } from 'viem';
+import contracts from '@/config/contracts.json';
+import { marketAbi, tokenAbi } from '@/abis';
 
-// ABI Snippet
-const MarketABI = [
-  { inputs: [{ internalType: 'uint256', name: 'marketId', type: 'uint256' }, { internalType: 'bytes32', name: 'commitHash', type: 'bytes32' }, { internalType: 'uint256', name: 'amount', type: 'uint256' }], name: 'commitBet', outputs: [], stateMutability: 'nonpayable', type: 'function' },
-  { inputs: [{ internalType: 'uint256', name: 'marketId', type: 'uint256' }, { internalType: 'uint8', name: 'choice', type: 'uint8' }, { internalType: 'uint256', name: 'salt', type: 'uint256' }], name: 'revealBet', outputs: [], stateMutability: 'nonpayable', type: 'function' },
-    { inputs: [{ internalType: 'address', name: 'spender', type: 'address' }, { internalType: 'uint256', name: 'amount', type: 'uint256' }], name: 'approve', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'nonpayable', type: 'function' }
+const CHOICES = [
+  { value: 1, label: 'YES' },
+  { value: 0, label: 'NO' },
+  { value: 2, label: 'UNALIGNED' },
 ];
-const TokenABI = [
-    { inputs: [{ internalType: 'address', name: 'spender', type: 'address' }, { internalType: 'uint256', name: 'amount', type: 'uint256' }], name: 'approve', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'nonpayable', type: 'function' }
-];
-
 
 export default function BettingWidget({ marketId, commitEnd, revealEnd }) {
   const { address } = useAccount();
-  const { writeContract } = useWriteContract();
-
+  const { writeContractAsync, isPending } = useWriteContract();
   const [amount, setAmount] = useState('');
-  const [choice, setChoice] = useState('1'); // Default YES (1). 0=NO, 2=UNALIGNED
-  const [phase, setPhase] = useState('COMMIT'); // COMMIT, REVEAL, ENDED
+  const [choice, setChoice] = useState(1);
+  const [phase, setPhase] = useState('COMMIT');
   const [storedBet, setStoredBet] = useState(null);
+  const [status, setStatus] = useState('');
+  const [txHash, setTxHash] = useState();
+
+  const { data: allowance } = useReadContract({
+    address: contracts.AlphaHelixToken,
+    abi: tokenAbi,
+    functionName: 'allowance',
+    args: address ? [address, contracts.HelixMarket] : undefined,
+    query: { enabled: Boolean(address) },
+  });
+
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+
+  const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
+  const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
 
   useEffect(() => {
-    const checkPhase = () => {
+    const updatePhase = () => {
       const now = Math.floor(Date.now() / 1000);
-      if (now < commitEnd) setPhase('COMMIT');
-      else if (now < revealEnd) setPhase('REVEAL');
+      if (now < commitEndSeconds) setPhase('COMMIT');
+      else if (now < revealEndSeconds) setPhase('REVEAL');
       else setPhase('ENDED');
     };
-    checkPhase();
-    const interval = setInterval(checkPhase, 5000);
-    return () => clearInterval(interval);
-  }, [commitEnd, revealEnd]);
+    updatePhase();
+    const id = setInterval(updatePhase, 4000);
+    return () => clearInterval(id);
+  }, [commitEndSeconds, revealEndSeconds]);
 
   useEffect(() => {
-    // Check localStorage for existing commit
-    if (address && marketId) {
+    if (address && marketId !== undefined) {
       const key = `helix_bet_${marketId}_${address}`;
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        setStoredBet(JSON.parse(saved));
-      }
+      const saved = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+      if (saved) setStoredBet(JSON.parse(saved));
     }
   }, [address, marketId]);
 
-  const handleCommit = async () => {
-    if (!amount) return;
+  useEffect(() => {
+    if (isConfirming) setStatus('Transaction pending...');
+    else if (isSuccess) setStatus('Transaction confirmed');
+  }, [isConfirming, isSuccess]);
 
-    // 1. Generate Salt
-    const randomBuffer = new Uint8Array(32);
-    crypto.getRandomValues(randomBuffer);
-    const salt = BigInt('0x' + Array.from(randomBuffer).map(b => b.toString(16).padStart(2, '0')).join(''));
-
-    // 2. Hash
-    // solidity: keccak256(abi.encodePacked(choice, salt, msg.sender))
-    // viem: keccak256(encodePacked(['uint8', 'uint256', 'address'], [choice, salt, address]))
-    const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [parseInt(choice), salt, address]));
-
-    // 3. Save to storage
-    const betData = {
-      marketId,
-      salt: salt.toString(), // Store as string to avoid JSON issues
-      choice: parseInt(choice),
-      amount,
-      hash
-    };
-    localStorage.setItem(`helix_bet_${marketId}_${address}`, JSON.stringify(betData));
-    setStoredBet(betData);
-
-    // 4. Approve Token (Assuming user needs to approve market)
-    // In a real app, check allowance. Here we just blast approve for simplicity or assume it.
-    writeContract({
-        address: contracts.AlphaHelixToken,
-        abi: TokenABI,
-        functionName: 'approve',
-        args: [contracts.HelixMarket, parseEther(amount)],
-    });
-
-    // 5. Commit
-    writeContract({
-      address: contracts.HelixMarket,
-      abi: MarketABI,
-      functionName: 'commitBet',
-      args: [marketId, hash, parseEther(amount)],
-    });
+  const persistBet = (data) => {
+    if (!address) return;
+    const key = `helix_bet_${marketId}_${address}`;
+    localStorage.setItem(key, JSON.stringify(data));
+    setStoredBet(data);
   };
 
-  const handleReveal = () => {
-    if (!storedBet) return alert("No local bet found to reveal!");
+  const handleCommit = async () => {
+    if (!amount) {
+      setStatus('Enter an amount of HLX to stake.');
+      return;
+    }
+    if (typeof window === 'undefined' || !window.crypto) {
+      setStatus('Secure random generator unavailable.');
+      return;
+    }
+    try {
+      setStatus('');
+      const randomBuffer = new Uint8Array(32);
+      window.crypto.getRandomValues(randomBuffer);
+      const salt = BigInt('0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''));
+      const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
+      const betData = { marketId, salt: salt.toString(), choice: Number(choice), amount, hash };
+      persistBet(betData);
 
-    writeContract({
-      address: contracts.HelixMarket,
-      abi: MarketABI,
-      functionName: 'revealBet',
-      args: [marketId, storedBet.choice, BigInt(storedBet.salt)],
-    });
+      const amountValue = parseEther(amount);
+      if (!allowance || allowance < amountValue) {
+        const approveHash = await writeContractAsync({
+          address: contracts.AlphaHelixToken,
+          abi: tokenAbi,
+          functionName: 'approve',
+          args: [contracts.HelixMarket, amountValue],
+        });
+        setTxHash(approveHash);
+      }
+
+      const commitHash = await writeContractAsync({
+        address: contracts.HelixMarket,
+        abi: marketAbi,
+        functionName: 'commitBet',
+        args: [BigInt(marketId), hash, amountValue],
+      });
+      setTxHash(commitHash);
+      setStatus('Commit sent. Keep your device to reveal later.');
+    } catch (err) {
+      setStatus(err?.shortMessage || err?.message || 'Commit failed');
+    }
+  };
+
+  const handleReveal = async () => {
+    if (!storedBet) {
+      setStatus('No stored bet found for this market.');
+      return;
+    }
+    try {
+      setStatus('');
+      const revealHash = await writeContractAsync({
+        address: contracts.HelixMarket,
+        abi: marketAbi,
+        functionName: 'revealBet',
+        args: [BigInt(marketId), storedBet.choice, BigInt(storedBet.salt)],
+      });
+      setTxHash(revealHash);
+      setStatus('Reveal submitted.');
+    } catch (err) {
+      setStatus(err?.shortMessage || err?.message || 'Reveal failed');
+    }
   };
 
   if (phase === 'COMMIT') {
     return (
-      <div className="p-4 border rounded bg-gray-50">
-        <h3 className="font-bold">Commit Phase</h3>
-        <div className="flex gap-2 my-2">
-          <select value={choice} onChange={(e) => setChoice(e.target.value)} className="border p-2">
-            <option value="1">YES</option>
-            <option value="0">NO</option>
-            <option value="2">UNALIGNED</option>
+      <div className="card">
+        <h3 className="font-semibold">Commit phase</h3>
+        <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
+        <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
+          <select className="input" value={choice} onChange={(e) => setChoice(Number(e.target.value))}>
+            {CHOICES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
           </select>
           <input
             type="number"
-            placeholder="Amount HLX"
+            min="0"
+            step="0.01"
+            className="input"
+            placeholder="Amount of HLX"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="border p-2"
           />
+          <button className="button primary" onClick={handleCommit} disabled={isPending}>
+            {isPending ? 'Submitting...' : 'Commit bet'}
+          </button>
         </div>
-        <button onClick={handleCommit} className="bg-blue-600 text-white px-4 py-2 rounded">Commit Bet</button>
-        {storedBet && <p className="text-xs text-green-600 mt-2">Bet locally saved.</p>}
+        {storedBet && <div className="status">Commit saved locally. Keep this device for reveal.</div>}
+        {status && <div className="status">{status}</div>}
       </div>
     );
   }
 
   if (phase === 'REVEAL') {
     return (
-      <div className="p-4 border rounded bg-yellow-50">
-        <h3 className="font-bold">Reveal Phase</h3>
+      <div className="card" style={{ borderColor: '#fef3c7' }}>
+        <h3 className="font-semibold">Reveal phase</h3>
         {storedBet ? (
-          <div>
-            <p>You have a saved bet: {storedBet.choice === 1 ? 'YES' : storedBet.choice === 0 ? 'NO' : 'UNALIGNED'} ({storedBet.amount} HLX)</p>
-            <button onClick={handleReveal} className="bg-yellow-600 text-white px-4 py-2 rounded mt-2">Reveal My Bet</button>
+          <div className="section">
+            <div className="label">Stored choice</div>
+            <div className="value">
+              {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
+            </div>
+            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isPending}>
+              {isPending ? 'Revealing...' : 'Reveal my bet'}
+            </button>
           </div>
         ) : (
-          <p>No local bet found for this market.</p>
+          <p className="helper">No locally stored commitment found for this address and market.</p>
         )}
+        {status && <div className="status">{status}</div>}
       </div>
     );
   }
 
-  return <div className="p-4 border rounded">Market Closed</div>;
+  return (
+    <div className="card" style={{ borderColor: '#e5e7eb' }}>
+      <h3 className="font-semibold">Market closed</h3>
+      <p className="helper">Commit and reveal windows have ended.</p>
+    </div>
+  );
 }

@@ -16,9 +16,9 @@
 - [ ] Integrate gas snapshots or fuzzing for payout calculations.
 
 ## Phase 3: Frontend scaffolding
-- [ ] Convert frontend/ into a cohesive Next.js app shell with routing for market list/detail.
-- [ ] Wire wagmi connectors and contract calls for commit/reveal/claim flows.
-- [ ] Add client-side validation for salt handling and timing windows.
+- [x] Convert frontend/ into a cohesive Next.js app shell with routing for market list/detail.
+- [x] Wire wagmi connectors and contract calls for commit/reveal/claim flows (commit/reveal live; claim UX pending).
+- [ ] Add client-side validation for salt handling and timing windows (countdowns/guards still needed).
 
 ## Phase 4: UX polish
 - [ ] Market listing cards with live commit/reveal countdowns.
