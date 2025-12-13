@@ -78,6 +78,7 @@ contract HelixMarket is ReentrancyGuard {
         Statement storage s = markets[marketId];
         require(block.timestamp < s.commitEndTime, "Commit phase over");
         require(amount > 0, "Amount must be > 0");
+        require(!hasCommitted[marketId][msg.sender], "Already committed");
 
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
