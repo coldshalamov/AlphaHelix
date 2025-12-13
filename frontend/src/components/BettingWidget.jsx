@@ -271,21 +271,27 @@ export default function BettingWidget({
                 value={c.value}
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
-                style={{ display: 'none' }}
+                className="visually-hidden"
               />
               {c.label}
             </label>
           ))}
         </div>
-        <input
-          type="number"
-          min="0"
-          step="0.01"
-          className="input"
-          placeholder="Amount of HLX"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
+        <div>
+          <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
+            Amount to Stake
+          </label>
+          <input
+            id="bet-amount"
+            type="number"
+            min="0"
+            step="0.01"
+            className="input"
+            placeholder="Amount of HLX"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </div>
         <button
           className="button primary"
           onClick={handleCommit}
@@ -294,8 +300,8 @@ export default function BettingWidget({
           {isPending || isConfirming ? 'Submitting...' : 'Commit bet'}
         </button>
       </div>
-      {storedBet && <div className="status">Commit saved locally. Keep this device for reveal.</div>}
-      {status && <div className="status">{status}</div>}
+      {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
+      {status && <div className="status" role="alert">{status}</div>}
     </div>
   );
 }
