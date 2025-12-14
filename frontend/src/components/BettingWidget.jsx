@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { encodePacked, keccak256, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -50,18 +50,21 @@ export default function BettingWidget({
   }, [address, marketId]);
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
-  const persistBet = (data) => {
+  // Optimization: Wrapped in useCallback to prevent unnecessary effect executions
+  // since this component re-renders every second due to the countdown timer.
+  const persistBet = useCallback((data) => {
     if (!storageKey || typeof window === 'undefined') return;
     localStorage.setItem(storageKey, JSON.stringify(data));
     setStoredBet(data);
-  };
+  }, [storageKey]);
 
-  const clearStoredBet = () => {
+  // Optimization: Wrapped in useCallback to prevent unnecessary effect executions
+  const clearStoredBet = useCallback(() => {
     if (storageKey && typeof window !== 'undefined') {
       localStorage.removeItem(storageKey);
     }
     setStoredBet(null);
-  };
+  }, [storageKey]);
 
   useEffect(() => {
     if (storageKey && typeof window !== 'undefined') {
