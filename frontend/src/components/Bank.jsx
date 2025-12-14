@@ -3,6 +3,7 @@ import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTr
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
+import Spinner from './Spinner';
 
 export default function Bank() {
   const { address } = useAccount();
@@ -117,7 +118,14 @@ export default function Bank() {
               onClick={handleBuy}
               disabled={isWriting || !buyAmount}
             >
-              {isWriting ? 'Submitting...' : 'Buy HLX'}
+              {isWriting ? (
+                <>
+                  <Spinner />
+                  Submitting...
+                </>
+              ) : (
+                'Buy HLX'
+              )}
             </button>
           </div>
 
@@ -139,7 +147,14 @@ export default function Bank() {
               onClick={handleSell}
               disabled={isWriting || !sellAmount}
             >
-              {isWriting ? 'Submitting...' : 'Approve & Sell'}
+              {isWriting ? (
+                <>
+                  <Spinner />
+                  Submitting...
+                </>
+              ) : (
+                'Approve & Sell'
+              )}
             </button>
             <p className="helper">Allowances reset each time for simplicity.</p>
           </div>
