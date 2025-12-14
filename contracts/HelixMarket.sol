@@ -11,6 +11,7 @@ contract HelixMarket is ReentrancyGuard {
     uint256 public constant STATEMENT_FEE = 100 * 10**18; // 100 HLX
     uint256 public constant ORIGINATOR_FEE_BPS = 100; // 1%
     uint256 public constant UNREVEALED_PENALTY_BPS = 100; // 1% burned on unrevealed withdrawals
+    uint256 public constant MIN_REVEAL_DURATION = 1 hours;
     uint256 public marketCount;
     // Use a dead address for burning since we can't transfer to address(0)
     address constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
@@ -57,6 +58,7 @@ contract HelixMarket is ReentrancyGuard {
     /// @param biddingDuration Duration of the commit phase in seconds.
     /// @param revealDuration Duration of the reveal phase in seconds.
     function submitStatement(string memory ipfsCid, uint256 biddingDuration, uint256 revealDuration) external nonReentrant {
+        require(revealDuration >= MIN_REVEAL_DURATION, "Reveal duration too short");
         require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
         require(token.transfer(BURN_ADDRESS, STATEMENT_FEE), "Burn transfer failed");
 
