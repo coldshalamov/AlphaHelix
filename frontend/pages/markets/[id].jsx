@@ -5,6 +5,7 @@ import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
+import Spinner from '@/components/Spinner';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
@@ -231,7 +232,14 @@ export default function MarketDetailPage() {
                 !resolved || claimable === 0n || isClaimPending || isClaimConfirming || (chainId && chainId !== expectedChainId)
               }
             >
-              {isClaimPending || isClaimConfirming ? 'Claiming...' : 'Claim winnings / refund'}
+              {isClaimPending || isClaimConfirming ? (
+                <>
+                  <Spinner />
+                  Claiming...
+                </>
+              ) : (
+                'Claim winnings / refund'
+              )}
             </button>
             {chainId && chainId !== expectedChainId && (
               <div className="helper">Wrong network detected. Switch chains to claim.</div>

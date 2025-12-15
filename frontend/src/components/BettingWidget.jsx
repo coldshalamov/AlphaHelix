@@ -3,6 +3,7 @@ import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, 
 import { encodePacked, keccak256, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
+import Spinner from './Spinner';
 
 const CHOICES = [
   { value: 1, label: 'YES' },
@@ -233,7 +234,14 @@ export default function BettingWidget({
               onClick={handleReveal}
               disabled={isPending || isConfirming}
             >
-              {isPending || isConfirming ? 'Revealing...' : 'Reveal my bet'}
+              {isPending || isConfirming ? (
+                <>
+                  <Spinner />
+                  Revealing...
+                </>
+              ) : (
+                'Reveal my bet'
+              )}
             </button>
           </div>
         ) : (
@@ -300,7 +308,14 @@ export default function BettingWidget({
           onClick={handleCommit}
           disabled={isPending || isConfirming || !amount}
         >
-          {isPending || isConfirming ? 'Submitting...' : 'Commit bet'}
+          {isPending || isConfirming ? (
+            <>
+              <Spinner />
+              Submitting...
+            </>
+          ) : (
+            'Commit bet'
+          )}
         </button>
       </div>
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
