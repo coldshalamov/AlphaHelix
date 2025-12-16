@@ -26,7 +26,7 @@ describe("HelixMarket Security: Overwrite Commitment", function () {
   }
 
   const biddingDuration = 60;
-  const revealDuration = 60;
+  const revealDuration = 3600;
 
   function buildCommit(choice, salt, user) {
     return ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [choice, salt, user.address]);
