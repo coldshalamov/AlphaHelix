@@ -6,6 +6,7 @@ import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, 
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import Spinner from '@/components/Spinner';
+import Countdown from '@/components/Countdown';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
@@ -14,7 +15,6 @@ export default function MarketDetailPage() {
   const chainId = useChainId();
   const router = useRouter();
   const { id } = router.query;
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
 
   const marketId = useMemo(() => {
@@ -76,10 +76,38 @@ export default function MarketDetailPage() {
   const [txHash, setTxHash] = useState();
   const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
+  const [marketState, setMarketState] = useState('UNKNOWN');
+
+  const marketData = market || [];
+  const commitEndTime = marketData[1];
+  const revealEndTime = marketData[2];
+  const resolved = marketData[6];
+
   useEffect(() => {
-    const timer = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!commitEndTime || !revealEndTime) return;
+
+    const checkState = () => {
+      const now = Math.floor(Date.now() / 1000);
+      const commitEndSeconds = Number(commitEndTime);
+      const revealEndSeconds = Number(revealEndTime);
+
+      if (now < commitEndSeconds) {
+        setMarketState('COMMIT');
+        const ms = (commitEndSeconds - now) * 1000;
+        if (ms < 2147483647) setTimeout(checkState, ms + 1000);
+      } else if (now < revealEndSeconds) {
+        setMarketState('REVEAL');
+        const ms = (revealEndSeconds - now) * 1000;
+        if (ms < 2147483647) setTimeout(checkState, ms + 1000);
+      } else if (resolved) {
+        setMarketState('CLOSED');
+      } else {
+        setMarketState('AFTER_REVEAL_NOT_RESOLVED');
+      }
+    };
+
+    checkState();
+  }, [commitEndTime, revealEndTime, resolved]);
 
   useEffect(() => {
     if (isClaimConfirming) setStatus('Claim transaction pending...');
@@ -90,39 +118,16 @@ export default function MarketDetailPage() {
   if (error) return <div className="status">Failed to load market.</div>;
   if (isLoading || !market) return <div className="status">Fetching market data...</div>;
 
-  const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] = market;
+  const [ipfsCid, , , yesPool, noPool, unalignedPool, , outcome, tie, originator] = market;
 
-  const marketState = useMemo(() => {
-    if (!commitEndTime || !revealEndTime) return 'UNKNOWN';
-    const commitEndSeconds = Number(commitEndTime);
-    const revealEndSeconds = Number(revealEndTime);
-    if (now < commitEndSeconds) return 'COMMIT';
-    if (now >= commitEndSeconds && now < revealEndSeconds) return 'REVEAL';
-    if (now >= revealEndSeconds && resolved) return 'CLOSED';
-    if (now >= revealEndSeconds && !resolved) return 'AFTER_REVEAL_NOT_RESOLVED';
-    return 'UNKNOWN';
-  }, [commitEndTime, revealEndTime, now, resolved]);
-
-  const commitCountdown = useMemo(() => {
-    if (!commitEndTime) return null;
-    const secondsLeft = Number(commitEndTime) - now;
-    return secondsLeft > 0 ? formatDuration(secondsLeft) : null;
-  }, [commitEndTime, now]);
-
-  const revealCountdown = useMemo(() => {
-    if (!revealEndTime) return null;
-    const secondsLeft = Number(revealEndTime) - now;
-    return secondsLeft > 0 ? formatDuration(secondsLeft) : null;
-  }, [revealEndTime, now]);
-
-  const claimable = useMemo(() => {
+  const claimable = (() => {
     if (!resolved || !address) return 0n;
     if (tie) {
       return (yesBet || 0n) + (noBet || 0n) + (unalignedBet || 0n);
     }
     if (outcome) return yesBet || 0n;
     return noBet || 0n;
-  }, [address, noBet, outcome, resolved, tie, unalignedBet, yesBet]);
+  })();
 
   const handleClaim = async () => {
     if (!address) {
@@ -158,12 +163,18 @@ export default function MarketDetailPage() {
           <div>
             <div className="label">Commit end</div>
             <div className="value">{new Date(Number(commitEndTime) * 1000).toLocaleString()}</div>
-            {commitCountdown && <div className="helper">Time left: {commitCountdown}</div>}
+            <Countdown
+              targetSeconds={Number(commitEndTime)}
+              render={(t) => <div className="helper">Time left: {t}</div>}
+            />
           </div>
           <div>
             <div className="label">Reveal end</div>
             <div className="value">{new Date(Number(revealEndTime) * 1000).toLocaleString()}</div>
-            {revealCountdown && <div className="helper">Time left: {revealCountdown}</div>}
+            <Countdown
+              targetSeconds={Number(revealEndTime)}
+              render={(t) => <div className="helper">Time left: {t}</div>}
+            />
           </div>
           <div>
             <div className="label">Originator</div>
@@ -261,17 +272,4 @@ export default function MarketDetailPage() {
       />
     </div>
   );
-}
-
-function formatDuration(seconds) {
-  const s = Math.max(0, seconds);
-  const minutes = Math.floor(s / 60);
-  const secs = s % 60;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const parts = [];
-  if (hours > 0) parts.push(`${hours}h`);
-  if (mins > 0) parts.push(`${mins}m`);
-  parts.push(`${secs}s`);
-  return parts.join(' ');
 }
