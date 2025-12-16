@@ -301,12 +301,13 @@ export default function BettingWidget({
             placeholder="Amount of HLX"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            aria-describedby="status-message"
           />
         </div>
         <button
           className="button primary"
           onClick={handleCommit}
-          disabled={isPending || isConfirming || !amount}
+          disabled={isPending || isConfirming}
         >
           {isPending || isConfirming ? (
             <>
@@ -319,7 +320,11 @@ export default function BettingWidget({
         </button>
       </div>
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
-      {status && <div className="status" role="alert">{status}</div>}
+      {status && (
+        <div id="status-message" className="status" role="status" aria-live="polite">
+          {status}
+        </div>
+      )}
     </div>
   );
 }

@@ -40,6 +40,10 @@ export default function Bank() {
 
   const handleBuy = async () => {
     setStatus('');
+    if (!buyAmount) {
+      setStatus('Enter an amount of ETH to spend.');
+      return;
+    }
     try {
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
@@ -55,6 +59,10 @@ export default function Bank() {
 
   const handleSell = async () => {
     setStatus('');
+    if (!sellAmount) {
+      setStatus('Enter an amount of HLX to sell.');
+      return;
+    }
     try {
       const hlxValue = parseEther(sellAmount || '0');
       const approveHash = await writeContractAsync({
@@ -111,12 +119,13 @@ export default function Bank() {
               placeholder="0.1"
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
+              aria-label="Amount of ETH to spend"
             />
             <button
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting || !buyAmount}
+              disabled={isWriting}
             >
               {isWriting ? (
                 <>
@@ -140,12 +149,13 @@ export default function Bank() {
               placeholder="100"
               value={sellAmount}
               onChange={(e) => setSellAmount(e.target.value)}
+              aria-label="Amount of HLX to sell"
             />
             <button
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting || !sellAmount}
+              disabled={isWriting}
             >
               {isWriting ? (
                 <>
@@ -160,9 +170,21 @@ export default function Bank() {
           </div>
         </div>
 
-        {status && <div className="status">{status}</div>}
-        {isConfirming && <div className="status">Awaiting confirmation...</div>}
-        {isSuccess && <div className="status">Latest transaction confirmed.</div>}
+        {status && (
+          <div className="status" role="status" aria-live="polite">
+            {status}
+          </div>
+        )}
+        {isConfirming && (
+          <div className="status" role="status" aria-live="polite">
+            Awaiting confirmation...
+          </div>
+        )}
+        {isSuccess && (
+          <div className="status" role="status" aria-live="polite">
+            Latest transaction confirmed.
+          </div>
+        )}
       </div>
     </div>
   );
