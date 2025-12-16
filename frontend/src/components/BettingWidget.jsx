@@ -294,6 +294,7 @@ export default function BettingWidget({
           </label>
           <input
             id="bet-amount"
+            aria-describedby="bet-status"
             type="number"
             min="0"
             step="0.01"
@@ -306,7 +307,7 @@ export default function BettingWidget({
         <button
           className="button primary"
           onClick={handleCommit}
-          disabled={isPending || isConfirming || !amount}
+          disabled={isPending || isConfirming}
         >
           {isPending || isConfirming ? (
             <>
@@ -319,7 +320,7 @@ export default function BettingWidget({
         </button>
       </div>
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
-      {status && <div className="status" role="alert">{status}</div>}
+      {status && <div id="bet-status" className="status" role="alert">{status}</div>}
     </div>
   );
 }
