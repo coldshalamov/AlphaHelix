@@ -38,8 +38,19 @@ export default function Bank() {
     }
   }, [hlxBalance]);
 
+  const liveStatus = useMemo(() => {
+    // One message, one announcer.
+    if (isConfirming) return 'Awaiting confirmation...';
+    if (isSuccess) return 'Latest transaction confirmed.';
+    return status;
+  }, [isConfirming, isSuccess, status]);
+
   const handleBuy = async () => {
     setStatus('');
+    if (!buyAmount) {
+      setStatus('Enter an amount of ETH to spend.');
+      return;
+    }
     try {
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
@@ -55,6 +66,10 @@ export default function Bank() {
 
   const handleSell = async () => {
     setStatus('');
+    if (!sellAmount) {
+      setStatus('Enter an amount of HLX to sell.');
+      return;
+    }
     try {
       const hlxValue = parseEther(sellAmount || '0');
       const approveHash = await writeContractAsync({
@@ -64,6 +79,7 @@ export default function Bank() {
         args: [contracts.HelixReserve, hlxValue],
       });
       setTxHash(approveHash);
+
       const sellHash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
@@ -114,12 +130,13 @@ export default function Bank() {
               placeholder="0.1"
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
+              aria-label="Amount of ETH to spend"
             />
             <button
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting || !buyAmount}
+              disabled={isWriting}
             >
               {isWriting ? (
                 <>
@@ -146,12 +163,13 @@ export default function Bank() {
               placeholder="100"
               value={sellAmount}
               onChange={(e) => setSellAmount(e.target.value)}
+              aria-label="Amount of HLX to sell"
             />
             <button
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting || !sellAmount}
+              disabled={isWriting}
             >
               {isWriting ? (
                 <>
@@ -167,9 +185,7 @@ export default function Bank() {
         </div>
 
         <div role="status" aria-live="polite">
-          {status && <div className="status">{status}</div>}
-          {isConfirming && <div className="status">Awaiting confirmation...</div>}
-          {isSuccess && <div className="status">Latest transaction confirmed.</div>}
+          {liveStatus ? <div className="status">{liveStatus}</div> : null}
         </div>
       </div>
     </div>

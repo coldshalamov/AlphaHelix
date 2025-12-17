@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { formatEther } from 'viem';
-import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import Spinner from '@/components/Spinner';
@@ -26,50 +26,64 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
-  const { data: market, error, isLoading } = useReadContract({
+  const contractConfig = {
     address: contracts.HelixMarket,
     abi: marketAbi,
-    functionName: 'markets',
-    args: marketId !== undefined ? [marketId] : undefined,
-    query: { enabled: marketId !== undefined },
-    watch: true,
+  };
+
+  // Optimization: Batch multiple contract reads into a single multicall/RPC request
+  // This reduces network waterfall and synchronizes loading states
+  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+    contracts: [
+      {
+        ...contractConfig,
+        functionName: 'markets',
+        args: marketId !== undefined ? [marketId] : undefined,
+      },
+      // Conditional user data fetches
+      ...(marketId !== undefined && address ? [
+        {
+          ...contractConfig,
+          functionName: 'bets',
+          args: [marketId, address, 1], // Yes bet
+        },
+        {
+          ...contractConfig,
+          functionName: 'bets',
+          args: [marketId, address, 0], // No bet
+        },
+        {
+          ...contractConfig,
+          functionName: 'bets',
+          args: [marketId, address, 2], // Unaligned bet
+        },
+        {
+           ...contractConfig,
+           functionName: 'committedAmount',
+           args: [marketId, address],
+        }
+      ] : [])
+    ],
+    query: {
+       enabled: marketId !== undefined,
+       // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)
+       refetchInterval: 5000
+    }
   });
 
-  const { data: yesBet } = useReadContract({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-    functionName: 'bets',
-    args: marketId !== undefined && address ? [marketId, address, 1] : undefined,
-    query: { enabled: marketId !== undefined && Boolean(address) },
-    watch: true,
-  });
+  const market = readResults?.[0]?.result;
 
-  const { data: noBet } = useReadContract({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-    functionName: 'bets',
-    args: marketId !== undefined && address ? [marketId, address, 0] : undefined,
-    query: { enabled: marketId !== undefined && Boolean(address) },
-    watch: true,
-  });
+  // Destructure based on whether address was present.
+  // If address is missing, these will be undefined as the array is shorter.
+  // Note: We check address presence to align indices.
+  const userResultsBaseIndex = 1;
+  const yesBet = address ? readResults?.[userResultsBaseIndex]?.result : undefined;
+  const noBet = address ? readResults?.[userResultsBaseIndex + 1]?.result : undefined;
+  const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
+  const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
 
-  const { data: unalignedBet } = useReadContract({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-    functionName: 'bets',
-    args: marketId !== undefined && address ? [marketId, address, 2] : undefined,
-    query: { enabled: marketId !== undefined && Boolean(address) },
-    watch: true,
-  });
-
-  const { data: committedBalance } = useReadContract({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-    functionName: 'committedAmount',
-    args: marketId !== undefined && address ? [marketId, address] : undefined,
-    query: { enabled: marketId !== undefined && Boolean(address) },
-    watch: true,
-  });
+  const isLoading = isReading;
+  const error = readError;
 
   const { writeContractAsync, isPending: isClaimPending } = useWriteContract();
   const [status, setStatus] = useState('');
