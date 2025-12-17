@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import {
+  useAccount,
+  useChainId,
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+  usePublicClient,
+} from 'wagmi';
 import { encodePacked, keccak256, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
@@ -24,13 +31,17 @@ export default function BettingWidget({
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
+
   const [amount, setAmount] = useState('');
   const [choice, setChoice] = useState(1);
   const [storedBet, setStoredBet] = useState(null);
   const [status, setStatus] = useState('');
-  const [txHash, setTxHash] = useState();
-  const [pendingAction, setPendingAction] = useState('');
+  const [txHash, setTxHash] = useState(undefined);
+
+  // Track what the current txHash actually represents
+  const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
   const [pendingBet, setPendingBet] = useState(null);
 
   const { data: allowance } = useReadContract({
@@ -41,94 +52,104 @@ export default function BettingWidget({
     query: { enabled: Boolean(address) },
   });
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash,
+    query: { enabled: Boolean(txHash) },
+  });
 
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
   const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
+
   const storageKey = useMemo(() => {
     if (marketId === undefined || !address) return null;
     return `helix_bet_${marketId}_${address}`;
   }, [address, marketId]);
+
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
-  // Optimization: Wrapped in useCallback to prevent unnecessary effect executions
-  // Note: Countdown logic has been moved to a separate component to prevent this entire component from re-rendering every second.
-  const persistBet = useCallback((data) => {
-    if (!storageKey || typeof window === 'undefined') return;
-    localStorage.setItem(storageKey, JSON.stringify(data));
-    setStoredBet(data);
-  }, [storageKey]);
+  const persistBet = useCallback(
+    (data) => {
+      if (!storageKey || typeof window === 'undefined') return;
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      setStoredBet(data);
+    },
+    [storageKey],
+  );
 
   const clearStoredBet = useCallback(() => {
-    if (storageKey && typeof window !== 'undefined') {
-      localStorage.removeItem(storageKey);
-    }
+    if (storageKey && typeof window !== 'undefined') localStorage.removeItem(storageKey);
     setStoredBet(null);
   }, [storageKey]);
 
   useEffect(() => {
-    if (storageKey && typeof window !== 'undefined') {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) setStoredBet(JSON.parse(saved));
-    }
+    if (!storageKey || typeof window === 'undefined') return;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) setStoredBet(JSON.parse(saved));
   }, [storageKey]);
 
   useEffect(() => {
-    if (isConfirming) setStatus('Transaction pending...');
-    else if (isSuccess) {
+    if (!txHash) return;
+
+    if (isConfirming) {
+      setStatus('Transaction pending...');
+      return;
+    }
+
+    if (isSuccess) {
       if (pendingAction === 'commit' && pendingBet) {
         persistBet(pendingBet);
-        setStatus('Commit confirmed. Salt saved locally for reveal.');
         setPendingBet(null);
+        setStatus('Commit confirmed. Salt saved locally for reveal.');
       } else if (pendingAction === 'reveal') {
         clearStoredBet();
         setStatus('Reveal confirmed and local commit cleared.');
+      } else if (pendingAction === 'approve') {
+        setStatus('Approve confirmed.');
       } else {
-        setStatus('Transaction confirmed');
+        setStatus('Transaction confirmed.');
       }
+
       setPendingAction('');
     }
-  }, [clearStoredBet, isConfirming, isSuccess, pendingAction, pendingBet, persistBet]);
+  }, [
+    clearStoredBet,
+    isConfirming,
+    isSuccess,
+    pendingAction,
+    pendingBet,
+    persistBet,
+    txHash,
+  ]);
 
   const handleCommit = async () => {
-    if (!isConnected) {
-      setStatus('Connect your wallet to commit.');
-      return;
-    }
-    if (isWrongNetwork) {
-      setStatus('Wrong network selected. Switch to the Helix deployment chain.');
-      return;
-    }
-    if (!amount) {
-      setStatus('Enter an amount of HLX to stake.');
-      return;
-    }
-    if (typeof window === 'undefined' || !window.crypto) {
-      setStatus('Secure random generator unavailable.');
-      return;
-    }
+    if (!isConnected) return setStatus('Connect your wallet to commit.');
+    if (isWrongNetwork) return setStatus('Wrong network selected. Switch to the Helix deployment chain.');
+    if (!amount) return setStatus('Enter an amount of HLX to stake.');
+    if (typeof window === 'undefined' || !window.crypto) return setStatus('Secure random generator unavailable.');
+
     let amountValue;
     try {
       amountValue = parseEther(amount);
-    } catch (err) {
-      setStatus('Invalid HLX amount.');
-      return;
+    } catch {
+      return setStatus('Invalid HLX amount.');
     }
-    if (amountValue <= 0n) {
-      setStatus('Enter an amount greater than zero.');
-      return;
-    }
+    if (amountValue <= 0n) return setStatus('Enter an amount greater than zero.');
+
     try {
       setStatus('');
+
+      // Create salt + commitment hash
       const randomBuffer = new Uint8Array(32);
       window.crypto.getRandomValues(randomBuffer);
-      const salt = BigInt('0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''));
+      const salt = BigInt(
+        '0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''),
+      );
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
       const betData = { marketId, salt: salt.toString(), choice: Number(choice), amount, hash };
-      setPendingBet(betData);
-      setPendingAction('commit');
 
+      // If allowance is insufficient, approve first and *wait for it*
       if (!allowance || allowance < amountValue) {
+        setPendingAction('approve');
         const approveHash = await writeContractAsync({
           address: contracts.AlphaHelixToken,
           abi: tokenAbi,
@@ -136,7 +157,15 @@ export default function BettingWidget({
           args: [contracts.HelixMarket, amountValue],
         });
         setTxHash(approveHash);
+
+        // Wait for approval receipt explicitly so we don't confuse receipts
+        if (!publicClient) throw new Error('Public client unavailable to confirm approval.');
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
       }
+
+      // Now commit
+      setPendingBet(betData);
+      setPendingAction('commit');
 
       const commitHash = await writeContractAsync({
         address: contracts.HelixMarket,
@@ -148,26 +177,20 @@ export default function BettingWidget({
       setStatus('Commit sent. Keep this device to reveal later.');
     } catch (err) {
       setPendingAction('');
+      setPendingBet(null);
       setStatus(err?.shortMessage || err?.message || 'Commit failed');
     }
   };
 
   const handleReveal = async () => {
-    if (!isConnected) {
-      setStatus('Connect your wallet to reveal.');
-      return;
-    }
-    if (isWrongNetwork) {
-      setStatus('Wrong network selected. Switch to the Helix deployment chain.');
-      return;
-    }
-    if (!storedBet) {
-      setStatus('No locally stored commit found; you may have used a different browser.');
-      return;
-    }
+    if (!isConnected) return setStatus('Connect your wallet to reveal.');
+    if (isWrongNetwork) return setStatus('Wrong network selected. Switch to the Helix deployment chain.');
+    if (!storedBet) return setStatus('No locally stored commit found; you may have used a different browser.');
+
     try {
       setStatus('');
       setPendingAction('reveal');
+
       const revealHash = await writeContractAsync({
         address: contracts.HelixMarket,
         abi: marketAbi,
@@ -204,22 +227,16 @@ export default function BettingWidget({
     return (
       <div className="card" style={{ borderColor: '#fef3c7' }}>
         <h3 className="font-semibold">Reveal phase</h3>
-        <Countdown
-            targetSeconds={revealEndSeconds}
-            render={(t) => <div className="helper">{t} remaining</div>}
-        />
+        <Countdown targetSeconds={revealEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+
         {storedBet ? (
           <div className="section">
             <div className="label">Stored choice</div>
             <div className="value">
               {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
             </div>
-            <button
-              className="button secondary"
-              style={{ marginTop: '0.75rem' }}
-              onClick={handleReveal}
-              disabled={isPending || isConfirming}
-            >
+
+            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isPending || isConfirming}>
               {isPending || isConfirming ? (
                 <>
                   <Spinner />
@@ -233,7 +250,12 @@ export default function BettingWidget({
         ) : (
           <p className="helper">No locally stored commit found; you may have used a different browser or device.</p>
         )}
-        {status && <div className="status">{status}</div>}
+
+        {status && (
+          <div id="status-message" className="status" role="status" aria-live="polite">
+            {status}
+          </div>
+        )}
       </div>
     );
   }
@@ -256,11 +278,9 @@ export default function BettingWidget({
   return (
     <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
-      <Countdown
-        targetSeconds={commitEndSeconds}
-        render={(t) => <div className="helper">{t} remaining</div>}
-      />
+      <Countdown targetSeconds={commitEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
+
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
           {CHOICES.map((c) => (
@@ -277,13 +297,13 @@ export default function BettingWidget({
             </label>
           ))}
         </div>
+
         <div>
           <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
             Amount to Stake
           </label>
           <input
             id="bet-amount"
-            aria-describedby="bet-status"
             type="number"
             min="0"
             step="0.01"
@@ -291,13 +311,11 @@ export default function BettingWidget({
             placeholder="Amount of HLX"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            aria-describedby="status-message"
           />
         </div>
-        <button
-          className="button primary"
-          onClick={handleCommit}
-          disabled={isPending || isConfirming}
-        >
+
+        <button className="button primary" onClick={handleCommit} disabled={isPending || isConfirming}>
           {isPending || isConfirming ? (
             <>
               <Spinner />
@@ -308,8 +326,14 @@ export default function BettingWidget({
           )}
         </button>
       </div>
+
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
-      {status && <div id="bet-status" className="status" role="alert">{status}</div>}
+
+      {status && (
+        <div id="status-message" className="status" role="status" aria-live="polite">
+          {status}
+        </div>
+      )}
     </div>
   );
 }
