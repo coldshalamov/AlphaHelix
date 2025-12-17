@@ -4,6 +4,7 @@ import { encodePacked, keccak256, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
+import Countdown from './Countdown';
 
 const CHOICES = [
   { value: 1, label: 'YES' },
@@ -29,7 +30,6 @@ export default function BettingWidget({
   const [storedBet, setStoredBet] = useState(null);
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
-  const [countdown, setCountdown] = useState('');
   const [pendingAction, setPendingAction] = useState('');
   const [pendingBet, setPendingBet] = useState(null);
 
@@ -52,14 +52,13 @@ export default function BettingWidget({
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
   // Optimization: Wrapped in useCallback to prevent unnecessary effect executions
-  // since this component re-renders every second due to the countdown timer.
+  // Note: Countdown logic has been moved to a separate component to prevent this entire component from re-rendering every second.
   const persistBet = useCallback((data) => {
     if (!storageKey || typeof window === 'undefined') return;
     localStorage.setItem(storageKey, JSON.stringify(data));
     setStoredBet(data);
   }, [storageKey]);
 
-  // Optimization: Wrapped in useCallback to prevent unnecessary effect executions
   const clearStoredBet = useCallback(() => {
     if (storageKey && typeof window !== 'undefined') {
       localStorage.removeItem(storageKey);
@@ -73,22 +72,6 @@ export default function BettingWidget({
       if (saved) setStoredBet(JSON.parse(saved));
     }
   }, [storageKey]);
-
-  useEffect(() => {
-    const updateCountdown = () => {
-      const now = Math.floor(Date.now() / 1000);
-      if (marketState === 'COMMIT' && commitEndSeconds > now) {
-        setCountdown(formatDuration(commitEndSeconds - now));
-      } else if (marketState === 'REVEAL' && revealEndSeconds > now) {
-        setCountdown(formatDuration(revealEndSeconds - now));
-      } else {
-        setCountdown('');
-      }
-    };
-    updateCountdown();
-    const id = setInterval(updateCountdown, 1000);
-    return () => clearInterval(id);
-  }, [commitEndSeconds, revealEndSeconds, marketState]);
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
@@ -221,7 +204,10 @@ export default function BettingWidget({
     return (
       <div className="card" style={{ borderColor: '#fef3c7' }}>
         <h3 className="font-semibold">Reveal phase</h3>
-        {countdown && <div className="helper">{countdown} remaining</div>}
+        <Countdown
+            targetSeconds={revealEndSeconds}
+            render={(t) => <div className="helper">{t} remaining</div>}
+        />
         {storedBet ? (
           <div className="section">
             <div className="label">Stored choice</div>
@@ -270,7 +256,10 @@ export default function BettingWidget({
   return (
     <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
-      {countdown && <div className="helper">{countdown} remaining</div>}
+      <Countdown
+        targetSeconds={commitEndSeconds}
+        render={(t) => <div className="helper">{t} remaining</div>}
+      />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
@@ -323,17 +312,4 @@ export default function BettingWidget({
       {status && <div id="bet-status" className="status" role="alert">{status}</div>}
     </div>
   );
-}
-
-function formatDuration(seconds) {
-  const s = Math.max(0, seconds);
-  const minutes = Math.floor(s / 60);
-  const secs = s % 60;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const parts = [];
-  if (hours > 0) parts.push(`${hours}h`);
-  if (mins > 0) parts.push(`${mins}m`);
-  parts.push(`${secs}s`);
-  return parts.join(' ');
 }
