@@ -68,16 +68,24 @@ export default function MarketsPage() {
       setLoading(true);
       setError('');
       try {
-        const rows = [];
+        // BOLT: Parallelized fetching with Promise.all to avoid N+1 waterfall
+        const promises = [];
         for (let i = 0; i < numericCount; i++) {
-          const data = await publicClient.readContract({
-            address: contracts.HelixMarket,
-            abi: marketAbi,
-            functionName: 'markets',
-            args: [BigInt(i)],
-          });
+          promises.push(
+            publicClient.readContract({
+              address: contracts.HelixMarket,
+              abi: marketAbi,
+              functionName: 'markets',
+              args: [BigInt(i)],
+            })
+          );
+        }
+
+        const results = await Promise.all(promises);
+
+        const rows = results.map((data, i) => {
           const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] = data;
-          rows.push({
+          return {
             id: i,
             ipfsCid,
             commitEndTime: Number(commitEndTime),
@@ -89,8 +97,9 @@ export default function MarketsPage() {
             outcome,
             tie,
             originator,
-          });
-        }
+          };
+        });
+
         setMarkets(rows);
       } catch (err) {
         setError(err?.shortMessage || err?.message || 'Unable to load markets');
