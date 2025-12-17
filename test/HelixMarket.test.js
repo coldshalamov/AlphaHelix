@@ -28,7 +28,7 @@ describe("HelixMarket", function () {
   }
 
   const biddingDuration = 60;
-  const revealDuration = 60;
+  const revealDuration = 3600;
   const burnAddress = "0x000000000000000000000000000000000000dEaD";
 
   function buildCommit(choice, salt, user) {
