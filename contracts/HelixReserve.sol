@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./AlphaHelixToken.sol";
@@ -11,7 +11,7 @@ interface IMarketAMM {
     function mint(uint256 amount) external;
 }
 
-contract HelixReserve is ReentrancyGuard, Ownable {
+contract HelixReserve is ReentrancyGuard, Ownable2Step {
     AlphaHelixToken public immutable token;
     uint256 public constant RATE = 1000; // 1 ETH = 1000 HLX
 
