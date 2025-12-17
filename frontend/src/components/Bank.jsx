@@ -38,6 +38,13 @@ export default function Bank() {
     }
   }, [hlxBalance]);
 
+  const liveStatus = useMemo(() => {
+    // One message, one announcer.
+    if (isConfirming) return 'Awaiting confirmation...';
+    if (isSuccess) return 'Latest transaction confirmed.';
+    return status;
+  }, [isConfirming, isSuccess, status]);
+
   const handleBuy = async () => {
     setStatus('');
     if (!buyAmount) {
@@ -72,6 +79,7 @@ export default function Bank() {
         args: [contracts.HelixReserve, hlxValue],
       });
       setTxHash(approveHash);
+
       const sellHash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
@@ -110,8 +118,11 @@ export default function Bank() {
         <div className="grid two" style={{ marginTop: '1.5rem' }}>
           <div className="card" style={{ borderColor: '#dbeafe' }}>
             <h3 className="font-semibold">Buy HLX</h3>
-            <p className="helper">Enter ETH to spend.</p>
+            <label htmlFor="buy-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Enter ETH to spend
+            </label>
             <input
+              id="buy-amount"
               type="number"
               min="0"
               step="0.01"
@@ -140,8 +151,11 @@ export default function Bank() {
 
           <div className="card" style={{ borderColor: '#ffe4e6' }}>
             <h3 className="font-semibold">Sell HLX</h3>
-            <p className="helper">Approve and sell HLX back to ETH.</p>
+            <label htmlFor="sell-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Approve and sell HLX back to ETH
+            </label>
             <input
+              id="sell-amount"
               type="number"
               min="0"
               step="0.01"
@@ -170,21 +184,9 @@ export default function Bank() {
           </div>
         </div>
 
-        {status && (
-          <div className="status" role="status" aria-live="polite">
-            {status}
-          </div>
-        )}
-        {isConfirming && (
-          <div className="status" role="status" aria-live="polite">
-            Awaiting confirmation...
-          </div>
-        )}
-        {isSuccess && (
-          <div className="status" role="status" aria-live="polite">
-            Latest transaction confirmed.
-          </div>
-        )}
+        <div role="status" aria-live="polite">
+          {liveStatus ? <div className="status">{liveStatus}</div> : null}
+        </div>
       </div>
     </div>
   );
