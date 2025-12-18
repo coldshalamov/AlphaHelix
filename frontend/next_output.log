@@ -1,0 +1,28 @@
+
+> alphahelix-frontend@0.1.0 dev /app/frontend
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3001
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+ ✓ Ready in 2.6s
+ ○ Compiling /markets/[id] ...
+ ✓ Compiled /markets/[id] in 9.4s (1783 modules)
+ ✓ Compiled in 464ms (1783 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for  ✓ Compiled in 692ms (1783 modules)
+ ✓ Compiled in 513ms (1783 modules)
+ ✓ Compiled in 623ms (1783 modules)
+ ✓ Compiled in 465ms (1783 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/app/frontend/.next/cache/webpack/server-development/2.pack.gz_' -> '/app/frontend/.next/cache/webpack/server-development/2.pack.gz'
+ebpack/client-development/2.pack.gz'
+ ✓ Compiled in 827ms (1783 modules)
+ ✓ Compiled in 542ms (1783 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 527ms (1785 modules)
+ ✓ Compiled in 418ms (1783 modules)
+ ✓ Compiled /_error in 240ms (1785 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 458ms (1783 modules)

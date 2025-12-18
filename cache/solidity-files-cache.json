@@ -380,8 +380,8 @@
       ]
     },
     "/app/contracts/HelixReserve.sol": {
-      "lastModificationDate": 1765760412517,
-      "contentHash": "d2806409c5e07a3896253b5b456400fd",
+      "lastModificationDate": 1766019677074,
+      "contentHash": "b630eb632c092ec0a3b9a8b032cc9bf4",
       "sourceName": "contracts/HelixReserve.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -409,7 +409,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/access/Ownable2Step.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./AlphaHelixToken.sol"
       ],
@@ -983,6 +983,44 @@
       ],
       "artifacts": [
         "Ownable"
+      ]
+    },
+    "/app/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/access/Ownable2Step.sol": {
+      "lastModificationDate": 1766019920210,
+      "contentHash": "4c23c95621f1bdfb8c47bcb3795c53e8",
+      "sourceName": "@openzeppelin/contracts/access/Ownable2Step.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Ownable2Step"
       ]
     }
   }
