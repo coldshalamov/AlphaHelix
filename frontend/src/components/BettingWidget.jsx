@@ -57,6 +57,8 @@ export default function BettingWidget({
     query: { enabled: Boolean(txHash) },
   });
 
+  const isSubmitting = isPending || isConfirming;
+
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
   const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
 
@@ -284,7 +286,16 @@ export default function BettingWidget({
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
           {CHOICES.map((c) => (
-            <label key={c.value} className={`button ${choice === c.value ? 'primary' : 'secondary'}`} style={{ margin: 0 }}>
+            <label
+              key={c.value}
+              className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+              style={{
+                margin: 0,
+                opacity: isSubmitting ? 0.6 : 1,
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                pointerEvents: isSubmitting ? 'none' : 'auto',
+              }}
+            >
               <input
                 type="radio"
                 name="choice"
@@ -292,6 +303,7 @@ export default function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
+                disabled={isSubmitting}
               />
               {c.label}
             </label>
@@ -312,14 +324,15 @@ export default function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+            disabled={isSubmitting}
           />
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isPending || isConfirming}>
-          {isPending || isConfirming ? (
+        <button className="button primary" onClick={handleCommit} disabled={isSubmitting}>
+          {isSubmitting ? (
             <>
               <Spinner />
-              Submitting...
+              {pendingAction === 'approve' ? 'Approving...' : 'Committing...'}
             </>
           ) : (
             'Commit bet'
