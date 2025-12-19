@@ -100,6 +100,8 @@ export default function MarketDetailPage() {
   useEffect(() => {
     if (!commitEndTime || !revealEndTime) return;
 
+    let timer;
+
     const checkState = () => {
       const now = Math.floor(Date.now() / 1000);
       const commitEndSeconds = Number(commitEndTime);
@@ -108,11 +110,11 @@ export default function MarketDetailPage() {
       if (now < commitEndSeconds) {
         setMarketState('COMMIT');
         const ms = (commitEndSeconds - now) * 1000;
-        if (ms < 2147483647) setTimeout(checkState, ms + 1000);
+        if (ms < 2147483647) timer = setTimeout(checkState, ms + 1000);
       } else if (now < revealEndSeconds) {
         setMarketState('REVEAL');
         const ms = (revealEndSeconds - now) * 1000;
-        if (ms < 2147483647) setTimeout(checkState, ms + 1000);
+        if (ms < 2147483647) timer = setTimeout(checkState, ms + 1000);
       } else if (resolved) {
         setMarketState('CLOSED');
       } else {
@@ -121,6 +123,7 @@ export default function MarketDetailPage() {
     };
 
     checkState();
+    return () => clearTimeout(timer);
   }, [commitEndTime, revealEndTime, resolved]);
 
   useEffect(() => {

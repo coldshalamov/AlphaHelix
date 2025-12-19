@@ -7,3 +7,7 @@
 ## 2025-02-19 - [Batched Reads via useReadContracts]
 **Learning:** Replacing manual loops of `readContract` + `Promise.all` with `useReadContracts` allows Wagmi to automatically use `multicall` (when available), reducing N RPC requests to 1 and preventing network waterfalls.
 **Action:** Use `useReadContracts` for any list fetching instead of iterative fetching.
+
+## 2025-10-24 - [Polling & Memoization]
+**Learning:** When using polling hooks like `useReadContracts` with `refetchInterval`, the parent component re-renders on every fetch even if data values are deep-equal (due to new object references). Child components with complex sub-hooks (like `useReadContract` or `useAccount`) should be memoized to prevent cascading re-renders.
+**Action:** Wrap expensive or side-effect-heavy child components (like `BettingWidget`) in `React.memo` when placed inside polling pages. Also, always clean up `setTimeout` in `useEffect` to prevent memory leaks during navigation.
