@@ -30,4 +30,14 @@ describe("HelixMarket Security - Griefing", function () {
         market.connect(userA).submitStatement("ipfs://grief", biddingDuration, shortRevealDuration)
     ).to.be.revertedWith("Reveal duration too short");
   });
+
+  it("should fail to create a market with extremely short bidding duration", async function () {
+    const { market, userA } = await loadFixture(deployHelixMarketFixture);
+    const shortBiddingDuration = 1;
+    const revealDuration = 3600;
+
+    await expect(
+        market.connect(userA).submitStatement("ipfs://grief_bidding", shortBiddingDuration, revealDuration)
+    ).to.be.revertedWith("Bidding duration too short");
+  });
 });

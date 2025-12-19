@@ -27,7 +27,7 @@ describe("HelixMarket", function () {
     return { market, token, owner, userA, userB, userC };
   }
 
-  const biddingDuration = 60;
+  const biddingDuration = 3600;
   const revealDuration = 3600;
   const burnAddress = "0x000000000000000000000000000000000000dEaD";
 
