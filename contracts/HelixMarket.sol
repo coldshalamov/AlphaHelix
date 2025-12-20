@@ -12,6 +12,7 @@ contract HelixMarket is ReentrancyGuard {
     uint256 public constant ORIGINATOR_FEE_BPS = 100; // 1%
     uint256 public constant UNREVEALED_PENALTY_BPS = 100; // 1% burned on unrevealed withdrawals
     uint256 public constant MIN_REVEAL_DURATION = 1 hours;
+    uint256 public constant MIN_BIDDING_DURATION = 1 hours;
     uint256 public constant MAX_CID_LENGTH = 128;
     uint256 public marketCount;
     // Use a dead address for burning since we can't transfer to address(0)
@@ -61,6 +62,7 @@ contract HelixMarket is ReentrancyGuard {
     function submitStatement(string memory ipfsCid, uint256 biddingDuration, uint256 revealDuration) external nonReentrant {
         require(bytes(ipfsCid).length > 0, "CID empty");
         require(bytes(ipfsCid).length <= MAX_CID_LENGTH, "CID too long");
+        require(biddingDuration >= MIN_BIDDING_DURATION, "Bidding duration too short");
         require(revealDuration >= MIN_REVEAL_DURATION, "Reveal duration too short");
         require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
         require(token.transfer(BURN_ADDRESS, STATEMENT_FEE), "Burn transfer failed");
