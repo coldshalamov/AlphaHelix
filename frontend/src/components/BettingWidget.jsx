@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo } from 'react';
 import {
   useAccount,
   useChainId,
@@ -19,7 +19,7 @@ const CHOICES = [
   { value: 2, label: 'UNALIGNED' },
 ];
 
-export default function BettingWidget({
+function BettingWidget({
   marketId,
   commitEnd,
   revealEnd,
@@ -337,3 +337,5 @@ export default function BettingWidget({
     </div>
   );
 }
+
+export default memo(BettingWidget);
