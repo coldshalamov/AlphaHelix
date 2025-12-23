@@ -25,7 +25,7 @@ describe("HelixMarket Security: Overwrite Commitment", function () {
     return { market, token, owner, userA, userB };
   }
 
-  const biddingDuration = 60;
+  const biddingDuration = 3600;
   const revealDuration = 3600;
 
   function buildCommit(choice, salt, user) {
