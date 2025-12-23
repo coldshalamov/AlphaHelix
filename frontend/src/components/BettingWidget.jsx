@@ -284,7 +284,15 @@ function BettingWidget({
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
           {CHOICES.map((c) => (
-            <label key={c.value} className={`button ${choice === c.value ? 'primary' : 'secondary'}`} style={{ margin: 0 }}>
+            <label
+              key={c.value}
+              className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+              style={{
+                margin: 0,
+                opacity: isPending || isConfirming ? 0.6 : 1,
+                cursor: isPending || isConfirming ? 'not-allowed' : 'pointer',
+              }}
+            >
               <input
                 type="radio"
                 name="choice"
@@ -292,6 +300,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
+                disabled={isPending || isConfirming}
               />
               {c.label}
             </label>
@@ -312,6 +321,7 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+            disabled={isPending || isConfirming}
           />
         </div>
 
@@ -319,7 +329,11 @@ function BettingWidget({
           {isPending || isConfirming ? (
             <>
               <Spinner />
-              Submitting...
+              {pendingAction === 'approve'
+                ? 'Approving...'
+                : pendingAction === 'commit'
+                ? 'Committing...'
+                : 'Submitting...'}
             </>
           ) : (
             'Commit bet'
