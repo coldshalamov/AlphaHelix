@@ -34,8 +34,6 @@ contract HelixMarket is ReentrancyGuard {
     mapping(uint256 => Statement) public markets;
     // marketId => user => commitHash
     mapping(uint256 => mapping(address => bytes32)) public commits;
-    // marketId => user => hasCommitted
-    mapping(uint256 => mapping(address => bool)) public hasCommitted;
 
     // Tracking payouts requires knowing how much a user bet on the winning side.
     // marketId => user => side => amount
@@ -85,12 +83,12 @@ contract HelixMarket is ReentrancyGuard {
         Statement storage s = markets[marketId];
         require(block.timestamp < s.commitEndTime, "Commit phase over");
         require(amount > 0, "Amount must be > 0");
-        require(!hasCommitted[marketId][msg.sender], "Already committed");
+        // BOLT: Optimization - removed hasCommitted mapping. Check committedAmount > 0 instead.
+        require(committedAmount[marketId][msg.sender] == 0, "Already committed");
 
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         commits[marketId][msg.sender] = commitHash;
-        hasCommitted[marketId][msg.sender] = true;
 
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
