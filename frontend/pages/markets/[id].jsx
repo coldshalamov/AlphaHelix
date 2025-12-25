@@ -26,15 +26,13 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
-  const contractConfig = {
+  const contractConfig = useMemo(() => ({
     address: contracts.HelixMarket,
     abi: marketAbi,
-  };
+  }), []);
 
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
-    contracts: [
+  const contractsArray = useMemo(() => {
+    return [
       {
         ...contractConfig,
         functionName: 'markets',
@@ -63,7 +61,13 @@ export default function MarketDetailPage() {
            args: [marketId, address],
         }
       ] : [])
-    ],
+    ];
+  }, [contractConfig, marketId, address]);
+
+  // Optimization: Batch multiple contract reads into a single multicall/RPC request
+  // This reduces network waterfall and synchronizes loading states
+  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+    contracts: contractsArray,
     query: {
        enabled: marketId !== undefined,
        // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)
