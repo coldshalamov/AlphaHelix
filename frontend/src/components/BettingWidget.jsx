@@ -319,7 +319,7 @@ function BettingWidget({
           {isPending || isConfirming ? (
             <>
               <Spinner />
-              Submitting...
+              {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
           ) : (
             'Commit bet'
