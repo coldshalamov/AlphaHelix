@@ -10,6 +10,8 @@ import Countdown from '@/components/Countdown';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
+const renderTimeLeft = (t) => <div className="helper">Time left: {t}</div>;
+
 export default function MarketDetailPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -186,7 +188,7 @@ export default function MarketDetailPage() {
             <div className="value">{new Date(Number(commitEndTime) * 1000).toLocaleString()}</div>
             <Countdown
               targetSeconds={Number(commitEndTime)}
-              render={(t) => <div className="helper">Time left: {t}</div>}
+              render={renderTimeLeft}
             />
           </div>
           <div>
@@ -194,7 +196,7 @@ export default function MarketDetailPage() {
             <div className="value">{new Date(Number(revealEndTime) * 1000).toLocaleString()}</div>
             <Countdown
               targetSeconds={Number(revealEndTime)}
-              render={(t) => <div className="helper">Time left: {t}</div>}
+              render={renderTimeLeft}
             />
           </div>
           <div>
