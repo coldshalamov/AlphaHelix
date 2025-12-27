@@ -57,6 +57,8 @@ function BettingWidget({
     query: { enabled: Boolean(txHash) },
   });
 
+  const isLoading = isPending || isConfirming;
+
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
   const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
 
@@ -284,7 +286,15 @@ function BettingWidget({
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
           {CHOICES.map((c) => (
-            <label key={c.value} className={`button ${choice === c.value ? 'primary' : 'secondary'}`} style={{ margin: 0 }}>
+            <label
+              key={c.value}
+              className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+              style={{
+                margin: 0,
+                opacity: isLoading ? 0.6 : 1,
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+              }}
+            >
               <input
                 type="radio"
                 name="choice"
@@ -292,6 +302,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
+                disabled={isLoading}
               />
               {c.label}
             </label>
@@ -312,11 +323,12 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+            disabled={isLoading}
           />
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isPending || isConfirming}>
-          {isPending || isConfirming ? (
+        <button className="button primary" onClick={handleCommit} disabled={isLoading}>
+          {isLoading ? (
             <>
               <Spinner />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
