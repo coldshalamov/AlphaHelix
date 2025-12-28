@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useCallback, memo } from 'react';
 import {
   useAccount,
   useChainId,
-  useReadContract,
   useWaitForTransactionReceipt,
   useWriteContract,
   usePublicClient,
@@ -28,6 +27,7 @@ function BettingWidget({
   outcome,
   tie,
   expectedChainId,
+  allowance,
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -43,14 +43,6 @@ function BettingWidget({
   // Track what the current txHash actually represents
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
   const [pendingBet, setPendingBet] = useState(null);
-
-  const { data: allowance } = useReadContract({
-    address: contracts.AlphaHelixToken,
-    abi: tokenAbi,
-    functionName: 'allowance',
-    args: address ? [address, contracts.HelixMarket] : undefined,
-    query: { enabled: Boolean(address) },
-  });
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,

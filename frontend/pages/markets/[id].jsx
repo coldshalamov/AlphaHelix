@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
-import { marketAbi } from '@/abis';
+import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
 
@@ -59,6 +59,12 @@ export default function MarketDetailPage() {
            ...contractConfig,
            functionName: 'committedAmount',
            args: [marketId, address],
+        },
+        {
+          address: contracts.AlphaHelixToken,
+          abi: tokenAbi,
+          functionName: 'allowance',
+          args: [address, contracts.HelixMarket],
         }
       ] : [])
     ];
@@ -85,6 +91,7 @@ export default function MarketDetailPage() {
   const noBet = address ? readResults?.[userResultsBaseIndex + 1]?.result : undefined;
   const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
   const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
+  const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
 
   const isLoading = isReading;
   const error = readError;
@@ -290,6 +297,7 @@ export default function MarketDetailPage() {
         outcome={outcome}
         tie={tie}
         expectedChainId={expectedChainId}
+        allowance={allowance}
       />
     </div>
   );
