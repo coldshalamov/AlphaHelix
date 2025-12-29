@@ -61,10 +61,10 @@ export default function MarketDetailPage() {
            args: [marketId, address],
         },
         {
-          address: contracts.AlphaHelixToken,
-          abi: tokenAbi,
-          functionName: 'allowance',
-          args: [address, contracts.HelixMarket],
+           address: contracts.AlphaHelixToken,
+           abi: tokenAbi,
+           functionName: 'allowance',
+           args: [address, contracts.HelixMarket],
         }
       ] : [])
     ];
