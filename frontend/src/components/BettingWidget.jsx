@@ -49,6 +49,7 @@ function BettingWidget({
     query: { enabled: Boolean(txHash) },
   });
 
+  const isLoading = isPending || isConfirming;
   const isLocked = isPending || isConfirming;
 
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
@@ -284,10 +285,8 @@ function BettingWidget({
               className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
               style={{
                 margin: 0,
-                opacity: isPending || isConfirming ? 0.6 : 1,
-                cursor: isPending || isConfirming ? 'not-allowed' : 'pointer',
-                opacity: isLocked ? 0.6 : 1,
-                cursor: isLocked ? 'not-allowed' : 'pointer',
+                                opacity: isLoading || isPending || isConfirming ? 0.6 : 1,
+                cursor: isLoading || isPending || isConfirming ? 'not-allowed' : 'pointer',cursor: isLocked ? 'not-allowed' : 'pointer',
               }}
             >
               <input
@@ -297,7 +296,8 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
-                disabled={isPending || isConfirming || isLocked}
+                                disabled={isLoading || isPending || isConfirming || isLocked}
+                
               />
               {c.label}
             </label>
@@ -318,6 +318,13 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+                            
+                            
+                
+        </div>
+
+        <button className="button primary" onClick={handleCommit} disabled={isLoading}>
+          {isLoading ? (
                 disabled={isPending || isConfirming || isLocked}
           />
         </div>
