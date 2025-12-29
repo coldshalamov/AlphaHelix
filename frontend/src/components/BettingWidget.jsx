@@ -276,7 +276,8 @@ function BettingWidget({
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
+        <fieldset className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
+          <legend className="visually-hidden">Select outcome</legend>
           {CHOICES.map((c) => (
             <label
               key={c.value}
@@ -299,7 +300,7 @@ function BettingWidget({
               {c.label}
             </label>
           ))}
-        </div>
+        </fieldset>
 
         <div>
           <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
