@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useCallback, memo } from 'react';
 import {
   useAccount,
   useChainId,
-  useReadContract,
   useWaitForTransactionReceipt,
   useWriteContract,
   usePublicClient,
@@ -28,6 +27,7 @@ function BettingWidget({
   outcome,
   tie,
   expectedChainId,
+  allowance,
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -44,18 +44,12 @@ function BettingWidget({
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
   const [pendingBet, setPendingBet] = useState(null);
 
-  const { data: allowance } = useReadContract({
-    address: contracts.AlphaHelixToken,
-    abi: tokenAbi,
-    functionName: 'allowance',
-    args: address ? [address, contracts.HelixMarket] : undefined,
-    query: { enabled: Boolean(address) },
-  });
-
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
     query: { enabled: Boolean(txHash) },
   });
+
+  const isLocked = isPending || isConfirming;
 
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
   const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
@@ -282,9 +276,20 @@ function BettingWidget({
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
+        <fieldset className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
+          <legend className="visually-hidden">Select outcome</legend>
           {CHOICES.map((c) => (
-            <label key={c.value} className={`button ${choice === c.value ? 'primary' : 'secondary'}`} style={{ margin: 0 }}>
+            <label
+              key={c.value}
+              className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+              style={{
+                margin: 0,
+                opacity: isPending || isConfirming ? 0.6 : 1,
+                cursor: isPending || isConfirming ? 'not-allowed' : 'pointer',
+                opacity: isLocked ? 0.6 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
+              }}
+            >
               <input
                 type="radio"
                 name="choice"
@@ -292,11 +297,12 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
+                disabled={isPending || isConfirming || isLocked}
               />
               {c.label}
             </label>
           ))}
-        </div>
+        </fieldset>
 
         <div>
           <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
@@ -312,10 +318,11 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+                disabled={isPending || isConfirming || isLocked}
           />
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isPending || isConfirming}>
+        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
           {isPending || isConfirming ? (
             <>
               <Spinner />
