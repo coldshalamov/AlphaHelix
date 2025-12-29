@@ -4,11 +4,13 @@ import dynamic from 'next/dynamic';
 import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
-import { marketAbi } from '@/abis';
+import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
+
+const renderTimeLeft = (t) => <div className="helper">Time left: {t}</div>;
 
 export default function MarketDetailPage() {
   const { address, isConnected } = useAccount();
@@ -36,6 +38,30 @@ export default function MarketDetailPage() {
       };
 
       return [
+  const contractConfig = useMemo(() => ({
+    address: contracts.HelixMarket,
+    abi: marketAbi,
+  }), []);
+
+  const contractsArray = useMemo(() => {
+    return [
+      {
+        ...contractConfig,
+        functionName: 'markets',
+        args: marketId !== undefined ? [marketId] : undefined,
+      },
+      // Conditional user data fetches
+      ...(marketId !== undefined && address ? [
+        {
+          ...contractConfig,
+          functionName: 'bets',
+          args: [marketId, address, 1], // Yes bet
+        },
+        {
+          ...contractConfig,
+          functionName: 'bets',
+          args: [marketId, address, 0], // No bet
+        },
         {
           ...contractConfig,
           functionName: 'markets',
@@ -66,6 +92,25 @@ export default function MarketDetailPage() {
         ] : [])
       ];
     }, [marketId, address]),
+        {
+           ...contractConfig,
+           functionName: 'committedAmount',
+           args: [marketId, address],
+        },
+        {
+           address: contracts.AlphaHelixToken,
+           abi: tokenAbi,
+           functionName: 'allowance',
+           args: [address, contracts.HelixMarket],
+        }
+      ] : [])
+    ];
+  }, [contractConfig, marketId, address]);
+
+  // Optimization: Batch multiple contract reads into a single multicall/RPC request
+  // This reduces network waterfall and synchronizes loading states
+  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+    contracts: contractsArray,
     query: {
        enabled: marketId !== undefined,
        // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)
@@ -83,6 +128,7 @@ export default function MarketDetailPage() {
   const noBet = address ? readResults?.[userResultsBaseIndex + 1]?.result : undefined;
   const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
   const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
+  const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
 
   const isLoading = isReading;
   const error = readError;
@@ -184,7 +230,7 @@ export default function MarketDetailPage() {
             <div className="value">{new Date(Number(commitEndTime) * 1000).toLocaleString()}</div>
             <Countdown
               targetSeconds={Number(commitEndTime)}
-              render={(t) => <div className="helper">Time left: {t}</div>}
+              render={renderTimeLeft}
             />
           </div>
           <div>
@@ -192,7 +238,7 @@ export default function MarketDetailPage() {
             <div className="value">{new Date(Number(revealEndTime) * 1000).toLocaleString()}</div>
             <Countdown
               targetSeconds={Number(revealEndTime)}
-              render={(t) => <div className="helper">Time left: {t}</div>}
+              render={renderTimeLeft}
             />
           </div>
           <div>
@@ -288,6 +334,7 @@ export default function MarketDetailPage() {
         outcome={outcome}
         tie={tie}
         expectedChainId={expectedChainId}
+        allowance={allowance}
       />
     </div>
   );
