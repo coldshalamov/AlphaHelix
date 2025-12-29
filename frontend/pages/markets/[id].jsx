@@ -28,6 +28,16 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
+  // Optimization: Batch multiple contract reads into a single multicall/RPC request
+  // This reduces network waterfall and synchronizes loading states
+  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+    contracts: useMemo(() => {
+      const contractConfig = {
+        address: contracts.HelixMarket,
+        abi: marketAbi,
+      };
+
+      return [
   const contractConfig = useMemo(() => ({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -54,9 +64,34 @@ export default function MarketDetailPage() {
         },
         {
           ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 2], // Unaligned bet
+          functionName: 'markets',
+          args: marketId !== undefined ? [marketId] : undefined,
         },
+        // Conditional user data fetches
+        ...(marketId !== undefined && address ? [
+          {
+            ...contractConfig,
+            functionName: 'bets',
+            args: [marketId, address, 1], // Yes bet
+          },
+          {
+            ...contractConfig,
+            functionName: 'bets',
+            args: [marketId, address, 0], // No bet
+          },
+          {
+            ...contractConfig,
+            functionName: 'bets',
+            args: [marketId, address, 2], // Unaligned bet
+          },
+          {
+            ...contractConfig,
+            functionName: 'committedAmount',
+            args: [marketId, address],
+          }
+        ] : [])
+      ];
+    }, [marketId, address]),
         {
            ...contractConfig,
            functionName: 'committedAmount',
