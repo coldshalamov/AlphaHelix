@@ -1,0 +1,1536 @@
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+Accounts
+========
+
+WARNING: These accounts, and their private keys, are publicly known.
+Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+
+Account #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (10000 ETH)
+Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+Account #1: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 (10000 ETH)
+Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+
+Account #2: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC (10000 ETH)
+Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+
+Account #3: 0x90F79bf6EB2c4f870365E785982E1f101E93b906 (10000 ETH)
+Private Key: 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+
+Account #4: 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65 (10000 ETH)
+Private Key: 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+
+Account #5: 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc (10000 ETH)
+Private Key: 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+
+Account #6: 0x976EA74026E726554dB657fA54763abd0C3a0aa9 (10000 ETH)
+Private Key: 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+
+Account #7: 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955 (10000 ETH)
+Private Key: 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+
+Account #8: 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f (10000 ETH)
+Private Key: 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+
+Account #9: 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720 (10000 ETH)
+Private Key: 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Account #10: 0xBcd4042DE499D14e55001CcbB24a551F3b954096 (10000 ETH)
+Private Key: 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897
+
+Account #11: 0x71bE63f3384f5fb98995898A86B02Fb2426c5788 (10000 ETH)
+Private Key: 0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82
+
+Account #12: 0xFABB0ac9d68B0B445fB7357272Ff202C5651694a (10000 ETH)
+Private Key: 0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1
+
+Account #13: 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec (10000 ETH)
+Private Key: 0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd
+
+Account #14: 0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097 (10000 ETH)
+Private Key: 0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa
+
+Account #15: 0xcd3B766CCDd6AE721141F452C550Ca635964ce71 (10000 ETH)
+Private Key: 0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61
+
+Account #16: 0x2546BcD3c84621e976D8185a91A922aE77ECEc30 (10000 ETH)
+Private Key: 0xea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0
+
+Account #17: 0xbDA5747bFD65F08deb54cb465eB87D40e51B197E (10000 ETH)
+Private Key: 0x689af8efa8c651a91ad287602527f3af2fe9f6501a7ac4b061667b5a93e037fd
+
+Account #18: 0xdD2FD4581271e230360230F9337D5c0430Bf44C0 (10000 ETH)
+Private Key: 0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0
+
+Account #19: 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199 (10000 ETH)
+Private Key: 0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e
+
+WARNING: These accounts, and their private keys, are publicly known.
+Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_getBlockByNumber[0m
+[32meth_feeHistory[0m
+[32meth_maxPriorityFeePerGas[0m
+[32meth_sendTransaction[0m
+  Contract deployment: AlphaHelixToken
+  Contract address:    0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Transaction:         0x8a46e4362a2b61173d8d9acb93d468db871b9b2feb6adcce38914c1c68d395be
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            800351 of 16777216
+  Block #1:            0xcd3747f50738975898c9484c33476ccd412cda9176dd04e862e70a262aa4389c
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixReserve
+  Contract address:    0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+  Transaction:         0xe68a7a0bdaf41acfd6860ccaeb7f7bdb367a12cf76df8da409f2dcdf296c741b
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            718763 of 16777216
+  Block #2:            0xfeb00edc41586209b03015a24eb99e2d094e5475ddbafb0f716461b660c04de9
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixMarket
+  Contract address:    0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+  Transaction:         0x78576a5cd32a1d56880ba6cecdf26ad1b3a27d523fbf65b8a574e5864998a1ec
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            1500834 of 16777216
+  Block #3:            0x641aa78e4acbec17fc951ec0f09778d629bb456bcce4fa5baf219a0dd95f9bb4
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_call[0m
+  Contract call:       AlphaHelixToken#MINTER_ROLE
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0x29ed9364c053ede91e6ebe75956a1dbaf00a7ce023e552c0210c6c084053fb5f
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #4:            0x5c2a1357da45ae54a097e4c6432c6a6782fc965f680edd998d514d8fa0138d2b
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0x98c640edcc7ab6cc8b1380157d12d4791b0e5b2afd5ad03bc727785ed0063525
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #5:            0x06a629e8c9710f8edec98ecc0493f7346be617793a6b6e95fe9362cbcb6a5e03
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0xb683807ab20c4a947583df6090eec57032f52ad9546b0c9073f7e19e0ffe281a
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            70473 of 16777216
+  Block #6:            0xebade772fe9966e3efdb1cac033829dcbfd55ca884574ad7d6d7b8086ec47f18
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x40ff3025fbfb6b0eac81dde23a50395c5b69241fb4430a57c1a7af7f782cadc3
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #7:            0x1a2e7ec6a7a83563ac6a9095eb514836da9afb219e9dbcacffe087e7ec95a53a
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x06471c1f6c107a57c6fe87649bd9b6ab0486f5d4561e3f65ed2c28f2fb58119d
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            53373 of 16777216
+  Block #8:            0x90163026b61a5cba9d5202efe13bf1a88b60fab2413be8b6e110da426e649dca
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x4ac36c9fb5e3188aa83e618feb408d7b43834f69242109af6ceaf2ef4ac6f2e2
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #9:            0xb8ba43c20f531179eee52f4cca6d56c6c1f344fdd00e03b4ea1421640d32252f
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0xa20a0a43b127c6a0f13618a13aed8511843df603712432b4365d2aeeaf237786
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            53361 of 16777216
+  Block #10:           0xf9677e7b2ed9460071346113d6d5a21ab5cd5f8df0f10fdb988c134575a2406b
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0xbb5732b8957cec3ab9a4c1a6f6f94a672426f3f09a350f465242214a6c203b92
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #11:           0x4a1072d5382040a8151a133776c361bcd211ff096126679e005a78273fa2e08b
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[31meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x463ce0487b0a3b18f1922abff201054b8f0116cf8fe0a293bdb16758bae91461
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+  Value:               0 ETH
+  Gas used:            28120 of 16777216
+  Block #12:           0xfe48223f4140097aa000a912148e3758683e21dc32eeff40edbf77a36ac9c26b
+
+  Error: reverted with reason string 'Bidding duration too long'
+
+[32meth_accounts[0m
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0
+
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_getBlockByNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: AlphaHelixToken
+  Contract address:    0x610178da211fef7d417bc0e6fed39f05609ad788
+  Transaction:         0x58794fe817e51d002c1e463af780302299e6e95d4c0b279e12c2313f48cc0fe1
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            800351 of 16777216
+  Block #13:           0x37366932fa1d71b312a06da989ad30ca51ec355a0c06067e5d4587cf93af75ae
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixReserve
+  Contract address:    0xb7f8bc63bbcad18155201308c8f3540b07f84f5e
+  Transaction:         0x69463e1b40c9f540ee2e91c681d4f4795910d647b72820e8224bd46961096bd1
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            718763 of 16777216
+  Block #14:           0x3fa0c2c089c847e9aaa71b94f0ac9cc47d7ecf4a3e99b36959e2be0c12357378
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixMarket
+  Contract address:    0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Transaction:         0x926096c8ac28c48f99392aa67e02ad33bb2c32aa2fbbc5332df5513b4b8371f9
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            1500834 of 16777216
+  Block #15:           0x212a1cf4cf91cf17c519366bd609dd4d3201d8023826e3d7c650928002de0cc2
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_call[0m
+  Contract call:       AlphaHelixToken#MINTER_ROLE
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0x2a1864ce9610f3d4963335bedede079191d923220fb5c2cab06b0d039293421a
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #16:           0x2a1ba3aae2b4e892c9077ba1455fcda042360d3325ac715d23d1ff350044c785
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0x6c51392bed44d9a74f23835ee12e110177c6c3e7f302d5883c6d88d8cf040b8d
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #17:           0x97562ff93715c2252b2d21c0cb6067f42acb2e3d9ac5b57159a8fb9ffeb1655c
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0xe0cd1e91f0e80b107b293738f689af565fc829d08b13f6e9e3b11dceec494372
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            70473 of 16777216
+  Block #18:           0x38bf1d5d45d8081488c7f9c0ac7db93bd66058222cf448ff00350acd53997992
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x54afb9578c7ac862149daee1e43945afa6b6c499eb7e601ce16b784427f05ad3
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #19:           0x34bae5c12ac9e7727126895046f3f0675ab0029c3cd6e942c8ec72f5e0f30a86
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0xc5becbdc590eaefdf3937fd09cb2ff283694b48405b71c040aa9ed918b4a9620
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            53373 of 16777216
+  Block #20:           0x5bd8cb1aeb3592cfe823f47a6f399dd7de9f822e672824d03e198807c7a12d4e
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x37b9ed794223097269c1ed008350f8e167e1951e78ee089f543ee408c0252add
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #21:           0x0e70d39aac21b08026f2d38c780707391defdba8bf8d3d3e0568a679231eb5b8
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x8a2ba7a2f18b75195a4df4a6239d3311bed21f67199e4fc6cc82c89b7ce5ca29
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            53361 of 16777216
+  Block #22:           0x9c724ca5362e8b5b320ed6d6bbd4e8fd0632cb2a12f8f6cc769c03fccc34d23c
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0xb817c2bd9734fa803ce192f493064f63c4f66eebccb77a6bd85fe3ffe12c72ac
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x610178da211fef7d417bc0e6fed39f05609ad788
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #23:           0xd0a43ab7dce875c41490e741473175da9d99c515e99349846a7d6b240db48177
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x3362d168c0153fda5e974dcf8774ab524462eac6d3f316dfdbcc1d90acd25328
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            227939 of 16777216
+  Block #24:           0x74144eac13dc35eae5ce4d004cb856d931affdb18b2364a7f202d32ab7ac81a4
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x05e676fca965e8a7cac83320f02ffd6ddd77a232a4724c230f1b4f1a2a582292
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            148742 of 16777216
+  Block #25:           0x197a760cb64f8aff09cd6fc2fc869505488156decc532515ffc7aca918cccebd
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x8cba0e141817ec2134d41e5adfaa3b13be47ffef500618a2c8eef53546a7bf2c
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            133870 of 16777216
+  Block #26:           0x0559bc721bac08af1ad77bc5392866e95b6bee234a28020ae1899ec37b74431f
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0xeed03aa3df550ac2cf1cd798f0d3f2a093aee125bad5d78b6d444800976a4fb4
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #27:           0x6c914ac5ef45c9e24c92ef58fd14e2fd96eefad029a89301fc2c3ae73a1632b8
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x20f6350ec31144d03b8deda1fb938b5b13e225e9c6db2d53d9a8e01f47444c88
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #28:           0xd508228c8f78ca727bbd181930a53d647f6409794902e938358be032d1d18d91
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0xe948a0bb21a990a4487bcd5179492c3ace55fed7f35cf47508564c06f5953667
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            148778 of 16777216
+  Block #29:           0xd66c30cbfa8d0c73bd44f408b8a3cb89dcc988a13ccdb3e1cd17d5f7e3e40114
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0xb70bb076f92d394e3b7ea9d189e40348e496ee97c0e013887669c63283ac7024
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #30:           0x86e6b21ac373d2ebaafc23f6f44b8bf89902a7b3e14e0adc600802ebd451e8be
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x1e5b423a97b668880804ca248b7bbb93aa793f2a2bcb7a69c2693b317b6a2235
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #31:           0xec32f98b0f120dc8c03f8a56fdf8da1334f574612c7d5148a44c0f385e2f1849
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32mevm_increaseTime[0m
+[32mevm_mine[0m
+  Mined empty block #32 with base fee 15042946
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0
+
+[32meth_getBlockByNumber[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_getBlockByNumber[0m
+[32meth_feeHistory[0m
+[32meth_maxPriorityFeePerGas[0m
+[32meth_sendTransaction[0m
+  Contract deployment: AlphaHelixToken
+  Contract address:    0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Transaction:         0xdb7f22d499a561e45635bfb84fb60033687d52aa1d291962232c650688af1c0c
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            800351 of 16777216
+  Block #33:           0xbdf9fdc23a10b4f573edec156e7d515bbb907747e1853261eb861ab736a24439
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixReserve
+  Contract address:    0xa85233c63b9ee964add6f2cffe00fd84eb32338f
+  Transaction:         0x2bcfbb9b8859a33a5f535e3f1aa9ad36f5d96f5f2a384dd4945f6cb2a68c09ca
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            718763 of 16777216
+  Block #34:           0xb681aec5394ca3c392083e2dc3b9c2dc42376b8850e1ad1a08df19a2ce22db73
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixMarket
+  Contract address:    0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Transaction:         0xc65aa37dafcfe961440477866e5e9a3a5ec72eacda9b88ab59a6652b428ebf20
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            1500834 of 16777216
+  Block #35:           0x8810faf61ecc8aed2d72c557fb6c5d079567addedabcfb320d6195df21208c7e
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_call[0m
+  Contract call:       AlphaHelixToken#MINTER_ROLE
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0xe1ac964792895292a1ad259ccab133e07dd6edf855df1e992812a63fed8f1baf
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            51206 of 16777216
+  Block #36:           0x7a26891f88b5a3468e3a8d97807b2be8d678af53ee3a9656713011af8a25fadc
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0xe88954fcf0eab8261256a39f9e8049a259171e75a8cff880647911e4b0ad8bc1
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #37:           0x6e4bdcee4cdc5240f71c731b9d8edd3e3f9b9677067e433c105f9afceec2b5a7
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x997c1624dd8ad4e21f3a3b8437edbb1434bbe3fc9a0590fe1d714c7214743107
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            70473 of 16777216
+  Block #38:           0xab425d832e1d0230a68676b609b9bc0987ac2eee5ca2681c005e451528ea9dd5
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x7f6a37fd7e89ede3de917bd88a1ea28f4c8d68b54bf33514b4b1eb2ff6009067
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #39:           0x39ded4169fc5a332c0fd1fc05974e24d22df82d1c1c3e5020e923a9c97023bfb
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x5c1c389a890dfbd7dd0689f9a92ef53328a5aa603bf7393edcbd502090ba038b
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            53373 of 16777216
+  Block #40:           0xaef008bccd73810f5f63f13b1f48916263a498855d363a70ea847efb956cd7ca
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x65dfa9884c2f3993c8abf6cc1150651042476445100ad0c5dee8179e02926474
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #41:           0x516c4d864b72c7e1a6c57eb23b91663511ffd59d5c7f4d5bc4f97f998bb016d6
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x7e1ccd9cbeaf287e8721f1f36d7bcff35d2d6eccf503f97d3b17786a76f9d141
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            53361 of 16777216
+  Block #42:           0x3054d7c3ab0581688c8e648a079c492789d84c8090a5b021064c4a67591200d1
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x5c05e77787ff7eac97dff1cfdd7880d0e82a166a524dbf2067b76e9ad8405543
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x322813fd9a801c5507c9de605d63cea4f2ce6c44
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #43:           0x1443c5a667a4215e30cbe9e44918a121501b47a3c79bba7aed404db7a5438cfd
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0xd80db685878763ac385522edfd5eb3306101814b3d52d613a86eccf1665444ee
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            227939 of 16777216
+  Block #44:           0x11c9156356a35ac189f88624249b97473fc0771f28b518c318715c5aeea2cc7a
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x5d1e898ef52353ec8504561074271b9d49c87f7fca94934f9f4416bbe74b89d7
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            148742 of 16777216
+  Block #45:           0xcb3e8720ff0bf1707a3560c8cf501d5ab1a77d2daba662696ce3f28673fd1aa3
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x5e416897324f70d2bb16c7c179e3d5aad80c6179bf5157e95afe72845005fae0
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            133870 of 16777216
+  Block #46:           0x1994764e995554b2b170e3eb39f09c87ff77aae96cac38a36369b81f6722cd80
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0xa8529e28a3b8189348e2bd66229e202789350d6e13021d9d6a8c41e6e234fadd
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #47:           0xc874de16a063b61eafdd5a21410999126d49a3dfcadeb00c7a624894657369ab
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x61be536e828d78cb2529c4276a6b4761ea3385b258484f604b5b51af287fd0fb
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #48:           0x81715398c49f6a55fd62bf08459cc164448ddaff6471df418a039c7e9fb2b081
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x9212e9bf97849d7959ca4b5bcdcdfac9d269dbde0ee45c39a28c6e8520969e10
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            148778 of 16777216
+  Block #49:           0xf0c067c0533a6948b6c2f869c0118cd7369300c2102d5b6209ba388f20a2700d
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0xc95cf12694c499f3eb0dbb583f4b595e6833656f50bf93d3dcb72ab63357b464
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #50:           0xc79ee52202f18cbbccc1b7cc6589ba5c6bf57c71bd54952ae8a7dc0e58018efc
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x485ae7f58cdbcf69e42936095a16f3d813ceece57b43c06316bf0d7426d3967a
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #51:           0xeeef91cac7f3d9b6a463ac62151f37f16277520fa8a8aaf554d827c95f92e0c9
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32mevm_increaseTime[0m
+[32mevm_mine[0m
+  Mined empty block #52 with base fee 1087183
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x4a679253410272dd5232b3ff7cf5dbb88f295319
+
+[32meth_getBlockByNumber[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_getBlockByNumber[0m
+[32meth_feeHistory[0m
+[32meth_maxPriorityFeePerGas[0m
+[32meth_sendTransaction[0m
+  Contract deployment: AlphaHelixToken
+  Contract address:    0x851356ae760d987e095750cceb3bc6014560891c
+  Transaction:         0x3226fd3d130552df2b9e3b3833f5d70b7757749397fadcef7c61387cc4641e98
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            800351 of 16777216
+  Block #53:           0x6ff070bf11fcdbe8b6deea5fc67d33c04849005034d084b84868afeec281019e
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixReserve
+  Contract address:    0xf5059a5d33d5853360d16c683c16e67980206f36
+  Transaction:         0x4bcd6fa58856be243812247a82dbd9d99a80fae94d3e56e58d5eebbbf6268782
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            718763 of 16777216
+  Block #54:           0x0aa4bb273451dc7882494e85d4a79a1f32c291359985f13725bf7e3f87d70988
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_accounts[0m
+[32mhardhat_metadata[0m
+[32mhardhat_metadata (2)[0m
+[32mhardhat_metadata (3)[0m
+[32mhardhat_metadata (4)[0m
+[32mhardhat_metadata (5)[0m
+[32mhardhat_metadata (6)[0m
+[32mhardhat_metadata (7)[0m
+[32mhardhat_metadata (8)[0m
+[32mhardhat_metadata (9)[0m
+[32mhardhat_metadata (10)[0m
+[32mhardhat_metadata (11)[0m
+[32mhardhat_metadata (12)[0m
+[32mhardhat_metadata (13)[0m
+[32mhardhat_metadata (14)[0m
+[32mhardhat_metadata (15)[0m
+[32mhardhat_metadata (16)[0m
+[32mhardhat_metadata (17)[0m
+[32mhardhat_metadata (18)[0m
+[32mhardhat_metadata (19)[0m
+[32mhardhat_metadata (20)[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract deployment: HelixMarket
+  Contract address:    0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Transaction:         0x91b712b586a39915e1a0c21a7b49e01aa6571be272e07844559d7a5ffefc3163
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            1500834 of 16777216
+  Block #55:           0xa226bc26f813c9c4c07db710f6fe0be0e833fc334164ffb43989e5586f97ea4e
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_call[0m
+  Contract call:       AlphaHelixToken#MINTER_ROLE
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0xed826f5bb34bf5187ae7f9cd2bb3f9917e367fb8c2f705b750d272934b821c3c
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #56:           0xe38a54f298199c7b87f22b803b68bd7ce60bd52f5206eec02b09d91e5a113cdc
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#grantRole
+  Transaction:         0xa4c7ec70599c423d565101dd28d8e570034f31f09866b97a2193c67ee3cb265c
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            51218 of 16777216
+  Block #57:           0x0c86959a88c7f8fe344586daa1c838a6a945a65fda43be277d68b25f2491dba3
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x333c5266ba5420de9a027c36781436310115fa4e7a77f163ca198a7d4317706c
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            70473 of 16777216
+  Block #58:           0x611c7caa256fe22148e99e9f9401f29aedf7f84a32205f329971f36e8b9eecff
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x939e7e54878b22991985e1f66f0b9cbb5514b6864196ee2236cb5d03d6bb91ad
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #59:           0x5c00ddd98383cc15f38065ceb2a13e7a37c032a9e83243be34da39e701866aa3
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0xd9429967092ea8367179e4fd21ff1d0bdc5aa47dcc8b2a4b511210171ab7323b
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            53373 of 16777216
+  Block #60:           0x445e3a4bb88944929771e5aec266bef5f5dcc667291be244e7ae2b13da8152f0
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0x5a6c5e21c473320a45e53bd73f3dc7804bb988b497c740383d6b15fabfd84408
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #61:           0x8c2c921f74c9e02f36cfa12c97411fbd17c54bd818ad8d9d92a028b354bbf195
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#mint
+  Transaction:         0x8e11df5990db26e66646a9b596b074f8a098d2d342fbf9e4913d142fd7fe5281
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            53361 of 16777216
+  Block #62:           0x4e2ba2c2a65caf7aed61c6ca7e031f725160b7432834623148f3ed6d3e321602
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       AlphaHelixToken#approve
+  Transaction:         0xb1da23f985e128568221f0a0e2e8f54a234ae6c3b8fba847cdfd2e362cd3f569
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x851356ae760d987e095750cceb3bc6014560891c
+  Value:               0 ETH
+  Gas used:            46015 of 16777216
+  Block #63:           0x7547979e6357279caa87bb5d550370c5be7f728aed84b71aa7d22c53a6847e5b
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0xe2ab2970415aad56cdfc84358ea4ec8e70b7f46f207f785f99da516ba18da411
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            227939 of 16777216
+  Block #64:           0xcb499626e171fc27d83be07dd3a74d5e161675d4cfe4b04a0eaf3185b5bd595d
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0xf5cb16a2cd1464015ca9a326194fa962a6f3658b12c5ce3616333c05d876a26a
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            148742 of 16777216
+  Block #65:           0xc16720167a2c2f151feda020fc34ba8ce5d39d3c3f2c6f2d5e8351ba256aa6c8
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x19c78fdbfe344e74efa555eb7057ff3e8b9dd17d4c497d362b4840c55c4b89dc
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            133870 of 16777216
+  Block #66:           0xcc483d5c0cb09079234ac2ed4c6ea46f2e4a65f36579afd676ae829d950ea718
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x5c7531f4621c9b43c6dac714e6b09fde1bb9b996303a1e9eb100b2e4134312f2
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #67:           0x8528d847e284a6cd791925e3c7d5e2b4154f584ed2bb48b15d561056e7d3dba8
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x5a5b4ad6de95aaf9208379cc898a259ee085bfa0693d62fcf31910b9563e8297
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #68:           0x21c8e9ba77e8dfb0df967726a351f388ed6e1de6d8351d64e1a5f2cc943ed24a
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#submitStatement
+  Transaction:         0x95fcd7d83d9c27c0d75991d1b5319475901deaf4cc8d89f5d7fb1faeb891224d
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            148778 of 16777216
+  Block #69:           0x3f2b4de9c64e1ac8f193e76c37cd9223bfe024c41a9fe97621d8e39b060c6d7d
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0x41ab5899e76692bcb9480893d689a586a06ca5cef53442814ce97cc36b6dac51
+  From:                0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #70:           0x21d413db1e2f3f0112009bbea45714e0845ffa9da9f8d4e9047936dadbbea50d
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32meth_blockNumber[0m
+[32meth_feeHistory[0m
+[32meth_sendTransaction[0m
+  Contract call:       HelixMarket#commitBet
+  Transaction:         0xe7e8dfa0eb5b760c1f1c0bbeee016a9bf95594f69e6c4bb999933092c13a4298
+  From:                0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+  Value:               0 ETH
+  Gas used:            116782 of 16777216
+  Block #71:           0xb269bbea9bad452f8ac91b1555e8da587368ada87c4e4f96277c3ce72e80d61d
+
+[32meth_getTransactionByHash[0m
+[32meth_getTransactionReceipt[0m
+[32mevm_increaseTime[0m
+[32mevm_mine[0m
+  Mined empty block #72 with base fee 78576
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_getBlockByNumber[0m
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
+
+[32meth_call[0m
+  Contract call:       HelixMarket#markets
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  To:                  0x95401dc811bb5740090279ba06cfa8fcf6113778
