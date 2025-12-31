@@ -28,30 +28,24 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
-    contracts: useMemo(() => {
-      const contractConfig = {
-        address: contracts.HelixMarket,
-        abi: marketAbi,
-      };
-
-      return [
   const contractConfig = useMemo(() => ({
     address: contracts.HelixMarket,
     abi: marketAbi,
   }), []);
 
   const contractsArray = useMemo(() => {
-    return [
+    // Basic read for market data
+    const reqs = [
       {
         ...contractConfig,
         functionName: 'markets',
         args: marketId !== undefined ? [marketId] : undefined,
-      },
-      // Conditional user data fetches
-      ...(marketId !== undefined && address ? [
+      }
+    ];
+
+    // If user is connected, append user-specific reads to batch them
+    if (marketId !== undefined && address) {
+      reqs.push(
         {
           ...contractConfig,
           functionName: 'bets',
@@ -64,38 +58,13 @@ export default function MarketDetailPage() {
         },
         {
           ...contractConfig,
-          functionName: 'markets',
-          args: marketId !== undefined ? [marketId] : undefined,
+          functionName: 'bets',
+          args: [marketId, address, 2], // Unaligned bet
         },
-        // Conditional user data fetches
-        ...(marketId !== undefined && address ? [
-          {
-            ...contractConfig,
-            functionName: 'bets',
-            args: [marketId, address, 1], // Yes bet
-          },
-          {
-            ...contractConfig,
-            functionName: 'bets',
-            args: [marketId, address, 0], // No bet
-          },
-          {
-            ...contractConfig,
-            functionName: 'bets',
-            args: [marketId, address, 2], // Unaligned bet
-          },
-          {
-            ...contractConfig,
-            functionName: 'committedAmount',
-            args: [marketId, address],
-          }
-        ] : [])
-      ];
-    }, [marketId, address]),
         {
-           ...contractConfig,
-           functionName: 'committedAmount',
-           args: [marketId, address],
+          ...contractConfig,
+          functionName: 'committedAmount',
+          args: [marketId, address],
         },
         {
            address: contracts.AlphaHelixToken,
@@ -103,8 +72,9 @@ export default function MarketDetailPage() {
            functionName: 'allowance',
            args: [address, contracts.HelixMarket],
         }
-      ] : [])
-    ];
+      );
+    }
+    return reqs;
   }, [contractConfig, marketId, address]);
 
   // Optimization: Batch multiple contract reads into a single multicall/RPC request
