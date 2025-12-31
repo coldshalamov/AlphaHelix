@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
@@ -7,6 +7,7 @@ import Spinner from './Spinner';
 
 export default function Bank() {
   const { address } = useAccount();
+  const publicClient = usePublicClient();
   const [buyAmount, setBuyAmount] = useState('');
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
@@ -72,6 +73,8 @@ export default function Bank() {
     }
     try {
       const hlxValue = parseEther(sellAmount || '0');
+
+      setStatus('Approving HLX...');
       const approveHash = await writeContractAsync({
         address: contracts.AlphaHelixToken,
         abi: tokenAbi,
@@ -80,6 +83,11 @@ export default function Bank() {
       });
       setTxHash(approveHash);
 
+      setStatus('Waiting for approval confirmation...');
+      if (!publicClient) throw new Error('Public client unavailable.');
+      await publicClient.waitForTransactionReceipt({ hash: approveHash });
+
+      setStatus('Selling HLX...');
       const sellHash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,

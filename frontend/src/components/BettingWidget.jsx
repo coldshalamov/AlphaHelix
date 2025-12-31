@@ -285,8 +285,8 @@ function BettingWidget({
               className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
               style={{
                 margin: 0,
-                                opacity: isLoading || isPending || isConfirming ? 0.6 : 1,
-                cursor: isLoading || isPending || isConfirming ? 'not-allowed' : 'pointer',cursor: isLocked ? 'not-allowed' : 'pointer',
+                opacity: isLocked ? 0.6 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
               }}
             >
               <input
@@ -296,8 +296,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
-                                disabled={isLoading || isPending || isConfirming || isLocked}
-                
+                disabled={isLocked}
               />
               {c.label}
             </label>
@@ -318,14 +317,7 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
-                            
-                            
-                
-        </div>
-
-        <button className="button primary" onClick={handleCommit} disabled={isLoading}>
-          {isLoading ? (
-                disabled={isPending || isConfirming || isLocked}
+            disabled={isLocked}
           />
         </div>
 
