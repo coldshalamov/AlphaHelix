@@ -38,30 +38,6 @@ export default function MarketDetailPage() {
       };
 
       return [
-  const contractConfig = useMemo(() => ({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-  }), []);
-
-  const contractsArray = useMemo(() => {
-    return [
-      {
-        ...contractConfig,
-        functionName: 'markets',
-        args: marketId !== undefined ? [marketId] : undefined,
-      },
-      // Conditional user data fetches
-      ...(marketId !== undefined && address ? [
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 1], // Yes bet
-        },
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 0], // No bet
-        },
         {
           ...contractConfig,
           functionName: 'markets',
@@ -88,29 +64,16 @@ export default function MarketDetailPage() {
             ...contractConfig,
             functionName: 'committedAmount',
             args: [marketId, address],
+          },
+          {
+             address: contracts.AlphaHelixToken,
+             abi: tokenAbi,
+             functionName: 'allowance',
+             args: [address, contracts.HelixMarket],
           }
         ] : [])
       ];
     }, [marketId, address]),
-        {
-           ...contractConfig,
-           functionName: 'committedAmount',
-           args: [marketId, address],
-        },
-        {
-           address: contracts.AlphaHelixToken,
-           abi: tokenAbi,
-           functionName: 'allowance',
-           args: [address, contracts.HelixMarket],
-        }
-      ] : [])
-    ];
-  }, [contractConfig, marketId, address]);
-
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
-    contracts: contractsArray,
     query: {
        enabled: marketId !== undefined,
        // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)

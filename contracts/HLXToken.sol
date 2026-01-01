@@ -5,6 +5,7 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
 /**
  * @title HLXToken
@@ -60,6 +61,8 @@ contract HLXToken is ERC20, ERC20Permit, ERC20Votes, AccessControl {
 
     // ---- Overrides required by Solidity ----
 
+    // In OpenZeppelin 5.0, _mint, _burn, and _transfer were replaced by _update.
+    // ERC20Votes overrides _update to track voting power.
     function _update(
         address from,
         address to,
@@ -68,17 +71,13 @@ contract HLXToken is ERC20, ERC20Permit, ERC20Votes, AccessControl {
         super._update(from, to, value);
     }
 
-    function _mint(
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
-        super._mint(to, amount);
-    }
-
-    function _burn(
-        address from,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
-        super._burn(from, amount);
+    // ERC20Permit and Nonces (from ERC20Votes) both define nonces.
+    function nonces(address owner)
+        public
+        view
+        override(ERC20Permit, Nonces)
+        returns (uint256)
+    {
+        return super.nonces(owner);
     }
 }
