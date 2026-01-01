@@ -1,0 +1,170 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ITruthMarket",
+  "sourceName": "contracts/interfaces/ITruthMarket.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "claimId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "confidenceBps",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "position",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "trueStake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "falseStake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "unalignedStake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "paidOut",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "locked",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ITruthMarket.Position",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "resolvedAt",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totals",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "trueStake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "falseStake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "unalignedStake",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ITruthMarket.Totals",
+          "name": "aggregate",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalStake",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tradingClosesAt",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "winningOutcome",
+      "outputs": [
+        {
+          "internalType": "enum ITruthMarket.Resolution",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -200,6 +200,8 @@ function BettingWidget({
     }
   };
 
+  const renderTimeLeft = useCallback((t) => <div className="helper">{t} remaining</div>, []);
+
   if (!isConnected) {
     return (
       <div className="card" style={{ borderColor: '#e5e7eb' }}>
@@ -222,7 +224,7 @@ function BettingWidget({
     return (
       <div className="card" style={{ borderColor: '#fef3c7' }}>
         <h3 className="font-semibold">Reveal phase</h3>
-        <Countdown targetSeconds={revealEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+        <Countdown targetSeconds={revealEndSeconds} render={renderTimeLeft} />
 
         {storedBet ? (
           <div className="section">
@@ -231,7 +233,7 @@ function BettingWidget({
               {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
             </div>
 
-            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isPending || isConfirming}>
+            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
               {isPending || isConfirming ? (
                 <>
                   <Spinner />
@@ -273,7 +275,7 @@ function BettingWidget({
   return (
     <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
-      <Countdown targetSeconds={commitEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+      <Countdown targetSeconds={commitEndSeconds} render={renderTimeLeft} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
@@ -285,8 +287,8 @@ function BettingWidget({
               className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
               style={{
                 margin: 0,
-                                opacity: isLoading || isPending || isConfirming ? 0.6 : 1,
-                cursor: isLoading || isPending || isConfirming ? 'not-allowed' : 'pointer',cursor: isLocked ? 'not-allowed' : 'pointer',
+                opacity: isLocked ? 0.6 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
               }}
             >
               <input
@@ -296,8 +298,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
-                                disabled={isLoading || isPending || isConfirming || isLocked}
-                
+                disabled={isLocked}
               />
               {c.label}
             </label>
@@ -318,14 +319,7 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
-                            
-                            
-                
-        </div>
-
-        <button className="button primary" onClick={handleCommit} disabled={isLoading}>
-          {isLoading ? (
-                disabled={isPending || isConfirming || isLocked}
+            disabled={isLocked}
           />
         </div>
 
