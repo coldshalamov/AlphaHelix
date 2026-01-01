@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
-export default function Countdown({ targetSeconds, render }) {
+function Countdown({ targetSeconds, render }) {
   const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
@@ -42,3 +42,5 @@ function formatDuration(seconds) {
   parts.push(`${secs}s`);
   return parts.join(' ');
 }
+
+export default memo(Countdown);
