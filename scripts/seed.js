@@ -85,11 +85,11 @@ async function main() {
 
   // Market 1: "Will ETH flip BTC in 2025?" (Phase: Open)
   // Long duration
-  const oneYear = 365 * 24 * 60 * 60;
+  const oneMonth = 30 * 24 * 60 * 60;
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket1_ETH_BTC_Flip_2025",
-    oneYear,
-    oneYear
+    oneMonth,
+    oneMonth
   )).wait();
   console.log("Market 1 created: 'Will ETH flip BTC in 2025?' (Open)");
 
@@ -97,8 +97,8 @@ async function main() {
   // Also long duration, but we will place bets.
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket2_Sky_Blue",
-    oneYear,
-    oneYear
+    oneMonth,
+    oneMonth
   )).wait();
   console.log("Market 2 created: 'Is the sky blue?' (Commit)");
 
@@ -113,8 +113,8 @@ async function main() {
 
   // Market 3: "Did we land on the moon?" (Phase: Reveal)
   // Short commit duration so we can travel past it.
-  const shortDuration = 60; // 60 seconds
-  const longReveal = oneYear;
+  const shortDuration = 3600; // 1 hour
+  const longReveal = oneMonth;
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket3_Moon_Landing",
     shortDuration,
@@ -136,8 +136,8 @@ async function main() {
   }
 
   // Advance time to put Market 3 into Reveal phase
-  // Market 3 commit duration is 60s. We go 100s.
-  await increaseTime(100);
+  // Market 3 commit duration is 3600s. We go 3700s.
+  await increaseTime(3700);
   console.log("Time advanced. Market 3 should now be in Reveal phase.");
 
   // Check phases

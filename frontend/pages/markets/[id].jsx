@@ -28,40 +28,16 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
-    contracts: useMemo(() => {
-      const contractConfig = {
-        address: contracts.HelixMarket,
-        abi: marketAbi,
-      };
-
-      return [
   const contractConfig = useMemo(() => ({
     address: contracts.HelixMarket,
     abi: marketAbi,
   }), []);
 
-  const contractsArray = useMemo(() => {
-    return [
-      {
-        ...contractConfig,
-        functionName: 'markets',
-        args: marketId !== undefined ? [marketId] : undefined,
-      },
-      // Conditional user data fetches
-      ...(marketId !== undefined && address ? [
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 1], // Yes bet
-        },
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 0], // No bet
-        },
+  // Optimization: Batch multiple contract reads into a single multicall/RPC request
+  // This reduces network waterfall and synchronizes loading states
+  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+    contracts: useMemo(() => {
+      return [
         {
           ...contractConfig,
           functionName: 'markets',
@@ -88,29 +64,22 @@ export default function MarketDetailPage() {
             ...contractConfig,
             functionName: 'committedAmount',
             args: [marketId, address],
+          },
+          {
+            address: contracts.AlphaHelixToken,
+            abi: tokenAbi,
+            functionName: 'allowance',
+            args: [address, contracts.HelixMarket],
+          },
+          {
+            address: contracts.AlphaHelixToken,
+            abi: tokenAbi,
+            functionName: 'balanceOf',
+            args: [address],
           }
         ] : [])
       ];
-    }, [marketId, address]),
-        {
-           ...contractConfig,
-           functionName: 'committedAmount',
-           args: [marketId, address],
-        },
-        {
-           address: contracts.AlphaHelixToken,
-           abi: tokenAbi,
-           functionName: 'allowance',
-           args: [address, contracts.HelixMarket],
-        }
-      ] : [])
-    ];
-  }, [contractConfig, marketId, address]);
-
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
-    contracts: contractsArray,
+    }, [contractConfig, marketId, address]),
     query: {
        enabled: marketId !== undefined,
        // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)
@@ -129,6 +98,7 @@ export default function MarketDetailPage() {
   const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
   const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
   const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
+  const balance = address ? readResults?.[userResultsBaseIndex + 5]?.result : undefined;
 
   const isLoading = isReading;
   const error = readError;
@@ -335,6 +305,7 @@ export default function MarketDetailPage() {
         tie={tie}
         expectedChainId={expectedChainId}
         allowance={allowance}
+        balance={balance}
       />
     </div>
   );

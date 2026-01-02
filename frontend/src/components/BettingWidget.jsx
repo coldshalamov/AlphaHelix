@@ -6,7 +6,7 @@ import {
   useWriteContract,
   usePublicClient,
 } from 'wagmi';
-import { encodePacked, keccak256, parseEther } from 'viem';
+import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
@@ -28,6 +28,7 @@ function BettingWidget({
   tie,
   expectedChainId,
   allowance,
+  balance,
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -285,8 +286,8 @@ function BettingWidget({
               className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
               style={{
                 margin: 0,
-                                opacity: isLoading || isPending || isConfirming ? 0.6 : 1,
-                cursor: isLoading || isPending || isConfirming ? 'not-allowed' : 'pointer',cursor: isLocked ? 'not-allowed' : 'pointer',
+                opacity: isLocked ? 0.6 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
               }}
             >
               <input
@@ -296,8 +297,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
-                                disabled={isLoading || isPending || isConfirming || isLocked}
-                
+                disabled={isLocked}
               />
               {c.label}
             </label>
@@ -305,9 +305,32 @@ function BettingWidget({
         </fieldset>
 
         <div>
-          <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
-            Amount to Stake
-          </label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <label htmlFor="bet-amount" className="label" style={{ margin: 0 }}>
+              Amount to Stake
+            </label>
+            {balance && (
+              <button
+                type="button"
+                className="helper"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  color: 'var(--accent)',
+                  textDecoration: 'underline',
+                  opacity: isLocked ? 0.6 : 1
+                }}
+                onClick={() => setAmount(formatEther(balance))}
+                disabled={isLocked}
+                aria-label="Use maximum balance"
+              >
+                Max: {parseFloat(formatEther(balance)).toFixed(4)} HLX
+              </button>
+            )}
+          </div>
           <input
             id="bet-amount"
             type="number"
@@ -318,14 +341,7 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
-                            
-                            
-                
-        </div>
-
-        <button className="button primary" onClick={handleCommit} disabled={isLoading}>
-          {isLoading ? (
-                disabled={isPending || isConfirming || isLocked}
+            disabled={isLocked}
           />
         </div>
 
