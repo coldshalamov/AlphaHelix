@@ -40,6 +40,15 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
 
+  const isAmountError = useMemo(() => {
+    if (!status) return false;
+    return [
+      'Enter an amount of HLX to stake.',
+      'Invalid HLX amount.',
+      'Enter an amount greater than zero.',
+    ].includes(status);
+  }, [status]);
+
   // Track what the current txHash actually represents
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
   const [pendingBet, setPendingBet] = useState(null);
@@ -231,8 +240,8 @@ function BettingWidget({
               {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
             </div>
 
-            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isPending || isConfirming}>
-              {isPending || isConfirming ? (
+            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
+              {isLocked ? (
                 <>
                   <Spinner />
                   Revealing...
@@ -310,6 +319,8 @@ function BettingWidget({
           <input
             id="bet-amount"
             type="number"
+            inputMode="decimal"
+            autoComplete="off"
             min="0"
             step="0.01"
             className="input"
@@ -322,7 +333,7 @@ function BettingWidget({
         </div>
 
         <button className="button primary" onClick={handleCommit} disabled={isLocked}>
-          {isPending || isConfirming ? (
+          {isLocked ? (
             <>
               <Spinner />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}

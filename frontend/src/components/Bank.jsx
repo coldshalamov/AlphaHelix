@@ -74,6 +74,7 @@ export default function Bank() {
     try {
       const hlxValue = parseEther(sellAmount || '0');
 
+      // Step 1: Approve
       setStatus('Approving HLX...');
       const approveHash = await writeContractAsync({
         address: contracts.AlphaHelixToken,
