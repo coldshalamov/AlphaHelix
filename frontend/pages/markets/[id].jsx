@@ -34,14 +34,18 @@ export default function MarketDetailPage() {
   }), []);
 
   const contractsArray = useMemo(() => {
-    return [
+    // Basic read for market data
+    const reqs = [
       {
         ...contractConfig,
         functionName: 'markets',
         args: marketId !== undefined ? [marketId] : undefined,
-      },
-      // Conditional user data fetches
-      ...(marketId !== undefined && address ? [
+      }
+    ];
+
+    // If user is connected, append user-specific reads to batch them
+    if (marketId !== undefined && address) {
+      reqs.push(
         {
           ...contractConfig,
           functionName: 'bets',
@@ -58,9 +62,9 @@ export default function MarketDetailPage() {
           args: [marketId, address, 2], // Unaligned bet
         },
         {
-           ...contractConfig,
-           functionName: 'committedAmount',
-           args: [marketId, address],
+          ...contractConfig,
+          functionName: 'committedAmount',
+          args: [marketId, address],
         },
         {
            address: contracts.AlphaHelixToken,
@@ -68,8 +72,9 @@ export default function MarketDetailPage() {
            functionName: 'allowance',
            args: [address, contracts.HelixMarket],
         }
-      ] : [])
-    ];
+      );
+    }
+    return reqs;
   }, [contractConfig, marketId, address]);
 
   // Optimization: Batch multiple contract reads into a single multicall/RPC request
