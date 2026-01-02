@@ -84,11 +84,10 @@ export default function Bank() {
       });
       setTxHash(approveHash);
 
-      // Wait for approval to be mined
-      if (!publicClient) throw new Error('Public client not available');
+      setStatus('Waiting for approval confirmation...');
+      if (!publicClient) throw new Error('Public client unavailable.');
       await publicClient.waitForTransactionReceipt({ hash: approveHash });
 
-      // Step 2: Sell
       setStatus('Selling HLX...');
       const sellHash = await writeContractAsync({
         address: contracts.HelixReserve,
