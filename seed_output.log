@@ -1,0 +1,29 @@
+Downloading compiler 0.8.20
+Compiled 52 Solidity files successfully (evm target: paris).
+Seeding data with account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+AlphaHelixToken deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+HelixReserve deployed to: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+HelixMarket deployed to: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+Granted MINTER_ROLE to HelixReserve
+Granted MINTER_ROLE to Deployer
+Addresses written to frontend/src/config/contracts.json
+Minted 10,000 HLX to 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Approved HelixMarket for 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Minted 10,000 HLX to 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+Approved HelixMarket for 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+Minted 10,000 HLX to 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+Approved HelixMarket for 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+Market 1 created: 'Will ETH flip BTC in 2025?' (Open)
+Market 2 created: 'Is the sky blue?' (Commit)
+User 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 committed bet on Market 1 (Choice: 1, Amount: 500)
+User 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC committed bet on Market 1 (Choice: 0, Amount: 200)
+User 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 committed bet on Market 1 (Choice: 2, Amount: 100)
+Market 3 created: 'Did we land on the moon?' (Reveal target)
+User 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 committed bet on Market 2 (Choice: 1, Amount: 1000)
+User 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC committed bet on Market 2 (Choice: 1, Amount: 1000)
+Time traveled 3670 seconds
+Time advanced. Market 3 should now be in Reveal phase.
+Current Time: 1767319658
+Market 1 Commit End: 1797555981 (Open? true)
+Market 2 Commit End: 1797555982 (Open? true)
+Market 3 Commit End: 1767319646 (Reveal? true)

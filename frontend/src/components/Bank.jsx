@@ -124,6 +124,8 @@ export default function Bank() {
             <input
               id="buy-amount"
               type="number"
+              inputMode="decimal"
+              autoComplete="off"
               min="0"
               step="0.01"
               className="input"
@@ -157,6 +159,8 @@ export default function Bank() {
             <input
               id="sell-amount"
               type="number"
+              inputMode="decimal"
+              autoComplete="off"
               min="0"
               step="0.01"
               className="input"
