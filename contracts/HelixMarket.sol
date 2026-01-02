@@ -10,7 +10,7 @@ contract HelixMarket is ReentrancyGuard {
     AlphaHelixToken public immutable token;
     uint256 public constant STATEMENT_FEE = 100 * 10**18; // 100 HLX
     uint256 public constant ORIGINATOR_FEE_BPS = 100; // 1%
-    uint256 public constant UNREVEALED_PENALTY_BPS = 100; // 1% burned on unrevealed withdrawals
+    uint256 public constant UNREVEALED_PENALTY_BPS = 10000; // 100% burned on unrevealed withdrawals
     uint256 public constant MIN_REVEAL_DURATION = 1 hours;
     uint256 public constant MIN_BIDDING_DURATION = 1 hours;
     uint256 public constant MAX_DURATION = 52 weeks;

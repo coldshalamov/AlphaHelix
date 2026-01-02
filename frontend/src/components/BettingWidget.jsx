@@ -310,8 +310,6 @@ function BettingWidget({
           <input
             id="bet-amount"
             type="number"
-            inputMode="decimal"
-            autoComplete="off"
             min="0"
             step="0.01"
             className="input"
