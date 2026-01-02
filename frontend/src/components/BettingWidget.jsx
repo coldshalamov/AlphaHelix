@@ -40,6 +40,15 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
 
+  const isAmountError = useMemo(() => {
+    if (!status) return false;
+    return [
+      'Enter an amount of HLX to stake.',
+      'Invalid HLX amount.',
+      'Enter an amount greater than zero.',
+    ].includes(status);
+  }, [status]);
+
   // Track what the current txHash actually represents
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
   const [pendingBet, setPendingBet] = useState(null);
@@ -231,8 +240,8 @@ function BettingWidget({
               {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
             </div>
 
-            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isPending || isConfirming}>
-              {isPending || isConfirming ? (
+            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
+              {isLocked ? (
                 <>
                   <Spinner />
                   Revealing...
@@ -285,7 +294,7 @@ function BettingWidget({
               className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
               style={{
                 margin: 0,
-                opacity: isLoading || isPending || isConfirming ? 0.6 : 1,
+                opacity: isLocked ? 0.6 : 1,
                 cursor: isLocked ? 'not-allowed' : 'pointer',
               }}
             >
@@ -296,8 +305,7 @@ function BettingWidget({
                 checked={choice === c.value}
                 onChange={() => setChoice(c.value)}
                 className="visually-hidden"
-                disabled={isPending || isConfirming || isLocked}
-                
+                disabled={isLocked}
               />
               {c.label}
             </label>
@@ -311,6 +319,8 @@ function BettingWidget({
           <input
             id="bet-amount"
             type="number"
+            inputMode="decimal"
+            autoComplete="off"
             min="0"
             step="0.01"
             className="input"
@@ -318,12 +328,12 @@ function BettingWidget({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
-            disabled={isPending || isConfirming || isLocked}
+            disabled={isLocked}
           />
         </div>
 
         <button className="button primary" onClick={handleCommit} disabled={isLocked}>
-          {isPending || isConfirming ? (
+          {isLocked ? (
             <>
               <Spinner />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
