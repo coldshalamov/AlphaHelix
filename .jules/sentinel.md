@@ -14,8 +14,3 @@
 **Vulnerability:** `HelixMarket.sol` allowed creating markets with extremely short bidding durations (e.g., 1 second). This enabled creating "dead" markets where no one could participate (as the commit phase would close almost immediately), wasting fees and spamming the system.
 **Learning:** All time-based parameters controlled by users must have protocol-enforced minimums to ensure viability and prevent spam/griefing.
 **Prevention:** Enforce `MIN_BIDDING_DURATION` alongside `MIN_REVEAL_DURATION`.
-
-## 2025-08-05 - [Attack Surface Reduction]
-**Vulnerability:** The repository contained unused, unmaintained, and broken contracts (`TruthMarket.sol`, `MarketFactory.sol`, `HLXToken.sol`). These files presented a risk of confusion, potential accidental deployment, and distraction from the actual audited codebase (`HelixMarket.sol`).
-**Learning:** Dead code is a security liability. It increases the audit scope unnecessarily and can harbor vulnerabilities that might be copy-pasted into active code.
-**Prevention:** Regularly prune the codebase. If a contract is not part of the active protocol or the test suite, delete it.

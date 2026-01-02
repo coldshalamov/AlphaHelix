@@ -1,0 +1,15 @@
+
+> alphahelix-frontend@0.1.0 dev /app/frontend
+> next dev
+
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+ ✓ Ready in 2.5s
+ ○ Compiling /markets/[id] ...
+ ✓ Compiled /markets/[id] in 13.6s (1783 modules)
+ ✓ Compiled in 405ms (1783 modules)
+ ✓ Compiled in 327ms (1783 modules)
+ ✓ Compiled in 316ms (1783 modules)
