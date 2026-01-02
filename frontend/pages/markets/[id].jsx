@@ -83,7 +83,7 @@ export default function MarketDetailPage() {
     contracts: contractsArray,
     query: {
        enabled: marketId !== undefined,
-       // Use refetchInterval to simulate live updates (replacing watch: true which is deprecated/unavailable in v2 useReadContract props)
+       // Use refetchInterval to simulate live updates
        refetchInterval: 5000
     }
   });

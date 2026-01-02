@@ -5,6 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
   usePublicClient,
+  useConnect,
 } from 'wagmi';
 import { encodePacked, keccak256, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -33,6 +34,7 @@ function BettingWidget({
   const chainId = useChainId();
   const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
+  const { connectors, connect } = useConnect();
 
   const [amount, setAmount] = useState('');
   const [choice, setChoice] = useState(1);
@@ -214,6 +216,18 @@ function BettingWidget({
       <div className="card" style={{ borderColor: '#e5e7eb' }}>
         <h3 className="font-semibold">Connect to participate</h3>
         <p className="helper">Connect your wallet to commit, reveal, or claim.</p>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+          {connectors.map((connector) => (
+            <button
+              key={connector.uid}
+              className="button primary"
+              onClick={() => connect({ connector })}
+              type="button"
+            >
+              Connect {connector.name}
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
