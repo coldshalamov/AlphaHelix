@@ -86,10 +86,16 @@ async function main() {
   // Market 1: "Will ETH flip BTC in 2025?" (Phase: Open)
   // Long duration
   const oneYear = 365 * 24 * 60 * 60;
+  // Bidding duration: 1 year. Reveal duration: 1 year.
+  // Note: HelixMarket enforces MAX bidding duration of 52 weeks (31449600s).
+  // 1 year = 31536000s > 31449600s.
+  // We use 50 weeks instead.
+  const fiftyWeeks = 50 * 7 * 24 * 60 * 60;
+
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket1_ETH_BTC_Flip_2025",
-    oneYear,
-    oneYear
+    fiftyWeeks,
+    fiftyWeeks
   )).wait();
   console.log("Market 1 created: 'Will ETH flip BTC in 2025?' (Open)");
 
@@ -97,8 +103,8 @@ async function main() {
   // Also long duration, but we will place bets.
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket2_Sky_Blue",
-    oneYear,
-    oneYear
+    fiftyWeeks,
+    fiftyWeeks
   )).wait();
   console.log("Market 2 created: 'Is the sky blue?' (Commit)");
 
@@ -113,8 +119,8 @@ async function main() {
 
   // Market 3: "Did we land on the moon?" (Phase: Reveal)
   // Short commit duration so we can travel past it.
-  const shortDuration = 60; // 60 seconds
-  const longReveal = oneYear;
+  const shortDuration = 60 * 60 + 60; // 1 hour + 60s. (Min duration is 1 hour = 3600s)
+  const longReveal = fiftyWeeks;
   await (await market.connect(deployer).submitStatement(
     "ipfs://QmMarket3_Moon_Landing",
     shortDuration,
@@ -136,8 +142,8 @@ async function main() {
   }
 
   // Advance time to put Market 3 into Reveal phase
-  // Market 3 commit duration is 60s. We go 100s.
-  await increaseTime(100);
+  // Market 3 commit duration is shortDuration. We go shortDuration + 10s.
+  await increaseTime(shortDuration + 10);
   console.log("Time advanced. Market 3 should now be in Reveal phase.");
 
   // Check phases
