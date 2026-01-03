@@ -338,10 +338,12 @@ function BettingWidget({
             min="0"
             step="0.01"
             className="input"
+            style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             aria-describedby="status-message"
+            aria-invalid={isAmountError}
             disabled={isLocked}
           />
         </div>
