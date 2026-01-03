@@ -117,7 +117,7 @@ describe("HelixMarket", function () {
   });
 
   describe("Unrevealed commitments", function () {
-    it("allows withdrawing unrevealed stake with a small burn penalty", async function () {
+    it("punishes unrevealed stake with total forfeiture", async function () {
       const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
 
       await market.connect(userA).submitStatement("ipfs://unrevealed", biddingDuration, revealDuration);
@@ -136,8 +136,8 @@ describe("HelixMarket", function () {
       const userBalanceAfter = await token.balanceOf(userB.address);
       const burnAfter = await token.balanceOf(burnAddress);
 
-      expect(userBalanceAfter - userBalanceBefore).to.equal(ethers.parseEther("99"));
-      expect(burnAfter - burnBefore).to.equal(ethers.parseEther("1"));
+      expect(userBalanceAfter - userBalanceBefore).to.equal(0);
+      expect(burnAfter - burnBefore).to.equal(amount);
 
       await expect(market.connect(userB).withdrawUnrevealed(marketId)).to.be.revertedWith("No unrevealed stake");
     });
