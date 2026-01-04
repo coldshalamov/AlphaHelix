@@ -103,7 +103,6 @@ function BettingWidget({
 
     if (isSuccess) {
       if (pendingAction === 'commit' && pendingBet) {
-        persistBet(pendingBet);
         setPendingBet(null);
         setStatus('Commit confirmed. Salt saved locally for reveal.');
       } else if (pendingAction === 'reveal') {
@@ -170,6 +169,7 @@ function BettingWidget({
       }
 
       // Now commit
+      persistBet(betData);
       setPendingBet(betData);
       setPendingAction('commit');
 
@@ -182,6 +182,7 @@ function BettingWidget({
       setTxHash(commitHash);
       setStatus('Commit sent. Keep this device to reveal later.');
     } catch (err) {
+      clearStoredBet();
       setPendingAction('');
       setPendingBet(null);
       setStatus(err?.shortMessage || err?.message || 'Commit failed');
