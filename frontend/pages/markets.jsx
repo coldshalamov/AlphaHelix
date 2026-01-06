@@ -38,7 +38,12 @@ function MarketCard({ market, id }) {
           <div className="value">{formatEther(market.unalignedPool)} HLX</div>
         </div>
       </div>
-      <Link className="button primary" style={{ marginTop: '0.75rem', display: 'inline-block' }} href={`/markets/${id}`}>
+      <Link
+        className="button primary"
+        style={{ marginTop: '0.75rem', display: 'inline-block' }}
+        href={`/markets/${id}`}
+        aria-label={`View details for Statement #${id}`}
+      >
         View details
       </Link>
     </div>
