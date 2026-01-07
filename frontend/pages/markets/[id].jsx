@@ -7,6 +7,7 @@ import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
+import { dateTimeFormatter } from '@/lib/formatters';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
@@ -197,7 +198,7 @@ export default function MarketDetailPage() {
         <div className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
             <div className="label">Commit end</div>
-            <div className="value">{new Date(Number(commitEndTime) * 1000).toLocaleString()}</div>
+            <div className="value">{dateTimeFormatter.format(new Date(Number(commitEndTime) * 1000))}</div>
             <Countdown
               targetSeconds={Number(commitEndTime)}
               render={renderTimeLeft}
@@ -205,7 +206,7 @@ export default function MarketDetailPage() {
           </div>
           <div>
             <div className="label">Reveal end</div>
-            <div className="value">{new Date(Number(revealEndTime) * 1000).toLocaleString()}</div>
+            <div className="value">{dateTimeFormatter.format(new Date(Number(revealEndTime) * 1000))}</div>
             <Countdown
               targetSeconds={Number(revealEndTime)}
               render={renderTimeLeft}

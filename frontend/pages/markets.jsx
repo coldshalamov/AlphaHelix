@@ -1,13 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
+import { dateTimeFormatter } from '@/lib/formatters';
 
-function MarketCard({ market, id }) {
-  const commitDate = new Date(market.commitEndTime * 1000).toLocaleString();
-  const revealDate = new Date(market.revealEndTime * 1000).toLocaleString();
+const MarketCard = memo(function MarketCard({ market, id }) {
+  const commitDate = dateTimeFormatter.format(new Date(market.commitEndTime * 1000));
+  const revealDate = dateTimeFormatter.format(new Date(market.revealEndTime * 1000));
+
   return (
     <div className="card">
       <div className="label">Statement #{id}</div>
@@ -43,7 +45,7 @@ function MarketCard({ market, id }) {
       </Link>
     </div>
   );
-}
+});
 
 export default function MarketsPage() {
   const { data: marketCount } = useReadContract({
