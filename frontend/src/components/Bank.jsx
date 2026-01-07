@@ -46,6 +46,16 @@ export default function Bank() {
     return status;
   }, [isConfirming, isSuccess, status]);
 
+  const isBuyError = useMemo(() => {
+    if (!status) return false;
+    return ['Enter an amount of ETH to spend.', 'Buy failed'].some(msg => status.includes(msg));
+  }, [status]);
+
+  const isSellError = useMemo(() => {
+    if (!status) return false;
+    return ['Enter an amount of HLX to sell.', 'Sell failed'].some(msg => status.includes(msg));
+  }, [status]);
+
   const handleBuy = async () => {
     setStatus('');
     if (!buyAmount) {
@@ -62,6 +72,12 @@ export default function Bank() {
       setTxHash(hash);
     } catch (err) {
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
+    }
+  };
+
+  const handleMaxSell = () => {
+    if (formattedHlx) {
+      setSellAmount(formattedHlx);
     }
   };
 
@@ -142,6 +158,9 @@ export default function Bank() {
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
               aria-label="Amount of ETH to spend"
+              aria-describedby="bank-status"
+              aria-invalid={isBuyError}
+              style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button primary"
@@ -162,9 +181,21 @@ export default function Bank() {
 
           <div className="card" style={{ borderColor: '#ffe4e6' }}>
             <h3 className="font-semibold">Sell HLX</h3>
-            <label htmlFor="sell-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Approve and sell HLX back to ETH
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label htmlFor="sell-amount" className="helper">
+                Approve and sell HLX back to ETH
+              </label>
+              <button
+                type="button"
+                onClick={handleMaxSell}
+                className="badge"
+                style={{ cursor: 'pointer', border: 'none' }}
+                aria-label="Sell maximum available HLX"
+                disabled={isWriting}
+              >
+                Max
+              </button>
+            </div>
             <input
               id="sell-amount"
               type="number"
@@ -177,6 +208,9 @@ export default function Bank() {
               value={sellAmount}
               onChange={(e) => setSellAmount(e.target.value)}
               aria-label="Amount of HLX to sell"
+              aria-describedby="bank-status"
+              aria-invalid={isSellError}
+              style={isSellError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button danger"
@@ -197,7 +231,7 @@ export default function Bank() {
           </div>
         </div>
 
-        <div role="status" aria-live="polite">
+        <div id="bank-status" role="status" aria-live="polite">
           {liveStatus ? <div className="status">{liveStatus}</div> : null}
         </div>
       </div>
