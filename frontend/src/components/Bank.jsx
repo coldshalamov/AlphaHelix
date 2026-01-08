@@ -12,6 +12,7 @@ export default function Bank() {
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
+  const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -26,8 +27,12 @@ export default function Bank() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
   useEffect(() => {
-    if (isConfirming) setStatus('Transaction pending...');
-    else if (isSuccess) setStatus('Transaction confirmed');
+    if (isConfirming) {
+      setStatus('Transaction pending...');
+    } else if (isSuccess) {
+      setStatus('Transaction confirmed');
+      setActiveAction(null);
+    }
   }, [isConfirming, isSuccess]);
 
   const formattedHlx = useMemo(() => {
@@ -52,6 +57,7 @@ export default function Bank() {
       setStatus('Enter an amount of ETH to spend.');
       return;
     }
+    setActiveAction('buy');
     try {
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
@@ -61,6 +67,7 @@ export default function Bank() {
       });
       setTxHash(hash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
     }
   };
@@ -71,6 +78,7 @@ export default function Bank() {
       setStatus('Enter an amount of HLX to sell.');
       return;
     }
+    setActiveAction('sell');
     try {
       const hlxValue = parseEther(sellAmount || '0');
 
@@ -97,6 +105,7 @@ export default function Bank() {
       });
       setTxHash(sellHash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
   };
@@ -147,12 +156,12 @@ export default function Bank() {
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting}
+              disabled={isWriting || activeAction === 'sell'}
             >
-              {isWriting ? (
+              {activeAction === 'buy' && isWriting ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  Buying...
                 </>
               ) : (
                 'Buy HLX'
@@ -182,12 +191,12 @@ export default function Bank() {
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting}
+              disabled={isWriting || activeAction === 'buy'}
             >
-              {isWriting ? (
+              {activeAction === 'sell' && isWriting ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  Selling...
                 </>
               ) : (
                 'Approve & Sell'
