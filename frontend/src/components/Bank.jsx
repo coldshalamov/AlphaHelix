@@ -12,6 +12,7 @@ export default function Bank() {
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
+  const [activeAction, setActiveAction] = useState(null);
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -27,8 +28,14 @@ export default function Bank() {
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
-    else if (isSuccess) setStatus('Transaction confirmed');
+    else if (isSuccess) {
+      setStatus('Transaction confirmed');
+      setActiveAction(null);
+    }
   }, [isConfirming, isSuccess]);
+
+  const isBuyError = useMemo(() => status.includes('ETH to spend'), [status]);
+  const isSellError = useMemo(() => status.includes('HLX to sell'), [status]);
 
   const formattedHlx = useMemo(() => {
     if (!hlxBalance) return '0';
@@ -48,11 +55,10 @@ export default function Bank() {
 
   const handleBuy = async () => {
     setStatus('');
-    if (!buyAmount) {
-      setStatus('Enter an amount of ETH to spend.');
-      return;
-    }
+    if (!buyAmount) return setStatus('Enter an amount of ETH to spend.');
+
     try {
+      setActiveAction('buy');
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
@@ -61,17 +67,17 @@ export default function Bank() {
       });
       setTxHash(hash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
     }
   };
 
   const handleSell = async () => {
     setStatus('');
-    if (!sellAmount) {
-      setStatus('Enter an amount of HLX to sell.');
-      return;
-    }
+    if (!sellAmount) return setStatus('Enter an amount of HLX to sell.');
+
     try {
+      setActiveAction('sell');
       const hlxValue = parseEther(sellAmount || '0');
 
       // Step 1: Approve
@@ -82,7 +88,7 @@ export default function Bank() {
         functionName: 'approve',
         args: [contracts.HelixReserve, hlxValue],
       });
-      setTxHash(approveHash);
+      // Note: We don't setTxHash here to avoid global loading state for approval
 
       setStatus('Waiting for approval confirmation...');
       if (!publicClient) throw new Error('Public client unavailable.');
@@ -97,6 +103,7 @@ export default function Bank() {
       });
       setTxHash(sellHash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
   };
@@ -138,18 +145,24 @@ export default function Bank() {
               min="0"
               step="0.01"
               className="input"
+              style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
               placeholder="0.1"
               value={buyAmount}
-              onChange={(e) => setBuyAmount(e.target.value)}
-              aria-label="Amount of ETH to spend"
+              onChange={(e) => {
+                setBuyAmount(e.target.value);
+                if (status) setStatus('');
+              }}
+              aria-invalid={isBuyError}
+              aria-describedby="bank-status"
+              disabled={activeAction !== null}
             />
             <button
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting}
+              disabled={activeAction !== null}
             >
-              {isWriting ? (
+              {activeAction === 'buy' ? (
                 <>
                   <Spinner />
                   Submitting...
@@ -173,18 +186,24 @@ export default function Bank() {
               min="0"
               step="0.01"
               className="input"
+              style={isSellError ? { borderColor: 'var(--danger)' } : {}}
               placeholder="100"
               value={sellAmount}
-              onChange={(e) => setSellAmount(e.target.value)}
-              aria-label="Amount of HLX to sell"
+              onChange={(e) => {
+                setSellAmount(e.target.value);
+                if (status) setStatus('');
+              }}
+              aria-invalid={isSellError}
+              aria-describedby="bank-status"
+              disabled={activeAction !== null}
             />
             <button
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting}
+              disabled={activeAction !== null}
             >
-              {isWriting ? (
+              {activeAction === 'sell' ? (
                 <>
                   <Spinner />
                   Submitting...
@@ -197,7 +216,7 @@ export default function Bank() {
           </div>
         </div>
 
-        <div role="status" aria-live="polite">
+        <div id="bank-status" role="status" aria-live="polite">
           {liveStatus ? <div className="status">{liveStatus}</div> : null}
         </div>
       </div>
