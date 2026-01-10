@@ -103,7 +103,7 @@ function BettingWidget({
 
     if (isSuccess) {
       if (pendingAction === 'commit' && pendingBet) {
-        persistBet(pendingBet);
+        // Data was already persisted before tx
         setPendingBet(null);
         setStatus('Commit confirmed. Salt saved locally for reveal.');
       } else if (pendingAction === 'reveal') {
@@ -123,7 +123,6 @@ function BettingWidget({
     isSuccess,
     pendingAction,
     pendingBet,
-    persistBet,
     txHash,
   ]);
 
@@ -132,6 +131,11 @@ function BettingWidget({
     if (isWrongNetwork) return setStatus('Wrong network selected. Switch to the Helix deployment chain.');
     if (!amount) return setStatus('Enter an amount of HLX to stake.');
     if (typeof window === 'undefined' || !window.crypto) return setStatus('Secure random generator unavailable.');
+
+    // Warn if overwriting, but do NOT block (to prevent deadlock if previous tx failed silently)
+    if (storedBet) {
+      console.warn('Overwriting existing stored bet');
+    }
 
     let amountValue;
     try {
@@ -170,6 +174,14 @@ function BettingWidget({
       }
 
       // Now commit
+      // Persist bet logic BEFORE sending tx to ensure recoverability
+      // Wrap in try-catch to abort if storage fails (QuotaExceeded)
+      try {
+        persistBet(betData);
+      } catch (e) {
+        throw new Error('Failed to save commit locally. Check browser storage settings.');
+      }
+
       setPendingBet(betData);
       setPendingAction('commit');
 
@@ -184,6 +196,9 @@ function BettingWidget({
     } catch (err) {
       setPendingAction('');
       setPendingBet(null);
+      // Clean up local storage if commit failed/rejected to avoid stale state
+      // Ensure we clean up if it's a user rejection or any other error preventing the on-chain commit
+      clearStoredBet();
       setStatus(err?.shortMessage || err?.message || 'Commit failed');
     }
   };
