@@ -11,9 +11,9 @@ const MarketCard = memo(function MarketCard({ market, id }) {
   const revealDate = dateTimeFormatter.format(new Date(market.revealEndTime * 1000));
 
   return (
-    <div className="card">
+    <div className="card" aria-labelledby={`market-title-${id}`}>
       <div className="label">Statement #{id}</div>
-      <h3 className="font-semibold" style={{ marginTop: '0.25rem' }}>
+      <h3 id={`market-title-${id}`} className="font-semibold" style={{ marginTop: '0.25rem' }}>
         {market.ipfsCid || 'No CID provided'}
       </h3>
       <div className="table-like" style={{ marginTop: '0.5rem' }}>
@@ -40,7 +40,12 @@ const MarketCard = memo(function MarketCard({ market, id }) {
           <div className="value">{formatEther(market.unalignedPool)} HLX</div>
         </div>
       </div>
-      <Link className="button primary" style={{ marginTop: '0.75rem', display: 'inline-block' }} href={`/markets/${id}`}>
+      <Link
+        className="button primary"
+        style={{ marginTop: '0.75rem', display: 'inline-block' }}
+        href={`/markets/${id}`}
+        aria-label={`View details for ${market.ipfsCid || 'market ' + id}`}
+      >
         View details
       </Link>
     </div>
