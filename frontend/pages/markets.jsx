@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -9,6 +9,7 @@ import { dateTimeFormatter } from '@/lib/formatters';
 const MarketCard = memo(function MarketCard({ market, id }) {
   const commitDate = dateTimeFormatter.format(new Date(market.commitEndTime * 1000));
   const revealDate = dateTimeFormatter.format(new Date(market.revealEndTime * 1000));
+
   return (
     <div className="card">
       <div className="label">Statement #{id}</div>
@@ -39,7 +40,12 @@ const MarketCard = memo(function MarketCard({ market, id }) {
           <div className="value">{formatEther(market.unalignedPool)} HLX</div>
         </div>
       </div>
-      <Link className="button primary" style={{ marginTop: '0.75rem', display: 'inline-block' }} href={`/markets/${id}`}>
+      <Link
+        className="button primary"
+        style={{ marginTop: '0.75rem', display: 'inline-block' }}
+        href={`/markets/${id}`}
+        aria-label={`View details for Statement #${id}`}
+      >
         View details
       </Link>
     </div>
