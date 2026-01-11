@@ -103,7 +103,7 @@ function BettingWidget({
 
     if (isSuccess) {
       if (pendingAction === 'commit' && pendingBet) {
-        persistBet(pendingBet);
+        // Already persisted before transaction to prevent race conditions
         setPendingBet(null);
         setStatus('Commit confirmed. Salt saved locally for reveal.');
       } else if (pendingAction === 'reveal') {
@@ -141,6 +141,7 @@ function BettingWidget({
     }
     if (amountValue <= 0n) return setStatus('Enter an amount greater than zero.');
 
+    let persisted = false;
     try {
       setStatus('');
 
@@ -173,6 +174,10 @@ function BettingWidget({
       setPendingBet(betData);
       setPendingAction('commit');
 
+      // FIX: Save immediately to prevent data loss on crash/reload
+      persistBet(betData);
+      persisted = true;
+
       const commitHash = await writeContractAsync({
         address: contracts.HelixMarket,
         abi: marketAbi,
@@ -184,6 +189,10 @@ function BettingWidget({
     } catch (err) {
       setPendingAction('');
       setPendingBet(null);
+      // FIX: If we just saved it and tx failed/rejected, clear it
+      if (persisted) {
+        clearStoredBet();
+      }
       setStatus(err?.shortMessage || err?.message || 'Commit failed');
     }
   };
@@ -337,6 +346,7 @@ function BettingWidget({
             autoComplete="off"
             min="0"
             step="0.01"
+            maxLength="20"
             className="input"
             style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"

@@ -5,14 +5,19 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@tanstack/react-query": "5.52.1",
     "next": "14.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "wagmi": "2.12.9",
-    "viem": "2.9.8"
+    "viem": "2.9.8",
+    "wagmi": "2.12.9"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.1.0"
   }
 }
