@@ -12,6 +12,7 @@ export default function Bank() {
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
+  const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -27,7 +28,10 @@ export default function Bank() {
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
-    else if (isSuccess) setStatus('Transaction confirmed');
+    else if (isSuccess) {
+      setStatus('Transaction confirmed');
+      setActiveAction(null);
+    }
   }, [isConfirming, isSuccess]);
 
   const formattedHlx = useMemo(() => {
@@ -46,10 +50,21 @@ export default function Bank() {
     return status;
   }, [isConfirming, isSuccess, status]);
 
+  const isBuyError = useMemo(
+    () => status === 'Enter an amount of ETH to spend.',
+    [status]
+  );
+  const isSellError = useMemo(
+    () => status === 'Enter an amount of HLX to sell.',
+    [status]
+  );
+
   const handleBuy = async () => {
     setStatus('');
+    setActiveAction('buy');
     if (!buyAmount) {
       setStatus('Enter an amount of ETH to spend.');
+      setActiveAction(null);
       return;
     }
     try {
@@ -61,14 +76,17 @@ export default function Bank() {
       });
       setTxHash(hash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
     }
   };
 
   const handleSell = async () => {
     setStatus('');
+    setActiveAction('sell');
     if (!sellAmount) {
       setStatus('Enter an amount of HLX to sell.');
+      setActiveAction(null);
       return;
     }
     try {
@@ -97,6 +115,7 @@ export default function Bank() {
       });
       setTxHash(sellHash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
   };
@@ -142,17 +161,23 @@ export default function Bank() {
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
               aria-label="Amount of ETH to spend"
+              aria-invalid={isBuyError}
+              style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting}
+              disabled={activeAction === 'buy' || activeAction === 'sell'}
             >
-              {isWriting ? (
+              {activeAction === 'buy' ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  {isWriting
+                    ? 'Check wallet...'
+                    : isConfirming
+                      ? 'Confirming...'
+                      : 'Buying...'}
                 </>
               ) : (
                 'Buy HLX'
@@ -188,17 +213,23 @@ export default function Bank() {
               value={sellAmount}
               onChange={(e) => setSellAmount(e.target.value)}
               aria-label="Amount of HLX to sell"
+              aria-invalid={isSellError}
+              style={isSellError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting}
+              disabled={activeAction === 'buy' || activeAction === 'sell'}
             >
-              {isWriting ? (
+              {activeAction === 'sell' ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  {status.includes('Approving')
+                    ? 'Approving...'
+                    : status.includes('Selling')
+                      ? 'Selling...'
+                      : 'Processing...'}
                 </>
               ) : (
                 'Approve & Sell'
