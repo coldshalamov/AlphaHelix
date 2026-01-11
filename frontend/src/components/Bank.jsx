@@ -27,9 +27,8 @@ export default function Bank() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
   useEffect(() => {
-    if (isConfirming) {
-      setStatus('Transaction pending...');
-    } else if (isSuccess) {
+    if (isConfirming) setStatus('Transaction pending...');
+    else if (isSuccess) {
       setStatus('Transaction confirmed');
       setActiveAction(null);
     }
@@ -51,14 +50,26 @@ export default function Bank() {
     return status;
   }, [isConfirming, isSuccess, status]);
 
+  const isBuyError = useMemo(
+    () => status === 'Enter an amount of ETH to spend.',
+    [status]
+  );
+
+  const isSellError = useMemo(
+    () => status === 'Enter an amount of HLX to sell.',
+    [status]
+  );
+
   const handleBuy = async () => {
     setStatus('');
+    setActiveAction('buy');
     if (!buyAmount) {
       setStatus('Enter an amount of ETH to spend.');
+      setActiveAction(null);
       return;
     }
-    setActiveAction('buy');
     try {
+      setActiveAction('buy');
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
@@ -74,12 +85,14 @@ export default function Bank() {
 
   const handleSell = async () => {
     setStatus('');
+    setActiveAction('sell');
     if (!sellAmount) {
       setStatus('Enter an amount of HLX to sell.');
+      setActiveAction(null);
       return;
     }
-    setActiveAction('sell');
     try {
+      setActiveAction('sell');
       const hlxValue = parseEther(sellAmount || '0');
 
       // Step 1: Approve
@@ -90,8 +103,7 @@ export default function Bank() {
         functionName: 'approve',
         args: [contracts.HelixReserve, hlxValue],
       });
-      setTxHash(approveHash);
-
+      // Note: We don't setTxHash here to avoid global loading state for approval
       setStatus('Waiting for approval confirmation...');
       if (!publicClient) throw new Error('Public client unavailable.');
       await publicClient.waitForTransactionReceipt({ hash: approveHash });
@@ -111,105 +123,112 @@ export default function Bank() {
   };
 
   return (
-    <div className="grid section">
-      <div className="card">
-        <h2 className="text-xl font-bold">Helix Bank</h2>
-        <p className="helper">Swap ETH for HLX on the reserve contract.</p>
+    <div className="bank-container">
+      <h2>Helix Bank</h2>
+      <p>Swap ETH for HLX on the reserve contract.</p>
 
-        <div className="table-like" style={{ marginTop: '1rem' }}>
-          <div>
-            <div className="label">Wallet</div>
-            <div className="value">{address || 'Not connected'}</div>
-          </div>
-          <div>
-            <div className="label">ETH Balance</div>
-            <div className="value">
-              {ethBalance ? `${ethBalance.formatted} ${ethBalance.symbol}` : '—'}
-            </div>
-          </div>
-          <div>
-            <div className="label">HLX Balance</div>
-            <div className="value">{formattedHlx} HLX</div>
-          </div>
+      <div className="wallet-info">
+        <div>
+          <strong>Wallet</strong>
+          <span>{address || 'Not connected'}</span>
         </div>
-
-        <div className="grid two" style={{ marginTop: '1.5rem' }}>
-          <div className="card" style={{ borderColor: '#dbeafe' }}>
-            <h3 className="font-semibold">Buy HLX</h3>
-            <label htmlFor="buy-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Enter ETH to spend
-            </label>
-            <input
-              id="buy-amount"
-              type="number"
-              inputMode="decimal"
-              autoComplete="off"
-              min="0"
-              step="0.01"
-              className="input"
-              placeholder="0.1"
-              value={buyAmount}
-              onChange={(e) => setBuyAmount(e.target.value)}
-              aria-label="Amount of ETH to spend"
-            />
-            <button
-              className="button primary"
-              style={{ marginTop: '0.75rem' }}
-              onClick={handleBuy}
-              disabled={isWriting || activeAction === 'sell'}
-            >
-              {activeAction === 'buy' && isWriting ? (
-                <>
-                  <Spinner />
-                  Buying...
-                </>
-              ) : (
-                'Buy HLX'
-              )}
-            </button>
-          </div>
-
-          <div className="card" style={{ borderColor: '#ffe4e6' }}>
-            <h3 className="font-semibold">Sell HLX</h3>
-            <label htmlFor="sell-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Approve and sell HLX back to ETH
-            </label>
-            <input
-              id="sell-amount"
-              type="number"
-              inputMode="decimal"
-              autoComplete="off"
-              min="0"
-              step="0.01"
-              className="input"
-              placeholder="100"
-              value={sellAmount}
-              onChange={(e) => setSellAmount(e.target.value)}
-              aria-label="Amount of HLX to sell"
-            />
-            <button
-              className="button danger"
-              style={{ marginTop: '0.75rem' }}
-              onClick={handleSell}
-              disabled={isWriting || activeAction === 'buy'}
-            >
-              {activeAction === 'sell' && isWriting ? (
-                <>
-                  <Spinner />
-                  Selling...
-                </>
-              ) : (
-                'Approve & Sell'
-              )}
-            </button>
-            <p className="helper">Allowances reset each time for simplicity.</p>
-          </div>
+        <div>
+          <strong>ETH Balance</strong>
+          <span>{ethBalance ? `${ethBalance.formatted} ${ethBalance.symbol}` : '—'}</span>
         </div>
-
-        <div role="status" aria-live="polite">
-          {liveStatus ? <div className="status">{liveStatus}</div> : null}
+        <div>
+          <strong>HLX Balance</strong>
+          <span>{formattedHlx} HLX</span>
         </div>
       </div>
+
+      <div className="bank-actions">
+        <div className="action-group">
+          <h3>Buy HLX</h3>
+          <label htmlFor="buy-amount">Enter ETH to spend</label>
+          <input
+            id="buy-amount"
+            type="number"
+            inputMode="decimal"
+            autoComplete="off"
+            min="0"
+            step="0.01"
+            className="input"
+            style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
+            placeholder="0.1"
+            value={buyAmount}
+            onChange={(e) => {
+              setBuyAmount(e.target.value);
+              if (status) setStatus('');
+            }}
+            aria-label="Amount of ETH to spend"
+            aria-invalid={isBuyError}
+            aria-describedby="bank-status"
+            disabled={activeAction !== null}
+          />
+          <button onClick={handleBuy} disabled={activeAction !== null && activeAction !== 'buy'}>
+            {activeAction === 'buy' ? (
+              <>
+                <Spinner />
+                {isWriting ? 'Check wallet...' : isConfirming ? 'Confirming...' : 'Buying...'}
+              </>
+            ) : (
+              'Buy HLX'
+            )}
+          </button>
+        </div>
+
+        <div className="action-group">
+          <h3>Sell HLX</h3>
+          <label htmlFor="sell-amount">Approve and sell HLX back to ETH</label>
+          <button
+            type="button"
+            className="max-button"
+            onClick={() => setSellAmount(formattedHlx)}
+            aria-label="Sell all HLX"
+          >
+            Max
+          </button>
+          <input
+            id="sell-amount"
+            type="number"
+            inputMode="decimal"
+            autoComplete="off"
+            min="0"
+            step="0.01"
+            className="input"
+            style={isSellError ? { borderColor: 'var(--danger)' } : {}}
+            placeholder="100"
+            value={sellAmount}
+            onChange={(e) => {
+              setSellAmount(e.target.value);
+              if (status) setStatus('');
+            }}
+            aria-label="Amount of HLX to sell"
+            aria-invalid={isSellError}
+            aria-describedby="bank-status"
+            disabled={activeAction !== null}
+          />
+          <button onClick={handleSell} disabled={activeAction !== null && activeAction !== 'sell'}>
+            {activeAction === 'sell' ? (
+              <>
+                <Spinner />
+                {status.includes('Approving') ? 'Approving...' : status.includes('Selling') ? 'Selling...' : 'Processing...'}
+              </>
+            ) : (
+              'Approve & Sell'
+            )}
+          </button>
+        </div>
+      </div>
+
+      <p className="allowance-note">Allowances reset each time for simplicity.</p>
+
+      {liveStatus ? (
+        <div id="bank-status" className="status-message" role="status" aria-live="polite" aria-atomic="true">
+          {liveStatus}
+        </div>
+      ) : null}
     </div>
   );
 }
