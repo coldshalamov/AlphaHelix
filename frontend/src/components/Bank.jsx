@@ -162,9 +162,20 @@ export default function Bank() {
 
           <div className="card" style={{ borderColor: '#ffe4e6' }}>
             <h3 className="font-semibold">Sell HLX</h3>
-            <label htmlFor="sell-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Approve and sell HLX back to ETH
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label htmlFor="sell-amount" className="helper" style={{ marginBottom: 0 }}>
+                Approve and sell HLX back to ETH
+              </label>
+              <button
+                type="button"
+                className="badge"
+                style={{ border: 'none', cursor: 'pointer' }}
+                onClick={() => setSellAmount(formattedHlx)}
+                aria-label="Sell all HLX"
+              >
+                Max
+              </button>
+            </div>
             <input
               id="sell-amount"
               type="number"
