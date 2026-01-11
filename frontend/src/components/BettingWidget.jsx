@@ -19,6 +19,8 @@ const CHOICES = [
   { value: 2, label: 'UNALIGNED' },
 ];
 
+const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
+
 function BettingWidget({
   marketId,
   commitEnd,
@@ -254,7 +256,7 @@ function BettingWidget({
     return (
       <div className="card" style={{ borderColor: '#fef3c7' }}>
         <h3 className="font-semibold">Reveal phase</h3>
-        <Countdown targetSeconds={revealEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+        <Countdown targetSeconds={revealEndSeconds} render={renderCountdown} />
 
         {storedBet ? (
           <div className="section">
@@ -305,7 +307,7 @@ function BettingWidget({
   return (
     <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
-      <Countdown targetSeconds={commitEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+      <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
