@@ -5,6 +5,7 @@ import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
+import { dateTimeFormatter } from '@/lib/formatters';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
 import { dateTimeFormatter } from '@/lib/formatters';
