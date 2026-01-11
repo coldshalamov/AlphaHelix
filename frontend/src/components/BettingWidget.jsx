@@ -337,6 +337,7 @@ function BettingWidget({
             autoComplete="off"
             min="0"
             step="0.01"
+            maxLength="20"
             className="input"
             style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"
