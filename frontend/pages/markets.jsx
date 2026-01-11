@@ -6,6 +6,8 @@ import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
 
+// BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
+// re-initializing localization data on every render.
 const MarketCard = memo(function MarketCard({ market, id }) {
   const commitDate = dateTimeFormatter.format(new Date(market.commitEndTime * 1000));
   const revealDate = dateTimeFormatter.format(new Date(market.revealEndTime * 1000));
