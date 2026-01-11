@@ -11,3 +11,7 @@
 ## 2025-10-24 - [Polling & Memoization]
 **Learning:** When using polling hooks like `useReadContracts` with `refetchInterval`, the parent component re-renders on every fetch even if data values are deep-equal (due to new object references). Child components with complex sub-hooks (like `useReadContract` or `useAccount`) should be memoized to prevent cascading re-renders.
 **Action:** Wrap expensive or side-effect-heavy child components (like `BettingWidget`) in `React.memo` when placed inside polling pages. Also, always clean up `setTimeout` in `useEffect` to prevent memory leaks during navigation.
+
+## 2025-10-25 - [Smart Polling]
+**Learning:** Wagmi v2's `refetchInterval` accepts a function `(data) => number | false`. This allows disabling polling dynamically when a terminal state (e.g., market resolution) is reached, saving RPC calls.
+**Action:** Use conditional `refetchInterval` logic for entities with final states, and pair with manual `refetch()` for subsequent user actions (like claiming).

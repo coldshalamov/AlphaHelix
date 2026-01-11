@@ -19,6 +19,8 @@ const CHOICES = [
   { value: 2, label: 'UNALIGNED' },
 ];
 
+const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
+
 function BettingWidget({
   marketId,
   commitEnd,
@@ -103,7 +105,7 @@ function BettingWidget({
 
     if (isSuccess) {
       if (pendingAction === 'commit' && pendingBet) {
-        persistBet(pendingBet);
+        // Already persisted before transaction to prevent race conditions
         setPendingBet(null);
         setStatus('Commit confirmed. Salt saved locally for reveal.');
       } else if (pendingAction === 'reveal') {
@@ -141,6 +143,7 @@ function BettingWidget({
     }
     if (amountValue <= 0n) return setStatus('Enter an amount greater than zero.');
 
+    let persisted = false;
     try {
       setStatus('');
 
@@ -173,6 +176,10 @@ function BettingWidget({
       setPendingBet(betData);
       setPendingAction('commit');
 
+      // FIX: Save immediately to prevent data loss on crash/reload
+      persistBet(betData);
+      persisted = true;
+
       const commitHash = await writeContractAsync({
         address: contracts.HelixMarket,
         abi: marketAbi,
@@ -184,6 +191,10 @@ function BettingWidget({
     } catch (err) {
       setPendingAction('');
       setPendingBet(null);
+      // FIX: If we just saved it and tx failed/rejected, clear it
+      if (persisted) {
+        clearStoredBet();
+      }
       setStatus(err?.shortMessage || err?.message || 'Commit failed');
     }
   };
@@ -245,7 +256,7 @@ function BettingWidget({
     return (
       <div className="card" style={{ borderColor: '#fef3c7' }}>
         <h3 className="font-semibold">Reveal phase</h3>
-        <Countdown targetSeconds={revealEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+        <Countdown targetSeconds={revealEndSeconds} render={renderCountdown} />
 
         {storedBet ? (
           <div className="section">
@@ -296,7 +307,7 @@ function BettingWidget({
   return (
     <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
-      <Countdown targetSeconds={commitEndSeconds} render={(t) => <div className="helper">{t} remaining</div>} />
+      <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
@@ -337,6 +348,7 @@ function BettingWidget({
             autoComplete="off"
             min="0"
             step="0.01"
+            maxLength="20"
             className="input"
             style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"

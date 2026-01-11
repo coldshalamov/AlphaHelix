@@ -12,6 +12,7 @@ export default function Bank() {
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
+  const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -27,7 +28,10 @@ export default function Bank() {
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
-    else if (isSuccess) setStatus('Transaction confirmed');
+    else if (isSuccess) {
+      setStatus('Transaction confirmed');
+      setActiveAction(null);
+    }
   }, [isConfirming, isSuccess]);
 
   const formattedHlx = useMemo(() => {
@@ -58,11 +62,14 @@ export default function Bank() {
 
   const handleBuy = async () => {
     setStatus('');
+    setActiveAction('buy');
     if (!buyAmount) {
       setStatus('Enter an amount of ETH to spend.');
+      setActiveAction(null);
       return;
     }
     try {
+      setActiveAction('buy');
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
@@ -71,6 +78,7 @@ export default function Bank() {
       });
       setTxHash(hash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
     }
   };
@@ -83,11 +91,14 @@ export default function Bank() {
 
   const handleSell = async () => {
     setStatus('');
+    setActiveAction('sell');
     if (!sellAmount) {
       setStatus('Enter an amount of HLX to sell.');
+      setActiveAction(null);
       return;
     }
     try {
+      setActiveAction('sell');
       const hlxValue = parseEther(sellAmount || '0');
 
       // Step 1: Approve
@@ -98,8 +109,7 @@ export default function Bank() {
         functionName: 'approve',
         args: [contracts.HelixReserve, hlxValue],
       });
-      setTxHash(approveHash);
-
+      // Note: We don't setTxHash here to avoid global loading state for approval
       setStatus('Waiting for approval confirmation...');
       if (!publicClient) throw new Error('Public client unavailable.');
       await publicClient.waitForTransactionReceipt({ hash: approveHash });
@@ -113,32 +123,30 @@ export default function Bank() {
       });
       setTxHash(sellHash);
     } catch (err) {
+      setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
   };
 
   return (
-    <div className="grid section">
-      <div className="card">
-        <h2 className="text-xl font-bold">Helix Bank</h2>
-        <p className="helper">Swap ETH for HLX on the reserve contract.</p>
+    <div className="bank-container">
+      <h2>Helix Bank</h2>
+      <p>Swap ETH for HLX on the reserve contract.</p>
 
-        <div className="table-like" style={{ marginTop: '1rem' }}>
-          <div>
-            <div className="label">Wallet</div>
-            <div className="value">{address || 'Not connected'}</div>
-          </div>
-          <div>
-            <div className="label">ETH Balance</div>
-            <div className="value">
-              {ethBalance ? `${ethBalance.formatted} ${ethBalance.symbol}` : '—'}
-            </div>
-          </div>
-          <div>
-            <div className="label">HLX Balance</div>
-            <div className="value">{formattedHlx} HLX</div>
-          </div>
+      <div className="wallet-info">
+        <div>
+          <strong>Wallet</strong>
+          <span>{address || 'Not connected'}</span>
         </div>
+        <div>
+          <strong>ETH Balance</strong>
+          <span>{ethBalance ? `${ethBalance.formatted} ${ethBalance.symbol}` : '—'}</span>
+        </div>
+        <div>
+          <strong>HLX Balance</strong>
+          <span>{formattedHlx} HLX</span>
+        </div>
+      </div>
 
         <div className="grid two" style={{ marginTop: '1.5rem' }}>
           <div className="card" style={{ borderColor: '#dbeafe' }}>
@@ -235,6 +243,14 @@ export default function Bank() {
           {liveStatus ? <div className="status">{liveStatus}</div> : null}
         </div>
       </div>
+
+      <p className="allowance-note">Allowances reset each time for simplicity.</p>
+
+      {liveStatus ? (
+        <div id="bank-status" className="status-message" role="status" aria-live="polite" aria-atomic="true">
+          {liveStatus}
+        </div>
+      ) : null}
     </div>
   );
 }

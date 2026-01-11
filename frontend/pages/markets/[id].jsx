@@ -5,8 +5,10 @@ import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
+import { dateTimeFormatter } from '@/lib/formatters';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
+import { dateTimeFormatter } from '@/lib/formatters';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
@@ -79,12 +81,17 @@ export default function MarketDetailPage() {
 
   // Optimization: Batch multiple contract reads into a single multicall/RPC request
   // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError } = useReadContracts({
+  const { data: readResults, isLoading: isReading, error: readError, refetch } = useReadContracts({
     contracts: contractsArray,
     query: {
        enabled: marketId !== undefined,
-       // Use refetchInterval to simulate live updates
-       refetchInterval: 5000
+       // BOLT: Smart polling. If market is resolved, stop polling (return false) to save RPC calls and re-renders.
+       // Otherwise, poll every 5s for live updates.
+       refetchInterval: (data) => {
+         const market = data?.[0]?.result;
+         const resolved = market?.[6];
+         return resolved ? false : 5000;
+       }
     }
   });
 
@@ -146,8 +153,12 @@ export default function MarketDetailPage() {
 
   useEffect(() => {
     if (isClaimConfirming) setStatus('Claim transaction pending...');
-    else if (isClaimSuccess) setStatus('Claim confirmed. Balances will refresh shortly.');
-  }, [isClaimConfirming, isClaimSuccess]);
+    else if (isClaimSuccess) {
+      setStatus('Claim confirmed. Balances will refresh shortly.');
+      // BOLT: Manual refetch required because smart polling is disabled for resolved markets.
+      refetch();
+    }
+  }, [isClaimConfirming, isClaimSuccess, refetch]);
 
   if (!id) return <div className="status">Loading market...</div>;
   if (error) return <div className="status">Failed to load market.</div>;
@@ -197,7 +208,7 @@ export default function MarketDetailPage() {
         <div className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
             <div className="label">Commit end</div>
-            <div className="value">{new Date(Number(commitEndTime) * 1000).toLocaleString()}</div>
+            <div className="value">{dateTimeFormatter.format(new Date(Number(commitEndTime) * 1000))}</div>
             <Countdown
               targetSeconds={Number(commitEndTime)}
               render={renderTimeLeft}
@@ -205,7 +216,7 @@ export default function MarketDetailPage() {
           </div>
           <div>
             <div className="label">Reveal end</div>
-            <div className="value">{new Date(Number(revealEndTime) * 1000).toLocaleString()}</div>
+            <div className="value">{dateTimeFormatter.format(new Date(Number(revealEndTime) * 1000))}</div>
             <Countdown
               targetSeconds={Number(revealEndTime)}
               render={renderTimeLeft}
