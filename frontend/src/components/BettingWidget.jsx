@@ -90,6 +90,16 @@ function BettingWidget({
     }
   };
 
+  // BOLT: Memoized handlers to prevent recreating functions on every render,
+  // which avoids unnecessary re-rendering of input elements in the map loop.
+  const handleChoiceChange = useCallback((e) => {
+    setChoice(Number(e.target.value));
+  }, []);
+
+  const handleAmountChange = useCallback((e) => {
+    setAmount(e.target.value);
+  }, []);
+
   const persistBet = useCallback(
     (data) => {
       if (!storageKey || typeof window === 'undefined') return;
@@ -343,7 +353,7 @@ function BettingWidget({
                 name="choice"
                 value={c.value}
                 checked={choice === c.value}
-                onChange={() => setChoice(c.value)}
+                onChange={handleChoiceChange}
                 className="visually-hidden"
                 disabled={isLocked}
               />
@@ -380,7 +390,7 @@ function BettingWidget({
             style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={handleAmountChange}
             aria-describedby="status-message"
             aria-invalid={isAmountError}
             disabled={isLocked}
