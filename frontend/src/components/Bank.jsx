@@ -243,14 +243,5 @@ export default function Bank() {
           {liveStatus ? <div className="status">{liveStatus}</div> : null}
         </div>
       </div>
-
-      <p className="allowance-note">Allowances reset each time for simplicity.</p>
-
-      {liveStatus ? (
-        <div id="bank-status" className="status-message" role="status" aria-live="polite" aria-atomic="true">
-          {liveStatus}
-        </div>
-      ) : null}
-    </div>
   );
 }

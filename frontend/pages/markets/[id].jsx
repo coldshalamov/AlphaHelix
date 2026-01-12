@@ -8,7 +8,6 @@ import { marketAbi, tokenAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
 import Spinner from '@/components/Spinner';
 import Countdown from '@/components/Countdown';
-import { dateTimeFormatter } from '@/lib/formatters';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 

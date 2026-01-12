@@ -6,8 +6,9 @@ import {
   useWriteContract,
   usePublicClient,
   useConnect,
+  useReadContract,
 } from 'wagmi';
-import { encodePacked, keccak256, parseEther } from 'viem';
+import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
@@ -37,6 +38,14 @@ function BettingWidget({
   const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
   const { connectors, connect } = useConnect();
+
+  const { data: hlxBalance } = useReadContract({
+    address: contracts.AlphaHelixToken,
+    abi: tokenAbi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: { enabled: Boolean(address) },
+  });
 
   const [amount, setAmount] = useState('');
   const [choice, setChoice] = useState(1);
@@ -74,6 +83,12 @@ function BettingWidget({
   }, [address, marketId]);
 
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
+
+  const handleMax = () => {
+    if (hlxBalance) {
+      setAmount(formatEther(hlxBalance));
+    }
+  };
 
   const persistBet = useCallback(
     (data) => {
@@ -338,9 +353,21 @@ function BettingWidget({
         </fieldset>
 
         <div>
-          <label htmlFor="bet-amount" className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>
-            Amount to Stake
-          </label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <label htmlFor="bet-amount" className="label" style={{ display: 'block' }}>
+              Amount to Stake
+            </label>
+            <button
+              type="button"
+              onClick={handleMax}
+              className="badge"
+              style={{ cursor: 'pointer', border: 'none' }}
+              aria-label="Stake maximum available HLX"
+              disabled={isLocked}
+            >
+              Max
+            </button>
+          </div>
           <input
             id="bet-amount"
             type="number"
