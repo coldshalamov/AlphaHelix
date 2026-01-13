@@ -15,3 +15,7 @@
 ## 2025-10-25 - [Smart Polling]
 **Learning:** Wagmi v2's `refetchInterval` accepts a function `(data) => number | false`. This allows disabling polling dynamically when a terminal state (e.g., market resolution) is reached, saving RPC calls.
 **Action:** Use conditional `refetchInterval` logic for entities with final states, and pair with manual `refetch()` for subsequent user actions (like claiming).
+
+## 2025-10-26 - [Form Input Re-renders]
+**Learning:** Using inline arrow functions for `onChange` handlers in controlled components (like `Bank.jsx`) creates new function references on every render. Combined with state updates on every keystroke, this causes unnecessary work, especially if the component uses expensive hooks.
+**Action:** Memoize event handlers with `useCallback` and wrap form-heavy components in `React.memo` to stabilize function references and isolate re-renders.
