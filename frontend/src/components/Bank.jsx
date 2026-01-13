@@ -57,7 +57,7 @@ export default function Bank() {
 
   const isSellError = useMemo(() => {
     if (!status) return false;
-    return ['Enter an amount of HLX to sell.', 'Sell failed'].some(msg => status.includes(msg));
+    return ['Enter an amount of HLX to sell.', 'Sell failed', 'Invalid amount format'].some(msg => status.includes(msg));
   }, [status]);
 
   const handleBuy = async () => {
@@ -68,13 +68,20 @@ export default function Bank() {
       setActiveAction(null);
       return;
     }
+    // Validate format before parsing to avoid exceptions
+    if (!/^\d*\.?\d+$/.test(buyAmount)) {
+      setStatus('Invalid amount format.');
+      setActiveAction(null);
+      return;
+    }
+
     try {
       setActiveAction('buy');
       const hash = await writeContractAsync({
         address: contracts.HelixReserve,
         abi: reserveAbi,
         functionName: 'buy',
-        value: buyAmount ? parseEther(buyAmount) : undefined,
+        value: parseEther(buyAmount),
       });
       setTxHash(hash);
     } catch (err) {
@@ -97,9 +104,16 @@ export default function Bank() {
       setActiveAction(null);
       return;
     }
+    // Validate format before parsing
+    if (!/^\d*\.?\d+$/.test(sellAmount)) {
+      setStatus('Invalid amount format.');
+      setActiveAction(null);
+      return;
+    }
+
     try {
       setActiveAction('sell');
-      const hlxValue = parseEther(sellAmount || '0');
+      const hlxValue = parseEther(sellAmount);
 
       // Step 1: Approve
       setStatus('Approving HLX...');
@@ -161,10 +175,13 @@ export default function Bank() {
               autoComplete="off"
               min="0"
               step="0.01"
+              maxLength="20"
               className="input"
               placeholder="0.1"
               value={buyAmount}
-              onChange={(e) => setBuyAmount(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 20) setBuyAmount(e.target.value);
+              }}
               aria-label="Amount of ETH to spend"
               aria-describedby="bank-status"
               aria-invalid={isBuyError}
@@ -212,10 +229,13 @@ export default function Bank() {
               autoComplete="off"
               min="0"
               step="0.01"
+              maxLength="20"
               className="input"
               placeholder="100"
               value={sellAmount}
-              onChange={(e) => setSellAmount(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 20) setSellAmount(e.target.value);
+              }}
               aria-label="Amount of HLX to sell"
               aria-describedby="bank-status"
               aria-invalid={isSellError}
