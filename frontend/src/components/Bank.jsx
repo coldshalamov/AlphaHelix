@@ -168,18 +168,19 @@ export default function Bank() {
               aria-label="Amount of ETH to spend"
               aria-describedby="bank-status"
               aria-invalid={isBuyError}
+              disabled={Boolean(activeAction)}
               style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button primary"
               style={{ marginTop: '0.75rem' }}
               onClick={handleBuy}
-              disabled={isWriting}
+              disabled={Boolean(activeAction)}
             >
-              {isWriting ? (
+              {activeAction === 'buy' ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  Processing...
                 </>
               ) : (
                 'Buy HLX'
@@ -199,7 +200,7 @@ export default function Bank() {
                 className="badge"
                 style={{ cursor: 'pointer', border: 'none' }}
                 aria-label="Sell maximum available HLX"
-                disabled={isWriting}
+                disabled={Boolean(activeAction)}
               >
                 Max
               </button>
@@ -218,18 +219,19 @@ export default function Bank() {
               aria-label="Amount of HLX to sell"
               aria-describedby="bank-status"
               aria-invalid={isSellError}
+              disabled={Boolean(activeAction)}
               style={isSellError ? { borderColor: 'var(--danger)' } : {}}
             />
             <button
               className="button danger"
               style={{ marginTop: '0.75rem' }}
               onClick={handleSell}
-              disabled={isWriting}
+              disabled={Boolean(activeAction)}
             >
-              {isWriting ? (
+              {activeAction === 'sell' ? (
                 <>
                   <Spinner />
-                  Submitting...
+                  Processing...
                 </>
               ) : (
                 'Approve & Sell'
