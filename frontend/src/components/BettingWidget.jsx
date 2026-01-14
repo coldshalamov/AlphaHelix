@@ -97,7 +97,7 @@ function BettingWidget({
   }, []);
 
   const handleAmountChange = useCallback((e) => {
-    setAmount(e.target.value);
+    if (e.target.value.length <= 20) setAmount(e.target.value);
   }, []);
 
   const persistBet = useCallback(
