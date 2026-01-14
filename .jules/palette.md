@@ -5,3 +5,7 @@
 ## 2024-02-14 - Max Button Pattern
 **Learning:** A "Max" button is a critical affordance in DeFi interfaces (`Bank.jsx`). It should be positioned within the input label line for clarity. Using `type="button"` is mandatory to prevent accidental form submission in a multi-button form context.
 **Action:** Use the `.badge` class for auxiliary actions inside labels. Ensure they are explicitly typed as buttons.
+
+## 2026-01-14 - Interactive Wallet Badges
+**Learning:** Users expect wallet addresses displayed in headers to be interactive, specifically to copy the full address. Transforming static badges into accessible buttons (`type="button"`, `aria-label`) with feedback ("Copied!") provides a delightful micro-interaction without cluttering the UI.
+**Action:** When displaying wallet addresses, wrap them in a button with clipboard functionality and transient feedback.
