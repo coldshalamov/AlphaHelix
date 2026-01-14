@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
 
-export default function Bank() {
+function Bank() {
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const [buyAmount, setBuyAmount] = useState('');
@@ -60,7 +60,17 @@ export default function Bank() {
     return ['Enter an amount of HLX to sell.', 'Sell failed', 'Invalid amount format'].some(msg => status.includes(msg));
   }, [status]);
 
-  const handleBuy = async () => {
+  // BOLT: Memoized to prevent function recreation on every render,
+  // ensuring stable props for child inputs.
+  const handleBuyAmountChange = useCallback((e) => {
+    if (e.target.value.length <= 20) setBuyAmount(e.target.value);
+  }, []);
+
+  const handleSellAmountChange = useCallback((e) => {
+    if (e.target.value.length <= 20) setSellAmount(e.target.value);
+  }, []);
+
+  const handleBuy = useCallback(async () => {
     setStatus('');
     setActiveAction('buy');
     if (!buyAmount) {
@@ -88,15 +98,15 @@ export default function Bank() {
       setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Buy failed');
     }
-  };
+  }, [buyAmount, writeContractAsync]);
 
-  const handleMaxSell = () => {
+  const handleMaxSell = useCallback(() => {
     if (formattedHlx) {
       setSellAmount(formattedHlx);
     }
-  };
+  }, [formattedHlx]);
 
-  const handleSell = async () => {
+  const handleSell = useCallback(async () => {
     setStatus('');
     setActiveAction('sell');
     if (!sellAmount) {
@@ -140,7 +150,7 @@ export default function Bank() {
       setActiveAction(null);
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
-  };
+  }, [sellAmount, publicClient, writeContractAsync]);
 
   return (
     <div className="bank-container">
@@ -179,9 +189,7 @@ export default function Bank() {
               className="input"
               placeholder="0.1"
               value={buyAmount}
-              onChange={(e) => {
-                if (e.target.value.length <= 20) setBuyAmount(e.target.value);
-              }}
+              onChange={handleBuyAmountChange}
               aria-label="Amount of ETH to spend"
               aria-describedby="bank-status"
               aria-invalid={isBuyError}
@@ -233,9 +241,7 @@ export default function Bank() {
               className="input"
               placeholder="100"
               value={sellAmount}
-              onChange={(e) => {
-                if (e.target.value.length <= 20) setSellAmount(e.target.value);
-              }}
+              onChange={handleSellAmountChange}
               aria-label="Amount of HLX to sell"
               aria-describedby="bank-status"
               aria-invalid={isSellError}
@@ -267,3 +273,5 @@ export default function Bank() {
       </div>
   );
 }
+
+export default memo(Bank);
