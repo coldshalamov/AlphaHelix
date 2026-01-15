@@ -64,6 +64,8 @@ export const marketAbi = [
       { internalType: 'bool', name: 'outcome', type: 'bool' },
       { internalType: 'bool', name: 'tie', type: 'bool' },
       { internalType: 'address', name: 'originator', type: 'address' },
+      { internalType: 'uint256', name: 'claimedWinningStake', type: 'uint256' },
+      { internalType: 'uint256', name: 'claimedRewardPaid', type: 'uint256' },
     ],
     stateMutability: 'view',
     type: 'function',

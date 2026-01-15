@@ -2,6 +2,8 @@
 
 This repository ships a lightweight off-chain indexer to make it easier for the frontend and tooling to list markets and user positions without iterating on-chain state.
 
+In addition to market lifecycle events, the indexer also captures `Claimed` and `UnrevealedWithdrawn` so UIs can show whether a position has been claimed (or forfeited).
+
 ## Setup
 
 1. Install dependencies (Hardhat already vendors `ethers`):
@@ -37,6 +39,8 @@ The JSON snapshot contains two top-level maps: `markets` and `bets`.
   - `marketId`, `user`, `side` (0 = NO, 1 = YES, 2 = UNALIGNED)
   - `amount`
   - `committedAt` and `revealedAt` timestamps (unix seconds)
+  - `claimedAt` and `payout` (when claimed)
+  - `unrevealedWithdrawnAt`, `penaltyBurned`, and `amountReturned` (when forfeited)
 
 ### Example snapshot (truncated)
 

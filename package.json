@@ -5,9 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
+    "test:gas": "REPORT_GAS=true npx hardhat test",
+    "test:fuzzing": "npx hardhat test test/HelixMarket_fuzzing.test.js",
+    "coverage": "npx hardhat coverage",
     "node": "npx hardhat node",
     "deploy:local": "npx hardhat run scripts/deploy.js --network hardhat",
-    "deploy:arbSepolia": "npx hardhat run scripts/deploy.js --network arbitrumSepolia"
+    "deploy:arbSepolia": "npx hardhat run scripts/deploy.js --network arbitrumSepolia",
+    "verify:arbSepolia": "npx hardhat run scripts/verify.js --network arbitrumSepolia",
+    "prepare": "husky",
+    "reset": "node scripts/reset-dev.js",
+    "simulate": "npx hardhat run scripts/simulate-market.js --network localhost",
+    "docs": "node scripts/generate-docs.js",
+    "lint": "npx solhint 'contracts/**/*.sol'",
+    "lint:fix": "npx solhint 'contracts/**/*.sol' --fix",
+    "format": "npx prettier --write 'contracts/**/*.sol' 'test/**/*.js' 'scripts/**/*.js'",
+    "analyze": "slither . --json slither-report.json",
+    "clean": "npx hardhat clean && rm -rf cache artifacts coverage coverage.json"
   },
   "repository": {
     "type": "git",
@@ -25,7 +38,10 @@
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "dotenv": "^16.4.5",
     "ethers": "^6.16.0",
-    "hardhat": "^2.27.2"
+    "hardhat": "^2.27.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "solidity-coverage": "^0.8.17"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0"

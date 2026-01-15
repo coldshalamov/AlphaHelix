@@ -1,0 +1,94 @@
+INFO:Detectors:
+Detector: unchecked-transfer
+HelixReserve.sell(uint256) (contracts/HelixReserve.sol#40-55) ignores return value by token.transferFrom(msg.sender,address(this),hlxAmount) (contracts/HelixReserve.sol#48)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+INFO:Detectors:
+Detector: incorrect-equality
+HelixMarket.pingMarket(uint256) (contracts/HelixMarket.sol#425-434) uses a dangerous strict equality:
+	- s.commitPhaseClosed == block.timestamp (contracts/HelixMarket.sol#429)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: reentrancy-no-eth
+Reentrancy in HelixMarket.commitBet(uint256,bytes32,uint256) (contracts/HelixMarket.sol#205-231):
+	External calls:
+	- require(bool,string)(token.transferFrom(msg.sender,address(this),amount),Transfer failed) (contracts/HelixMarket.sol#222)
+	State variables written after the call(s):
+	- hasCommitted[marketId][msg.sender] = true (contracts/HelixMarket.sol#225)
+	HelixMarket.hasCommitted (contracts/HelixMarket.sol#53) can be used in cross function reentrancies:
+	- HelixMarket.hasCommitted (contracts/HelixMarket.sol#53)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+INFO:Detectors:
+Detector: reentrancy-benign
+Reentrancy in HelixMarket._submitStatementInternal(string,uint256,uint256,bool,uint256) (contracts/HelixMarket.sol#145-199):
+	External calls:
+	- require(bool,string)(token.transferFrom(msg.sender,address(this),STATEMENT_FEE),Fee transfer failed) (contracts/HelixMarket.sol#164)
+	- require(bool,string)(token.transfer(BURN_ADDRESS,STATEMENT_FEE),Burn transfer failed) (contracts/HelixMarket.sol#165)
+	State variables written after the call(s):
+	- marketId = marketCount ++ (contracts/HelixMarket.sol#167)
+	- s.ipfsCid = ipfsCid (contracts/HelixMarket.sol#169)
+	- s.commitEndTime = block.timestamp + minCommitDuration (contracts/HelixMarket.sol#170)
+	- s.originator = msg.sender (contracts/HelixMarket.sol#171)
+	- s.randomCloseEnabled = enableRandomClose (contracts/HelixMarket.sol#172)
+	- s.revealDuration = revealDuration (contracts/HelixMarket.sol#173)
+	- s.closeSeed = keccak256(bytes)(abi.encodePacked(block.timestamp,msg.sender,marketId,blockhash(uint256)(block.number - 1))) (contracts/HelixMarket.sol#177-182)
+	- s.difficultyTarget = _calculateDifficultyTarget(avgCommitDuration - minCommitDuration) (contracts/HelixMarket.sol#185)
+	- s.revealEndTime = 0 (contracts/HelixMarket.sol#188)
+	- s.revealEndTime = s.commitEndTime + revealDuration (contracts/HelixMarket.sol#193)
+	- s.difficultyTarget = 0 (contracts/HelixMarket.sol#194)
+	- s.commitPhaseClosed = s.commitEndTime (contracts/HelixMarket.sol#195)
+Reentrancy in HelixMarket.commitBet(uint256,bytes32,uint256) (contracts/HelixMarket.sol#205-231):
+	External calls:
+	- require(bool,string)(token.transferFrom(msg.sender,address(this),amount),Transfer failed) (contracts/HelixMarket.sol#222)
+	State variables written after the call(s):
+	- commits[marketId][msg.sender] = commitHash (contracts/HelixMarket.sol#224)
+	- committedAmount[marketId][msg.sender] += amount (contracts/HelixMarket.sol#228)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in HelixMarket.pingMarket(uint256) (contracts/HelixMarket.sol#425-434):
+	External calls:
+	- require(bool,string)(token.transfer(msg.sender,PING_REWARD),Reward transfer failed) (contracts/HelixMarket.sol#431)
+	Event emitted after the call(s):
+	- PingReward(marketId,msg.sender,PING_REWARD) (contracts/HelixMarket.sol#432)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+INFO:Detectors:
+Detector: timestamp
+HelixMarket.commitBet(uint256,bytes32,uint256) (contracts/HelixMarket.sol#205-231) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(s.commitPhaseClosed == 0,Commit phase closed) (contracts/HelixMarket.sol#214)
+	- require(bool,string)(block.timestamp < s.commitEndTime,Commit phase over) (contracts/HelixMarket.sol#216)
+HelixMarket.revealBet(uint256,uint8,uint256) (contracts/HelixMarket.sol#237-276) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(s.commitPhaseClosed > 0,Commit phase still open) (contracts/HelixMarket.sol#246)
+	- require(bool,string)(block.timestamp >= s.commitEndTime,Commit phase not over) (contracts/HelixMarket.sol#248)
+	- require(bool,string)(block.timestamp < s.revealEndTime,Reveal phase over) (contracts/HelixMarket.sol#251)
+HelixMarket.resolve(uint256) (contracts/HelixMarket.sol#280-296) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > s.revealEndTime,Reveal phase not over) (contracts/HelixMarket.sol#282)
+	- require(bool,string)(! s.resolved,Already resolved) (contracts/HelixMarket.sol#283)
+	- require(bool,string)(token.transfer(s.originator,fee),Fee transfer failed) (contracts/HelixMarket.sol#292)
+HelixMarket.claim(uint256) (contracts/HelixMarket.sol#300-330) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(s.resolved,Not resolved) (contracts/HelixMarket.sol#302)
+	- require(bool,string)(rewardPool >= s.claimedRewardPaid,Claim accounting overflow) (contracts/HelixMarket.sol#315)
+HelixMarket.withdrawUnrevealed(uint256) (contracts/HelixMarket.sol#334-353) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > s.revealEndTime,Reveal phase not over) (contracts/HelixMarket.sol#336)
+HelixMarket.pingMarket(uint256) (contracts/HelixMarket.sol#425-434) uses timestamp for comparisons
+	Dangerous comparisons:
+	- s.commitPhaseClosed == block.timestamp (contracts/HelixMarket.sol#429)
+HelixMarket.previewCloseCheck(uint256) (contracts/HelixMarket.sol#442-470) uses timestamp for comparisons
+	Dangerous comparisons:
+	- willClose = (s.randomCloseEnabled && s.commitPhaseClosed == 0 && block.timestamp >= s.commitEndTime && uint256(closeHash) < s.difficultyTarget) (contracts/HelixMarket.sol#466-469)
+	- isCommitPhaseOpen = (block.timestamp < s.commitEndTime) (contracts/HelixMarket.sol#451)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in HelixReserve.sell(uint256) (contracts/HelixReserve.sol#40-55):
+	- (success,None) = msg.sender.call{value: ethAmount}() (contracts/HelixReserve.sol#51)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: missing-inheritance
+DummyMarketAMM (contracts/mocks/DummyMarketAMM.sol#6-20) should inherit from IMarketAMM (contracts/HelixReserve.sol#10-12)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+INFO:Slither:. analyzed (19 contracts with 100 detectors), 15 result(s) found

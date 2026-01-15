@@ -2,6 +2,8 @@ const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
+require("@nomicfoundation/hardhat-chai-matchers");
+
 describe("HelixReserve", function () {
   async function deployHelixReserveFixture() {
     const [owner, user, other] = await ethers.getSigners();
@@ -106,5 +108,20 @@ describe("HelixReserve", function () {
     await buyTx.wait();
     const buyerBalance = await token.balanceOf(buyer.address);
     expect(buyerBalance).to.equal(ethers.parseEther("100"));
+  });
+
+  it("Buy with zero ETH reverts", async function () {
+    const { reserve, user } = await loadFixture(deployHelixReserveFixture);
+    await expect(reserve.connect(user).buy({ value: 0n })).to.be.revertedWith("No ETH sent");
+  });
+
+  it("Sell rejects HLX that cannot convert to whole wei", async function () {
+    const { token, reserve, owner, user } = await loadFixture(deployHelixReserveFixture);
+
+    const hlxAmount = ethers.parseEther("1") + 1n; // not divisible by RATE=1000
+    await token.connect(owner).mint(user.address, hlxAmount);
+    await token.connect(user).approve(reserve.target, hlxAmount);
+
+    await expect(reserve.connect(user).sell(hlxAmount)).to.be.revertedWith("HLX amount must convert to whole wei");
   });
 });

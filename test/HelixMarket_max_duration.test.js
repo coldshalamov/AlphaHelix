@@ -2,6 +2,8 @@ const { expect } = require("chai");
 const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
+require("@nomicfoundation/hardhat-chai-matchers");
+
 describe("HelixMarket Security - Max Duration", function () {
   async function deployHelixMarketFixture() {
     const [owner, userA] = await ethers.getSigners();

@@ -8,3 +8,9 @@ cache/
 artifacts/
 cache/
 hardhat_node.log
+
+# Coverage files
+coverage/
+coverage.json
+.coverage_cache/
+.coverage_contracts/

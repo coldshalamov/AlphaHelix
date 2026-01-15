@@ -82,6 +82,11 @@ function ensureBet(state, marketId, user) {
       amount: "0",
       committedAt: null,
       revealedAt: null,
+      claimedAt: null,
+      payout: "0",
+      unrevealedWithdrawnAt: null,
+      penaltyBurned: "0",
+      amountReturned: "0",
     };
   }
   return state.bets[key];
@@ -136,6 +141,25 @@ async function handleMarketResolved(state, log) {
   marketEntry.totalFeeCollected = addStrings(marketEntry.totalFeeCollected, originatorFee.toString());
 }
 
+async function handleClaimed(state, log) {
+  const { marketId, user, payout } = log.args;
+  const timestamp = await getTimestamp(log.blockNumber);
+  const bet = ensureBet(state, toStringValue(marketId), user);
+  bet.claimedAt = timestamp;
+  bet.payout = toStringValue(payout);
+}
+
+async function handleUnrevealedWithdrawn(state, log) {
+  const { marketId, user, amountReturned, penaltyBurned } = log.args;
+  const timestamp = await getTimestamp(log.blockNumber);
+  const bet = ensureBet(state, toStringValue(marketId), user);
+  bet.unrevealedWithdrawnAt = timestamp;
+  bet.amountReturned = toStringValue(amountReturned);
+  bet.penaltyBurned = toStringValue(penaltyBurned);
+  // The stake is no longer locked in the market after withdrawal.
+  bet.amount = "0";
+}
+
 async function processEvents(state, fromBlock, toBlock) {
   const logs = await market.queryFilter({}, fromBlock, toBlock);
   for (const log of logs) {
@@ -151,6 +175,12 @@ async function processEvents(state, fromBlock, toBlock) {
         break;
       case "MarketResolved":
         await handleMarketResolved(state, log);
+        break;
+      case "Claimed":
+        await handleClaimed(state, log);
+        break;
+      case "UnrevealedWithdrawn":
+        await handleUnrevealedWithdrawn(state, log);
         break;
       default:
         break;

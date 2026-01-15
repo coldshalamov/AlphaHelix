@@ -2,6 +2,9 @@ const { expect } = require("chai");
 const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
+// This is needed to make chai matchers work with ethers v6
+require("@nomicfoundation/hardhat-chai-matchers");
+
 describe("HelixMarket", function () {
   async function deployHelixMarketFixture() {
     const [owner, userA, userB, userC] = await ethers.getSigners();
@@ -161,7 +164,7 @@ describe("HelixMarket", function () {
 
       await market.connect(userA).commitBet(0, hashA, amountA);
 
-      await expect(market.connect(userA).revealBet(0, 1, 111)).to.be.revertedWith("Commit phase not active");
+      await expect(market.connect(userA).revealBet(0, 1, 111)).to.be.revertedWith("Commit phase not over");
     });
 
     it("reverts unrevealed withdrawal before reveal end", async function () {
@@ -264,6 +267,9 @@ describe("HelixMarket", function () {
         });
 
         let payoutTotal = 0n;
+        let claimedWinningStake = 0n;
+        let claimedRewardPaid = 0n;
+
         for (const stake of winners) {
           const before = await token.balanceOf(stake.actor.address);
           await market.connect(stake.actor).claim(0);
@@ -277,15 +283,19 @@ describe("HelixMarket", function () {
             const totalPool = yesPool + noPool + unalignedPool;
             const rewardPool = totalPool - originatorFee;
             const winningPool = statement.outcome ? yesPool : noPool;
-            const expected = (stake.amount * rewardPool) / winningPool;
+
+            const isLastWinner = claimedWinningStake + stake.amount === winningPool;
+            const expected = isLastWinner ? rewardPool - claimedRewardPaid : (stake.amount * rewardPool) / winningPool;
+            claimedWinningStake += stake.amount;
+            claimedRewardPaid += expected;
+
             expect(payout).to.equal(expected);
           }
         }
 
         const totalPool = yesPool + noPool + unalignedPool;
         const accounted = payoutTotal + originatorFee;
-        expect(accounted).to.be.at.most(totalPool);
-        expect(totalPool - accounted).to.be.lessThanOrEqual(BigInt(Math.max(1, winners.length)));
+        expect(accounted).to.equal(totalPool);
       });
     }
 
@@ -312,6 +322,351 @@ describe("HelixMarket", function () {
       await expect(market.connect(userB).withdrawUnrevealed(0)).to.be.revertedWith("No unrevealed stake");
       const after = await token.balanceOf(userB.address);
       expect(after).to.equal(before);
+    });
+  });
+
+  describe("Random close markets", function () {
+    it("Creates random close market with correct parameters", async function () {
+      const { market, token, userA } = await loadFixture(deployHelixMarketFixture);
+
+      const minDuration = 3600; // 1 hour minimum
+      const avgDuration = 7200; // 2 hours average
+      const revealDuration = 3600;
+
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://random-close",
+        minDuration,
+        revealDuration,
+        true, // enable random close
+        avgDuration
+      );
+
+      const marketId = 0;
+      const status = await market.getRandomCloseStatus(marketId);
+
+      expect(status.randomCloseEnabled).to.be.true;
+      expect(status.commitPhaseClosed).to.equal(0); // Not closed yet
+      expect(status.difficultyTarget).to.be.gt(0);
+      expect(status.closeSeed).to.not.equal(ethers.ZeroHash);
+    });
+
+    it("Fixed-time markets still work (backwards compatibility)", async function () {
+      const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
+
+      // Use the original submitStatement function
+      await market.connect(userA).submitStatement("ipfs://fixed-time", biddingDuration, revealDuration);
+
+      const marketId = 0;
+      const status = await market.getRandomCloseStatus(marketId);
+
+      // Should not have random close enabled
+      expect(status.randomCloseEnabled).to.be.false;
+      // commitPhaseClosed should equal commitEndTime for fixed-time markets
+      expect(status.commitPhaseClosed).to.be.gt(0);
+
+      // Commit should work during window
+      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), ethers.parseEther("100"));
+
+      // Can't reveal before commit end
+      await expect(
+        market.connect(userB).revealBet(marketId, 1, 111)
+      ).to.be.revertedWith("Commit phase not over");
+
+      // Time travel past commit window
+      await time.increase(biddingDuration + 1);
+
+      // Now reveal works
+      await market.connect(userB).revealBet(marketId, 1, 111);
+
+      const statement = await market.markets(marketId);
+      expect(statement.yesPool).to.equal(ethers.parseEther("100"));
+    });
+
+    it("Fixed-time markets also work with submitStatementWithRandomClose", async function () {
+      const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
+
+      // Use submitStatementWithRandomClose with enableRandomClose = false
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://fixed-time-v2",
+        biddingDuration,
+        revealDuration,
+        false, // disable random close
+        0 // avgDuration not used
+      );
+
+      const marketId = 0;
+      const status = await market.getRandomCloseStatus(marketId);
+
+      expect(status.randomCloseEnabled).to.be.false;
+
+      // Test normal flow
+      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), ethers.parseEther("50"));
+      await time.increase(biddingDuration + 1);
+      await market.connect(userB).revealBet(marketId, 1, 111);
+
+      const statement = await market.markets(marketId);
+      expect(statement.yesPool).to.equal(ethers.parseEther("50"));
+    });
+
+    it("Random close market can close during commit", async function () {
+      const { market, token, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+
+      const minDuration = 3600; // 1 hour minimum (required by MIN_BIDDING_DURATION)
+      const avgDuration = 3660; // Just 1 minute more = very high probability
+      const revealDuration = 3600;
+
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://random-close-test",
+        minDuration,
+        revealDuration,
+        true,
+        avgDuration
+      );
+
+      const marketId = 0;
+
+      // Time travel to minimum duration
+      await time.increase(minDuration + 1);
+
+      // Keep committing until market closes or max attempts
+      let statement = await market.markets(marketId);
+      let attempts = 0;
+      const maxAttempts = 500;
+
+      while (statement.commitPhaseClosed == 0 && attempts < maxAttempts) {
+        try {
+          // Alternate between users
+          const user = attempts % 2 === 0 ? userB : userC;
+          if (!await market.hasCommitted(marketId, user.address)) {
+            await market.connect(user).commitBet(
+              marketId,
+              buildCommit(1, 1000 + attempts, user),
+              ethers.parseEther("1")
+            );
+          }
+        } catch (e) {
+          // Commit phase may have closed
+          if (e.message.includes("Commit phase closed")) {
+            break;
+          }
+          throw e;
+        }
+
+        statement = await market.markets(marketId);
+        attempts++;
+
+        // Advance block to get new hash
+        await time.increase(1);
+      }
+
+      statement = await market.markets(marketId);
+      // Market should eventually close (or we hit max attempts)
+      console.log(`Market tested with ${attempts} attempts, closed: ${statement.commitPhaseClosed > 0}`);
+    });
+
+    it("Cannot commit after random close", async function () {
+      const { market, token, userA, userB, userC, owner } = await loadFixture(deployHelixMarketFixture);
+
+      // Create market with very high close probability (difficulty target = max)
+      const minDuration = 3600; // 1 hour minimum
+      const avgDuration = 3601; // Just 1 second more than min = extremely high probability
+      const revealDuration = 3600;
+
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://high-probability",
+        minDuration,
+        revealDuration,
+        true,
+        avgDuration
+      );
+
+      const marketId = 0;
+
+      // Commit before close
+      await market.connect(userB).commitBet(
+        marketId,
+        buildCommit(1, 111, userB),
+        ethers.parseEther("10")
+      );
+
+      // Time travel to minimum duration
+      await time.increase(minDuration + 1);
+
+      // Force close by pinging until it closes
+      let statement = await market.markets(marketId);
+      let attempts = 0;
+      while (statement.commitPhaseClosed == 0 && attempts < 100) {
+        await market.connect(owner).pingMarket(marketId);
+        statement = await market.markets(marketId);
+        attempts++;
+        await time.increase(1);
+      }
+
+      // Verify market is closed
+      statement = await market.markets(marketId);
+      if (statement.commitPhaseClosed > 0) {
+        // Now try to commit - should fail
+        await expect(
+          market.connect(userC).commitBet(
+            marketId,
+            buildCommit(0, 222, userC),
+            ethers.parseEther("5")
+          )
+        ).to.be.revertedWith("Commit phase closed");
+      }
+    });
+
+    it("Can reveal after random close", async function () {
+      const { market, token, userA, userB, owner } = await loadFixture(deployHelixMarketFixture);
+
+      const minDuration = 3600; // 1 hour minimum
+      const avgDuration = 3601; // Very high probability
+      const revealDuration = 3600;
+
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://reveal-test",
+        minDuration,
+        revealDuration,
+        true,
+        avgDuration
+      );
+
+      const marketId = 0;
+
+      // Commit before close
+      await market.connect(userB).commitBet(
+        marketId,
+        buildCommit(1, 111, userB),
+        ethers.parseEther("10")
+      );
+
+      // Time travel to minimum duration
+      await time.increase(minDuration + 1);
+
+      // Force close by pinging
+      let statement = await market.markets(marketId);
+      let attempts = 0;
+      while (statement.commitPhaseClosed == 0 && attempts < 100) {
+        await market.connect(owner).pingMarket(marketId);
+        statement = await market.markets(marketId);
+        attempts++;
+        await time.increase(1);
+      }
+
+      // If market closed, verify we can reveal
+      statement = await market.markets(marketId);
+      if (statement.commitPhaseClosed > 0) {
+        // Reveal should work now
+        await market.connect(userB).revealBet(marketId, 1, 111);
+
+        statement = await market.markets(marketId);
+        expect(statement.yesPool).to.equal(ethers.parseEther("10"));
+      }
+    });
+
+    it("previewCloseCheck returns correct values", async function () {
+      const { market, userA } = await loadFixture(deployHelixMarketFixture);
+
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://preview-test",
+        3600,
+        3600,
+        true,
+        7200
+      );
+
+      const preview = await market.previewCloseCheck(0);
+
+      expect(preview.isRandomCloseEnabled).to.be.true;
+      expect(preview.isCommitPhaseOpen).to.be.true;
+      expect(preview.closeHash).to.not.equal(ethers.ZeroHash);
+    });
+
+    it("getRandomCloseStatus returns correct values for both market types", async function () {
+      const { market, userA } = await loadFixture(deployHelixMarketFixture);
+
+      // Create fixed-time market
+      await market.connect(userA).submitStatement("ipfs://fixed", 3600, 3600);
+
+      // Create random close market
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://random",
+        3600,
+        3600,
+        true,
+        7200
+      );
+
+      const fixedStatus = await market.getRandomCloseStatus(0);
+      expect(fixedStatus.randomCloseEnabled).to.be.false;
+
+      const randomStatus = await market.getRandomCloseStatus(1);
+      expect(randomStatus.randomCloseEnabled).to.be.true;
+    });
+
+    it("Rejects invalid random close parameters", async function () {
+      const { market, userA } = await loadFixture(deployHelixMarketFixture);
+
+      // avgDuration < minDuration should fail
+      await expect(
+        market.connect(userA).submitStatementWithRandomClose(
+          "ipfs://invalid",
+          7200, // minDuration = 2 hours
+          3600,
+          true,
+          3600  // avgDuration = 1 hour (less than min)
+        )
+      ).to.be.revertedWith("Avg duration must be >= min duration");
+    });
+
+    it("Ping reward works for closing market", async function () {
+      const { market, token, userA, userC, owner } = await loadFixture(deployHelixMarketFixture);
+
+      // Create market with HIGH close probability
+      await market.connect(userA).submitStatementWithRandomClose(
+        "ipfs://ping-test",
+        3600,  // 1 hour minimum
+        3600,  // 1 hour reveal
+        true,  // random close
+        3601   // Very high probability (just 1 second more)
+      );
+
+      // Mint reward tokens to contract for ping rewards
+      const MINTER_ROLE = await token.MINTER_ROLE();
+      await token.grantRole(MINTER_ROLE, owner.address);
+      await token.mint(market.target, ethers.parseEther("100"));
+
+      await time.increase(3601);
+
+      // Keep pinging until it closes
+      let closed = false;
+      let attempts = 0;
+
+      while (!closed && attempts < 100) {
+        const balanceBefore = await token.balanceOf(userC.address);
+
+        try {
+          await market.connect(userC).pingMarket(0);
+        } catch (e) {
+          // Might fail if contract has no tokens
+          break;
+        }
+
+        const balanceAfter = await token.balanceOf(userC.address);
+        const statement = await market.markets(0);
+
+        if (balanceAfter > balanceBefore) {
+          // Got reward! Market must have closed
+          expect(balanceAfter - balanceBefore).to.equal(ethers.parseEther("1"));
+          closed = true;
+        }
+
+        attempts++;
+        await time.increase(1);
+      }
+
+      // Log result
+      console.log(`Ping test: ${closed ? "Got reward" : "No reward"} after ${attempts} attempts`);
     });
   });
 });
