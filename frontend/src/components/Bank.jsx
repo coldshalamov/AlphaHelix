@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, memo } from 'react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
@@ -7,6 +7,7 @@ import Spinner from './Spinner';
 
 function Bank() {
   const { address } = useAccount();
+  const chainId = useChainId();
   const publicClient = usePublicClient();
   const [buyAmount, setBuyAmount] = useState('');
   const [sellAmount, setSellAmount] = useState('');
@@ -25,6 +26,9 @@ function Bank() {
 
   const { writeContractAsync, isPending: isWriting } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+
+  const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
+  const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
@@ -172,7 +176,14 @@ function Bank() {
         </div>
       </div>
 
-        <div className="grid two" style={{ marginTop: '1.5rem' }}>
+        {isWrongNetwork && (
+          <div className="card" style={{ marginTop: '1.5rem', borderColor: '#fee2e2' }}>
+            <h3 className="font-semibold">Wrong network</h3>
+            <p className="helper">Switch to the configured Helix chain to continue.</p>
+          </div>
+        )}
+
+        <div className="grid two" style={{ marginTop: '1.5rem', opacity: isWrongNetwork ? 0.5 : 1, pointerEvents: isWrongNetwork ? 'none' : 'auto' }}>
           <div className="card" style={{ borderColor: '#dbeafe' }}>
             <h3 className="font-semibold">Buy HLX</h3>
             <label htmlFor="buy-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
