@@ -14,6 +14,7 @@ function Bank() {
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
+  const [copied, setCopied] = useState(false);
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -47,6 +48,8 @@ function Bank() {
     }
   }, [hlxBalance]);
 
+  const shortAddress = useMemo(() => address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected', [address]);
+
   const liveStatus = useMemo(() => {
     // One message, one announcer.
     if (isConfirming) return 'Awaiting confirmation...';
@@ -73,6 +76,14 @@ function Bank() {
   const handleSellAmountChange = useCallback((e) => {
     if (e.target.value.length <= 20) setSellAmount(e.target.value);
   }, []);
+
+  const handleCopy = useCallback(() => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [address]);
 
   const handleBuy = useCallback(async () => {
     setStatus('');
@@ -161,18 +172,36 @@ function Bank() {
       <h2>Helix Bank</h2>
       <p>Swap ETH for HLX on the reserve contract.</p>
 
-      <div className="wallet-info">
+      <div className="wallet-info table-like">
         <div>
-          <strong>Wallet</strong>
-          <span>{address || 'Not connected'}</span>
+          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>Wallet</strong>
+          {address ? (
+            <button
+              className="badge"
+              onClick={handleCopy}
+              type="button"
+              aria-label="Copy wallet address"
+              style={{
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: '0.9rem',
+                padding: '0.25rem 0.75rem',
+              }}
+            >
+              <span>{copied ? 'Copied!' : shortAddress}</span>
+            </button>
+          ) : (
+            <span>Not connected</span>
+          )}
         </div>
         <div>
-          <strong>ETH Balance</strong>
-          <span>{ethBalance ? `${ethBalance.formatted} ${ethBalance.symbol}` : '—'}</span>
+          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>ETH Balance</strong>
+          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{ethBalance ? `${Number(ethBalance.formatted).toFixed(4)} ${ethBalance.symbol}` : '—'}</span>
         </div>
         <div>
-          <strong>HLX Balance</strong>
-          <span>{formattedHlx} HLX</span>
+          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>HLX Balance</strong>
+          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{formattedHlx} HLX</span>
         </div>
       </div>
 
