@@ -15,3 +15,7 @@
 ## 2025-10-25 - [Smart Polling]
 **Learning:** Wagmi v2's `refetchInterval` accepts a function `(data) => number | false`. This allows disabling polling dynamically when a terminal state (e.g., market resolution) is reached, saving RPC calls.
 **Action:** Use conditional `refetchInterval` logic for entities with final states, and pair with manual `refetch()` for subsequent user actions (like claiming).
+
+## 2025-10-25 - [BigInt Serialization]
+**Learning:** `JSON.stringify` throws a `TypeError` when encountering `BigInt` values. In Wagmi/Viem DApps, IDs are often `BigInt`.
+**Action:** Explicitly convert `BigInt` fields to strings (e.g., `.toString()`) before storing them in `localStorage` or sending them to non-BigInt-aware APIs.

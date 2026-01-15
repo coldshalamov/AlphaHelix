@@ -179,7 +179,8 @@ function BettingWidget({
         '0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''),
       );
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
-      const betData = { marketId, salt: salt.toString(), choice: Number(choice), amount, hash };
+      // BOLT: Convert marketId (BigInt) to string to avoid JSON.stringify crash in persistBet
+      const betData = { marketId: marketId.toString(), salt: salt.toString(), choice: Number(choice), amount, hash };
 
       // If allowance is insufficient, approve first and *wait for it*
       if (!allowance || allowance < amountValue) {
