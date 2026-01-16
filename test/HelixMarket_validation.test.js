@@ -49,4 +49,29 @@ describe("HelixMarket Security: Input Validation", function () {
         market.connect(userA).submitStatement(validCid, biddingDuration, revealDuration)
     ).to.not.be.reverted;
   });
+
+  it("should revert on invalid marketId across entrypoints", async function () {
+    const { market, userA } = await loadFixture(deployHelixMarketFixture);
+
+    const commit = ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [1, 123, userA.address]);
+    await expect(market.connect(userA).commitBet(0, commit, 1n)).to.be.revertedWith("Invalid market");
+    await expect(market.resolve(0)).to.be.revertedWith("Invalid market");
+    await expect(market.previewCloseCheck(0)).to.be.revertedWith("Invalid market");
+    await expect(market.getRandomCloseStatus(0)).to.be.revertedWith("Invalid market");
+    await expect(market.pingMarket(0)).to.be.revertedWith("Invalid market");
+  });
+
+  it("should not allow resolving random-close markets before reveal starts", async function () {
+    const { market, userA } = await loadFixture(deployHelixMarketFixture);
+
+    await market.connect(userA).submitStatementWithRandomClose(
+      "ipfs://random-close",
+      3600,
+      3600,
+      true,
+      7200
+    );
+
+    await expect(market.resolve(0)).to.be.revertedWith("Reveal not started");
+  });
 });

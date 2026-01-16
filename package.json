@@ -16,8 +16,8 @@
     "reset": "node scripts/reset-dev.js",
     "simulate": "npx hardhat run scripts/simulate-market.js --network localhost",
     "docs": "node scripts/generate-docs.js",
-    "lint": "npx solhint 'contracts/**/*.sol'",
-    "lint:fix": "npx solhint 'contracts/**/*.sol' --fix",
+    "lint": "npx --yes solhint \"contracts/**/*.sol\"",
+    "lint:fix": "npx --yes solhint \"contracts/**/*.sol\" --fix",
     "format": "npx prettier --write 'contracts/**/*.sol' 'test/**/*.js' 'scripts/**/*.js'",
     "analyze": "slither . --json slither-report.json",
     "clean": "npx hardhat clean && rm -rf cache artifacts coverage coverage.json"

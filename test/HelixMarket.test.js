@@ -361,8 +361,8 @@ describe("HelixMarket", function () {
 
       // Should not have random close enabled
       expect(status.randomCloseEnabled).to.be.false;
-      // commitPhaseClosed should equal commitEndTime for fixed-time markets
-      expect(status.commitPhaseClosed).to.be.gt(0);
+      // commitPhaseClosed is unused for fixed-time markets
+      expect(status.commitPhaseClosed).to.equal(0);
 
       // Commit should work during window
       await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), ethers.parseEther("100"));
@@ -620,7 +620,7 @@ describe("HelixMarket", function () {
     });
 
     it("Ping reward works for closing market", async function () {
-      const { market, token, userA, userC, owner } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userC } = await loadFixture(deployHelixMarketFixture);
 
       // Create market with HIGH close probability
       await market.connect(userA).submitStatementWithRandomClose(
@@ -631,11 +631,6 @@ describe("HelixMarket", function () {
         3601   // Very high probability (just 1 second more)
       );
 
-      // Mint reward tokens to contract for ping rewards
-      const MINTER_ROLE = await token.MINTER_ROLE();
-      await token.grantRole(MINTER_ROLE, owner.address);
-      await token.mint(market.target, ethers.parseEther("100"));
-
       await time.increase(3601);
 
       // Keep pinging until it closes
@@ -645,12 +640,7 @@ describe("HelixMarket", function () {
       while (!closed && attempts < 100) {
         const balanceBefore = await token.balanceOf(userC.address);
 
-        try {
-          await market.connect(userC).pingMarket(0);
-        } catch (e) {
-          // Might fail if contract has no tokens
-          break;
-        }
+        await market.connect(userC).pingMarket(0);
 
         const balanceAfter = await token.balanceOf(userC.address);
         const statement = await market.markets(0);

@@ -18,22 +18,22 @@ Generated: 2026-01-15
 **Location**: `HelixReserve.sell()` [line 48]
 **Issue**: Return value of `token.transferFrom()` is not checked
 **Impact**: Failed transfers may silently pass
-**Status**: ⚠️ NEEDS FIX
+**Status**: ✅ FIXED (2026-01-16)
 **Recommendation**: Check return value or use SafeERC20
 
 #### 2. Dangerous Strict Equality (Medium Risk)
 **Location**: `HelixMarket.pingMarket()` [line 429]
 **Issue**: Uses `s.commitPhaseClosed == block.timestamp` which could fail if transaction timing is off
 **Impact**: Edge case where ping reward might not be claimable
-**Status**: ⚠️ NEEDS FIX
-**Recommendation**: Use `s.commitPhaseClosed >= block.timestamp - 1 && s.commitPhaseClosed <= block.timestamp`
+**Status**: ✅ FIXED (2026-01-16)
+**Recommendation**: Avoid strict timestamp equality checks, and ensure rewards cannot be claimed more than once per market.
 
 #### 3. Reentrancy in commitBet() (Medium Risk)
 **Location**: `HelixMarket.commitBet()` [line 222-225]
 **Issue**: State variable `hasCommitted` written after external call
 **Impact**: Low (using OpenZeppelin ERC20 which is safe)
-**Status**: ✅ ACCEPTABLE (but should add nonReentrant modifier for defense in depth)
-**Mitigation**: Contract already uses ReentrancyGuard, recommend adding modifier to commitBet()
+**Status**: ✅ FIXED (2026-01-16)
+**Mitigation**: `commitBet()` is protected by `nonReentrant`.
 
 #### 4. Reentrancy Event Emission (Low Risk)
 **Location**: `HelixMarket.pingMarket()` [line 431-432]
@@ -72,30 +72,11 @@ Generated: 2026-01-15
 
 ### Critical Fixes Required
 
-1. **Fix unchecked transfer in HelixReserve.sell()**
-   ```solidity
-   // Change from:
-   token.transferFrom(msg.sender, address(this), hlxAmount);
+All items above are addressed as of **2026-01-16**.
 
-   // To:
-   require(token.transferFrom(msg.sender, address(this), hlxAmount), "Transfer failed");
-   ```
-
-2. **Fix strict equality in pingMarket()**
-   ```solidity
-   // Change from:
-   if (s.commitPhaseClosed == block.timestamp) {
-
-   // To:
-   // Only pay reward if closed in this block or previous block
-   if (s.commitPhaseClosed >= block.timestamp - 1 &&
-       s.commitPhaseClosed <= block.timestamp) {
-   ```
-
-3. **Add nonReentrant to commitBet()**
-   ```solidity
-   function commitBet(...) external checkRandomClose(marketId) nonReentrant {
-   ```
+Additional hardening shipped on 2026-01-16:
+- Market ID validation on state-changing entrypoints (prevents pre-resolving / corrupting future market IDs)
+- Random-close markets cannot be resolved before reveal starts
 
 ## Overall Security Assessment
 
@@ -109,9 +90,7 @@ Generated: 2026-01-15
 - Protected against common attacks (overflow, underflow via Solidity 0.8.20)
 
 ### Areas for Improvement
-- Fix unchecked transfer return value
-- Fix strict timestamp equality in pingMarket
-- Add nonReentrant modifier to commitBet for defense in depth
+- Keep docs synced with code changes
 - Consider formal verification for payout calculations
 
 ### Additional Recommendations
