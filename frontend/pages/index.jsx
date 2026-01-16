@@ -114,7 +114,7 @@ export default function Home() {
             <div className="split-text">
               <h2 className="section-title">Epistemology as Infrastructure</h2>
               <p className="section-description">
-                AlphaHelix isn't just a prediction market—it's an <strong>Epistemology Operating System</strong>.
+                AlphaHelix isn&apos;t just a prediction market—it&apos;s an <strong>Epistemology Operating System</strong>.
                 Facts are logically dependent on each other, creating a web of consistency that makes
                 lying exponentially expensive.
               </p>
