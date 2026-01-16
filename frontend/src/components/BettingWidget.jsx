@@ -160,6 +160,11 @@ function BettingWidget({
     if (!amount) return setStatus('Enter an amount of HLX to stake.');
     if (typeof window === 'undefined' || !window.crypto) return setStatus('Secure random generator unavailable.');
 
+    // Validate format before parsing to ensure it's a valid decimal number
+    if (!/^\d*\.?\d+$/.test(amount)) {
+      return setStatus('Invalid HLX amount format.');
+    }
+
     let amountValue;
     try {
       amountValue = parseEther(amount);
