@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAccount } from 'wagmi';
 
 export default function Layout({ children }) {
   const { address, isConnected } = useAccount();
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected';
 
@@ -15,39 +17,94 @@ export default function Layout({ children }) {
     }
   };
 
+  const isActive = (path) => router.pathname === path;
+
   return (
     <div>
       <header className="header">
+        <div className="header-banner">
+          <Link href="/">
+            <div className="banner-crop">
+              <img
+                src="/images/banner_helix.jpg"
+                alt="AlphaHelix"
+                className="header-banner-image"
+              />
+            </div>
+          </Link>
+        </div>
         <div className="navbar">
-          <div className="brand">AlphaHelix</div>
           <nav className="nav-links">
-            <Link href="/">Home</Link>
-            <Link href="/bank">Bank</Link>
-            <Link href="/markets">Markets</Link>
+            <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+              Home
+            </Link>
+            <Link href="/bank" className={`nav-link ${isActive('/bank') ? 'active' : ''}`}>
+              Bank
+            </Link>
+            <Link href="/markets" className={`nav-link ${isActive('/markets') ? 'active' : ''}`}>
+              Markets
+            </Link>
           </nav>
           {isConnected ? (
             <button
-              className="badge"
+              className="badge cyan"
               onClick={handleCopy}
               type="button"
               aria-label="Copy wallet address"
               style={{
                 border: 'none',
                 cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: '0.85rem',
               }}
             >
-              <span>{copied ? 'Copied!' : shortAddress}</span>
+              <span>{copied ? '✓ Copied!' : shortAddress}</span>
             </button>
           ) : (
             <div className="badge">
-              <span>Connect wallet in your browser</span>
+              <span>Connect Wallet</span>
             </div>
           )}
         </div>
       </header>
       <main className="container">{children}</main>
+
+      <style jsx>{`
+        .header-banner {
+          width: 100%;
+          background: var(--charcoal-bg);
+          padding: 0;
+          border-bottom: 1px solid var(--color-border);
+        }
+
+        .banner-crop {
+          width: 100%;
+          max-width: 1200px;
+          height: 120px;
+          margin: 0 auto;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .header-banner-image {
+          width: 100%;
+          height: auto;
+          display: block;
+          cursor: pointer;
+          transition: opacity var(--transition-base);
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
+        .header-banner-image:hover {
+          opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+          .banner-crop {
+            height: 80px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

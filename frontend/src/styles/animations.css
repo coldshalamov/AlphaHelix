@@ -1,0 +1,452 @@
+/* ============================================
+   AlphaHelix Animation Library
+   Reusable CSS Animations
+   ============================================ */
+
+/* ========== Keyframe Definitions ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    50% {
+        box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes networkPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 5px currentColor);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 15px currentColor) drop-shadow(0 0 25px currentColor);
+    }
+}
+
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== Utility Classes ========== */
+
+/* Fade Animations */
+.animate-fade-in {
+    animation: fadeIn var(--transition-base) var(--ease-out) forwards;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp var(--transition-slow) var(--ease-out) forwards;
+}
+
+.animate-fade-in-down {
+    animation: fadeInDown var(--transition-slow) var(--ease-out) forwards;
+}
+
+/* Slide Animations */
+.animate-slide-in-left {
+    animation: slideInLeft var(--transition-slow) var(--ease-out) forwards;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight var(--transition-slow) var(--ease-out) forwards;
+}
+
+/* Scale Animation */
+.animate-scale-in {
+    animation: scaleIn var(--transition-base) var(--ease-out) forwards;
+}
+
+/* Continuous Animations */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.animate-network-pulse {
+    animation: networkPulse 3s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Shimmer Effect (for loading states) */
+.animate-shimmer {
+    background: linear-gradient(90deg,
+            var(--slate-800) 0%,
+            var(--slate-700) 50%,
+            var(--slate-800) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* ========== Stagger Delays ========== */
+
+.stagger-1 {
+    animation-delay: 0.05s;
+}
+
+.stagger-2 {
+    animation-delay: 0.1s;
+}
+
+.stagger-3 {
+    animation-delay: 0.15s;
+}
+
+.stagger-4 {
+    animation-delay: 0.2s;
+}
+
+.stagger-5 {
+    animation-delay: 0.25s;
+}
+
+.stagger-6 {
+    animation-delay: 0.3s;
+}
+
+/* ========== Hover Effects ========== */
+
+.hover-lift {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.hover-glow-cyan {
+    transition: box-shadow var(--transition-base);
+}
+
+.hover-glow-cyan:hover {
+    box-shadow: var(--shadow-glow-cyan);
+}
+
+.hover-glow-amber {
+    transition: box-shadow var(--transition-base);
+}
+
+.hover-glow-amber:hover {
+    box-shadow: var(--shadow-glow-amber);
+}
+
+.hover-scale {
+    transition: transform var(--transition-base);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+.hover-border-glow {
+    position: relative;
+    transition: border-color var(--transition-base);
+}
+
+.hover-border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--cyan-truth), var(--amber-uncertainty));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: -1;
+}
+
+.hover-border-glow:hover::before {
+    opacity: 0.5;
+}
+
+/* ========== Loading States ========== */
+
+.skeleton {
+    background: var(--slate-800);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.05) 50%,
+            transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+/* ========== Scroll-Triggered Animations ========== */
+
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity var(--transition-slower), transform var(--transition-slower);
+}
+
+.scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ========== Page Transitions ========== */
+
+.page-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.page-exit {
+    opacity: 1;
+}
+
+.page-exit-active {
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+/* ========== Success/Error Animations ========== */
+
+.success-pop {
+    animation: scaleIn var(--transition-base) var(--ease-out) forwards,
+        glow 1s ease-in-out 3;
+}
+
+.error-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* ========== Network Visualization Specific ========== */
+
+.network-node {
+    animation: networkPulse 3s ease-in-out infinite;
+}
+
+.network-node:nth-child(2n) {
+    animation-delay: 0.5s;
+}
+
+.network-node:nth-child(3n) {
+    animation-delay: 1s;
+}
+
+.network-line {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawLine 2s ease-out forwards;
+}
+
+/* ========== Reduced Motion Override ========== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .animate-pulse,
+    .animate-glow,
+    .animate-spin,
+    .animate-bounce,
+    .animate-network-pulse,
+    .animate-shimmer {
+        animation: none !important;
+    }
+}
