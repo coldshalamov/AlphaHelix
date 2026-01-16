@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAccount } from 'wagmi';
+import bannerHelix from '../assets/banner_helix.jpg';
 
 export default function Layout({ children }) {
   const { address, isConnected } = useAccount();
@@ -25,10 +27,11 @@ export default function Layout({ children }) {
         <div className="header-banner">
           <Link href="/">
             <div className="banner-crop">
-              <img
-                src="/images/banner_helix.jpg"
+              <Image
+                src={bannerHelix}
                 alt="AlphaHelix"
                 className="header-banner-image"
+                priority
               />
             </div>
           </Link>
