@@ -302,6 +302,12 @@ code {
   outline-offset: 2px;
 }
 
+/* Accessibility: Show focus ring on label when hidden input is focused via keyboard */
+label.button:has(:focus-visible) {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
 /* Button Variants */
 .button.primary {
   background: var(--gradient-cyan);
