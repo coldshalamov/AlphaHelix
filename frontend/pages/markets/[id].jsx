@@ -315,6 +315,7 @@ export default function MarketDetailPage() {
         tie={tie}
         expectedChainId={expectedChainId}
         allowance={allowance}
+        committedAmount={committedBalance}
       />
     </div>
   );

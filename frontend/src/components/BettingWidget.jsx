@@ -32,6 +32,7 @@ function BettingWidget({
   tie,
   expectedChainId,
   allowance,
+  committedAmount,
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -331,6 +332,25 @@ function BettingWidget({
               : `Outcome: ${outcome ? 'YES' : 'NO'} wins. Claim any winnings below.`
             : 'Reveal window closed. Awaiting on-chain resolution.'}
         </p>
+      </div>
+    );
+  }
+
+  // BOLT: Prevent double-commit which would overwrite local secret
+  const hasCommitted = committedAmount && committedAmount > 0n;
+  if (hasCommitted) {
+    return (
+      <div className="card" style={{ borderColor: '#dbeafe' }}>
+        <h3 className="font-semibold">Commit phase</h3>
+        <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
+        <div className="section" style={{ marginTop: '0.75rem' }}>
+          <p className="helper">✅ You have committed {formatEther(committedAmount)} HLX.</p>
+          <p className="helper" style={{ marginTop: '0.5rem' }}>
+            {storedBet
+              ? 'Your secret is saved on this device. Wait for the reveal phase.'
+              : '⚠️ Warning: Your secret was not found on this device. You may have used a different browser.'}
+          </p>
+        </div>
       </div>
     );
   }
