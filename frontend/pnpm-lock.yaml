@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@tanstack/query-core':
+        specifier: 5.52.0
+        version: 5.52.0
       '@tanstack/react-query':
         specifier: 5.52.1
         version: 5.52.1(react@18.2.0)

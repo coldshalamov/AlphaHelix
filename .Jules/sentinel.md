@@ -1,0 +1,4 @@
+## 2025-05-15 - Local Secret Fragility in Commit-Reveal
+**Vulnerability:** User interface allowed re-committing to a market where a bet was already active, causing the locally stored secret (salt) for the original bet to be overwritten by a new one. Since the contract rejects the second commit, the user is left with a new (useless) secret and no way to reveal the original bet, leading to total fund loss.
+**Learning:** In "local-first" secret management (storing salts in localStorage), the UI must strictly enforce the contract's state (e.g., `hasCommitted`) to prevent user actions that could corrupt local state. The "Overwrite -> Revert -> Cleanup" cycle is a dangerous pattern when state synchronization is laggy.
+**Prevention:** Always pass on-chain status (`committedAmount` or `hasCommitted`) to stateful widgets and disable conflicting actions (like "Commit") at the rendering level, rather than relying solely on contract reverts.
