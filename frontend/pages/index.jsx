@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -12,7 +13,16 @@ export default function Home() {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero">
-        <div className="hero-background" />
+        <div className="hero-background">
+          <Image
+            src="/images/hero_dna.jpg"
+            alt="DNA Helix Background"
+            fill
+            priority
+            style={{ objectFit: 'cover' }}
+            sizes="100vw"
+          />
+        </div>
         <div className="container">
           <div className="hero-content">
             <h1 className={`hero-title ${isVisible ? 'animate-fade-in-up' : ''}`}>
@@ -174,9 +184,6 @@ export default function Home() {
         .hero-background {
           position: absolute;
           inset: 0;
-          background-image: url('/images/hero_dna.jpg');
-          background-size: cover;
-          background-position: center;
           opacity: 0.4;
           z-index: 0;
         }
@@ -186,6 +193,7 @@ export default function Home() {
           position: absolute;
           inset: 0;
           background: linear-gradient(180deg, rgba(15, 15, 15, 0.3) 0%, var(--charcoal-bg) 100%);
+          z-index: 1;
         }
 
         .hero-content {
