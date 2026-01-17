@@ -430,6 +430,23 @@ label.button:has(:focus-visible) {
   border-color: var(--crimson-false);
 }
 
+/* Interactive Badge (Button) */
+button.badge {
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+button.badge:hover {
+  background: var(--charcoal-bg);
+  border-color: var(--cyan-truth);
+  color: var(--cyan-truth);
+}
+
+button.badge:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
 /* ========== Grid ========== */
 
 .grid {

@@ -181,13 +181,6 @@ function Bank() {
               onClick={handleCopy}
               type="button"
               aria-label="Copy wallet address"
-              style={{
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: '0.9rem',
-                padding: '0.25rem 0.75rem',
-              }}
             >
               <span>{copied ? 'Copied!' : shortAddress}</span>
             </button>
@@ -263,7 +256,6 @@ function Bank() {
                 type="button"
                 onClick={handleMaxSell}
                 className="badge"
-                style={{ cursor: 'pointer', border: 'none' }}
                 aria-label="Sell maximum available HLX"
                 disabled={Boolean(activeAction)}
               >

@@ -377,7 +377,6 @@ function BettingWidget({
               type="button"
               onClick={handleMax}
               className="badge"
-              style={{ cursor: 'pointer', border: 'none' }}
               aria-label="Stake maximum available HLX"
               disabled={isLocked}
             >
