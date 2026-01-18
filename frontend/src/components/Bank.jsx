@@ -70,11 +70,19 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    if (e.target.value.length <= 20) setBuyAmount(e.target.value);
+    const val = e.target.value;
+    // Strict sanitization: allow empty string or valid decimal fragments
+    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+      if (val.length <= 20) setBuyAmount(val);
+    }
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    if (e.target.value.length <= 20) setSellAmount(e.target.value);
+    const val = e.target.value;
+    // Strict sanitization: allow empty string or valid decimal fragments
+    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+      if (val.length <= 20) setSellAmount(val);
+    }
   }, []);
 
   const handleCopy = useCallback(() => {
