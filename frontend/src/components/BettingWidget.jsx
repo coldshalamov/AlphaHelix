@@ -98,7 +98,11 @@ function BettingWidget({
   }, []);
 
   const handleAmountChange = useCallback((e) => {
-    if (e.target.value.length <= 20) setAmount(e.target.value);
+    const val = e.target.value;
+    // Strict sanitization: allow empty string or valid decimal fragments
+    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+      if (val.length <= 20) setAmount(val);
+    }
   }, []);
 
   const persistBet = useCallback(
