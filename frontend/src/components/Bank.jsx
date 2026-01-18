@@ -93,6 +93,16 @@ function Bank() {
     }
   }, [address]);
 
+  const handleMaxBuy = useCallback(() => {
+    if (ethBalance) {
+      // Leave 0.01 ETH for gas
+      const buffer = 10000000000000000n;
+      const val = ethBalance.value - buffer;
+      const safeValue = val > 0n ? val : 0n;
+      setBuyAmount(formatEther(safeValue));
+    }
+  }, [ethBalance]);
+
   const handleBuy = useCallback(async () => {
     setStatus('');
     setActiveAction('buy');
@@ -216,9 +226,20 @@ function Bank() {
         <div className="grid two" style={{ marginTop: '1.5rem', opacity: isWrongNetwork ? 0.5 : 1, pointerEvents: isWrongNetwork ? 'none' : 'auto' }}>
           <div className="card" style={{ borderColor: '#dbeafe' }}>
             <h3 className="font-semibold">Buy HLX</h3>
-            <label htmlFor="buy-amount" className="helper" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Enter ETH to spend
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label htmlFor="buy-amount" className="helper">
+                Enter ETH to spend
+              </label>
+              <button
+                type="button"
+                onClick={handleMaxBuy}
+                className="badge"
+                aria-label="Buy with maximum safe ETH"
+                disabled={!ethBalance || Boolean(activeAction)}
+              >
+                Max
+              </button>
+            </div>
             <input
               id="buy-amount"
               type="number"
