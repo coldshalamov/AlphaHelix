@@ -8,7 +8,7 @@
 
 /* ========== Font Imports ========== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+/* Removed @import to optimize loading with next/font */
 
 /* ========== Reset & Base ========== */
 
@@ -34,6 +34,11 @@ body {
   color: var(--color-text-primary);
   background: var(--color-bg-primary);
   min-height: 100vh;
+}
+
+/* Wrapper to apply next/font variables to the app content */
+.app-font-wrapper {
+  font-family: var(--font-body);
 }
 
 /* ========== Typography ========== */

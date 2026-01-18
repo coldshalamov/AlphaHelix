@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useAccount } from 'wagmi';
 import bannerHelix from '../assets/banner_helix.jpg';
 
-export default function Layout({ children }) {
+export default function Layout({ children, className = '' }) {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -22,7 +22,7 @@ export default function Layout({ children }) {
   const isActive = (path) => router.pathname === path;
 
   return (
-    <div>
+    <div className={`${className} app-font-wrapper`}>
       <header className="header">
         <div className="header-banner">
           <Link href="/">
