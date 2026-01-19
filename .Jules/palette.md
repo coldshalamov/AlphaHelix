@@ -1,4 +1,3 @@
-## 2024-05-23 - Visually Hidden Inputs & Focus
-
-**Learning:** When wrapping `.visually-hidden` inputs inside `label` elements styled as buttons, standard `:focus-visible` styles on the label don't trigger because the *input* receives focus, not the label.
-**Action:** Use `label.button:has(:focus-visible)` (or `:focus-within` with care) to transfer the focus ring to the visible container.
+## 2024-05-22 - [Navigation Accessibility]
+**Learning:** React Router / Next.js Links often rely solely on CSS classes for active states, leaving screen reader users unaware of their current location.
+**Action:** Always include `aria-current="page"` on the active navigation item to provide semantic context alongside visual styling.
