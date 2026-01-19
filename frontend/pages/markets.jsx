@@ -8,15 +8,26 @@ import { dateTimeFormatter } from '@/lib/formatters';
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
-const MarketCard = memo(function MarketCard({ market, id }) {
-  const commitDate = dateTimeFormatter.format(new Date(market.commitEndTime * 1000));
-  const revealDate = dateTimeFormatter.format(new Date(market.revealEndTime * 1000));
+// BOLT: Changed props to primitives to ensure React.memo works correctly.
+// Passing the `market` object caused re-renders because the object reference changed
+// on every parent update, even if data was identical.
+const MarketCard = memo(function MarketCard({
+  id,
+  ipfsCid,
+  commitEndTime,
+  revealEndTime,
+  yesPool,
+  noPool,
+  unalignedPool,
+}) {
+  const commitDate = dateTimeFormatter.format(new Date(commitEndTime * 1000));
+  const revealDate = dateTimeFormatter.format(new Date(revealEndTime * 1000));
 
   return (
     <div className="card">
       <div className="label">Statement #{id}</div>
       <h3 className="font-semibold" style={{ marginTop: '0.25rem' }}>
-        {market.ipfsCid || 'No CID provided'}
+        {ipfsCid || 'No CID provided'}
       </h3>
       <div className="table-like" style={{ marginTop: '0.5rem' }}>
         <div>
@@ -31,15 +42,15 @@ const MarketCard = memo(function MarketCard({ market, id }) {
       <div className="table-like" style={{ marginTop: '0.5rem' }}>
         <div>
           <div className="label">YES Pool</div>
-          <div className="value">{formatEther(market.yesPool)} HLX</div>
+          <div className="value">{formatEther(yesPool)} HLX</div>
         </div>
         <div>
           <div className="label">NO Pool</div>
-          <div className="value">{formatEther(market.noPool)} HLX</div>
+          <div className="value">{formatEther(noPool)} HLX</div>
         </div>
         <div>
           <div className="label">UNALIGNED Pool</div>
-          <div className="value">{formatEther(market.unalignedPool)} HLX</div>
+          <div className="value">{formatEther(unalignedPool)} HLX</div>
         </div>
       </div>
       <Link
@@ -117,7 +128,16 @@ export default function MarketsPage() {
       {error && <div className="status">{error}</div>}
       <div className="grid two">
         {markets.map((m) => (
-          <MarketCard key={m.id} market={m} id={m.id} />
+          <MarketCard
+            key={m.id}
+            id={m.id}
+            ipfsCid={m.ipfsCid}
+            commitEndTime={m.commitEndTime}
+            revealEndTime={m.revealEndTime}
+            yesPool={m.yesPool}
+            noPool={m.noPool}
+            unalignedPool={m.unalignedPool}
+          />
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
