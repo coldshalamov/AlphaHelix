@@ -38,13 +38,25 @@ export default function Layout({ children, className = '' }) {
         </div>
         <div className="navbar">
           <nav className="nav-links">
-            <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+            <Link
+              href="/"
+              className={`nav-link ${isActive('/') ? 'active' : ''}`}
+              aria-current={isActive('/') ? 'page' : undefined}
+            >
               Home
             </Link>
-            <Link href="/bank" className={`nav-link ${isActive('/bank') ? 'active' : ''}`}>
+            <Link
+              href="/bank"
+              className={`nav-link ${isActive('/bank') ? 'active' : ''}`}
+              aria-current={isActive('/bank') ? 'page' : undefined}
+            >
               Bank
             </Link>
-            <Link href="/markets" className={`nav-link ${isActive('/markets') ? 'active' : ''}`}>
+            <Link
+              href="/markets"
+              className={`nav-link ${isActive('/markets') ? 'active' : ''}`}
+              aria-current={isActive('/markets') ? 'page' : undefined}
+            >
               Markets
             </Link>
           </nav>
