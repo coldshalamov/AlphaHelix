@@ -5,6 +5,134 @@ import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
 
+// BOLT: Extracted and memoized BuyCard to prevent re-renders when typing in Sell input
+const BuyCard = memo(function BuyCard({
+  buyAmount,
+  handleBuyAmountChange,
+  isBuyError,
+  activeAction,
+  ethBalance,
+  handleMaxBuy,
+  handleBuy
+}) {
+  return (
+    <div className="card" style={{ borderColor: '#dbeafe' }}>
+      <h3 className="font-semibold">Buy HLX</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <label htmlFor="buy-amount" className="helper">
+          Enter ETH to spend
+        </label>
+        <button
+          type="button"
+          onClick={handleMaxBuy}
+          className="badge"
+          aria-label="Buy with maximum safe ETH"
+          disabled={!ethBalance || Boolean(activeAction)}
+        >
+          Max
+        </button>
+      </div>
+      <input
+        id="buy-amount"
+        type="number"
+        inputMode="decimal"
+        autoComplete="off"
+        min="0"
+        step="0.01"
+        maxLength="20"
+        className="input"
+        placeholder="0.1"
+        value={buyAmount}
+        onChange={handleBuyAmountChange}
+        aria-label="Amount of ETH to spend"
+        aria-describedby="bank-status"
+        aria-invalid={isBuyError}
+        disabled={Boolean(activeAction)}
+        style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
+      />
+      <button
+        className="button primary"
+        style={{ marginTop: '0.75rem' }}
+        onClick={handleBuy}
+        disabled={Boolean(activeAction)}
+      >
+        {activeAction === 'buy' ? (
+          <>
+            <Spinner />
+            Processing...
+          </>
+        ) : (
+          'Buy HLX'
+        )}
+      </button>
+    </div>
+  );
+});
+
+// BOLT: Extracted and memoized SellCard to prevent re-renders when typing in Buy input
+const SellCard = memo(function SellCard({
+  sellAmount,
+  handleSellAmountChange,
+  isSellError,
+  activeAction,
+  handleMaxSell,
+  handleSell
+}) {
+  return (
+    <div className="card" style={{ borderColor: '#ffe4e6' }}>
+      <h3 className="font-semibold">Sell HLX</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <label htmlFor="sell-amount" className="helper">
+          Approve and sell HLX back to ETH
+        </label>
+        <button
+          type="button"
+          onClick={handleMaxSell}
+          className="badge"
+          aria-label="Sell maximum available HLX"
+          disabled={Boolean(activeAction)}
+        >
+          Max
+        </button>
+      </div>
+      <input
+        id="sell-amount"
+        type="number"
+        inputMode="decimal"
+        autoComplete="off"
+        min="0"
+        step="0.01"
+        maxLength="20"
+        className="input"
+        placeholder="100"
+        value={sellAmount}
+        onChange={handleSellAmountChange}
+        aria-label="Amount of HLX to sell"
+        aria-describedby="bank-status"
+        aria-invalid={isSellError}
+        disabled={Boolean(activeAction)}
+        style={isSellError ? { borderColor: 'var(--danger)' } : {}}
+      />
+      <button
+        className="button danger"
+        style={{ marginTop: '0.75rem' }}
+        onClick={handleSell}
+        disabled={Boolean(activeAction)}
+      >
+        {activeAction === 'sell' ? (
+          <>
+            <Spinner />
+            Processing...
+          </>
+        ) : (
+          'Approve & Sell'
+        )}
+      </button>
+      <p className="helper">Allowances reset each time for simplicity.</p>
+    </div>
+  );
+});
+
 function Bank() {
   const { address } = useAccount();
   const chainId = useChainId();
@@ -224,108 +352,23 @@ function Bank() {
         )}
 
         <div className="grid two" style={{ marginTop: '1.5rem', opacity: isWrongNetwork ? 0.5 : 1, pointerEvents: isWrongNetwork ? 'none' : 'auto' }}>
-          <div className="card" style={{ borderColor: '#dbeafe' }}>
-            <h3 className="font-semibold">Buy HLX</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <label htmlFor="buy-amount" className="helper">
-                Enter ETH to spend
-              </label>
-              <button
-                type="button"
-                onClick={handleMaxBuy}
-                className="badge"
-                aria-label="Buy with maximum safe ETH"
-                disabled={!ethBalance || Boolean(activeAction)}
-              >
-                Max
-              </button>
-            </div>
-            <input
-              id="buy-amount"
-              type="number"
-              inputMode="decimal"
-              autoComplete="off"
-              min="0"
-              step="0.01"
-              maxLength="20"
-              className="input"
-              placeholder="0.1"
-              value={buyAmount}
-              onChange={handleBuyAmountChange}
-              aria-label="Amount of ETH to spend"
-              aria-describedby="bank-status"
-              aria-invalid={isBuyError}
-              disabled={Boolean(activeAction)}
-              style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
-            />
-            <button
-              className="button primary"
-              style={{ marginTop: '0.75rem' }}
-              onClick={handleBuy}
-              disabled={Boolean(activeAction)}
-            >
-              {activeAction === 'buy' ? (
-                <>
-                  <Spinner />
-                  Processing...
-                </>
-              ) : (
-                'Buy HLX'
-              )}
-            </button>
-          </div>
-
-          <div className="card" style={{ borderColor: '#ffe4e6' }}>
-            <h3 className="font-semibold">Sell HLX</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <label htmlFor="sell-amount" className="helper">
-                Approve and sell HLX back to ETH
-              </label>
-              <button
-                type="button"
-                onClick={handleMaxSell}
-                className="badge"
-                aria-label="Sell maximum available HLX"
-                disabled={Boolean(activeAction)}
-              >
-                Max
-              </button>
-            </div>
-            <input
-              id="sell-amount"
-              type="number"
-              inputMode="decimal"
-              autoComplete="off"
-              min="0"
-              step="0.01"
-              maxLength="20"
-              className="input"
-              placeholder="100"
-              value={sellAmount}
-              onChange={handleSellAmountChange}
-              aria-label="Amount of HLX to sell"
-              aria-describedby="bank-status"
-              aria-invalid={isSellError}
-              disabled={Boolean(activeAction)}
-              style={isSellError ? { borderColor: 'var(--danger)' } : {}}
-            />
-            <button
-              className="button danger"
-              style={{ marginTop: '0.75rem' }}
-              onClick={handleSell}
-              disabled={Boolean(activeAction)}
-            >
-              {activeAction === 'sell' ? (
-                <>
-                  <Spinner />
-                  Processing...
-                </>
-              ) : (
-                'Approve & Sell'
-              )}
-            </button>
-            <p className="helper">Allowances reset each time for simplicity.</p>
-          </div>
+          <BuyCard
+            buyAmount={buyAmount}
+            handleBuyAmountChange={handleBuyAmountChange}
+            isBuyError={isBuyError}
+            activeAction={activeAction}
+            ethBalance={ethBalance}
+            handleMaxBuy={handleMaxBuy}
+            handleBuy={handleBuy}
+          />
+          <SellCard
+            sellAmount={sellAmount}
+            handleSellAmountChange={handleSellAmountChange}
+            isSellError={isSellError}
+            activeAction={activeAction}
+            handleMaxSell={handleMaxSell}
+            handleSell={handleSell}
+          />
         </div>
 
         <div id="bank-status" role="status" aria-live="polite">
