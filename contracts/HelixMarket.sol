@@ -173,8 +173,6 @@ contract HelixMarket is ReentrancyGuard {
             require(avgCommitDuration <= MAX_COMMIT_DURATION, "Avg duration too long");
         }
 
-        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
-
         uint256 marketId = marketCount++;
         Statement storage s = markets[marketId];
         s.ipfsCid = ipfsCid;
@@ -182,6 +180,8 @@ contract HelixMarket is ReentrancyGuard {
         s.originator = msg.sender;
         s.randomCloseEnabled = enableRandomClose;
         s.revealDuration = revealDuration;
+
+        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
 
         if (enableRandomClose) {
             // Generate market-specific random seed
@@ -240,14 +240,15 @@ contract HelixMarket is ReentrancyGuard {
 
         require(amount > 0, "Amount must be > 0");
         require(!hasCommitted[marketId][msg.sender], "Already committed");
-
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        require(commitHash != bytes32(0), "Invalid hash");
 
         commits[marketId][msg.sender] = commitHash;
         hasCommitted[marketId][msg.sender] = true;
 
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
+
+        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
     }
