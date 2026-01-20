@@ -625,3 +625,25 @@ button.badge:focus-visible {
   background: rgba(0, 217, 255, 0.3);
   color: var(--off-white);
 }
+/* ========== Accessibility ========== */
+
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cyan-truth);
+  color: var(--charcoal-bg);
+  padding: var(--space-3) var(--space-6);
+  z-index: var(--z-tooltip);
+  font-weight: var(--font-bold);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transition: top var(--transition-fast);
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--off-white);
+  outline-offset: -2px;
+}

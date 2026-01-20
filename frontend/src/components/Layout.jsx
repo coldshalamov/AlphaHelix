@@ -23,6 +23,9 @@ export default function Layout({ children, className = '' }) {
 
   return (
     <div className={`${className} app-font-wrapper`}>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <header className="header">
         <div className="header-banner">
           <Link href="/">
@@ -80,7 +83,9 @@ export default function Layout({ children, className = '' }) {
           )}
         </div>
       </header>
-      <main className="container">{children}</main>
+      <main id="main-content" className="container">
+        {children}
+      </main>
 
       <style jsx>{`
         .header-banner {
