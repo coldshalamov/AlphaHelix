@@ -34,6 +34,7 @@ function BettingWidget({
   expectedChainId,
   allowance,
   committedAmount,
+  hlxBalance, // BOLT: Received from parent via batched request
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -42,13 +43,8 @@ function BettingWidget({
   const { connectors, connect } = useConnect();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
 
-  const { data: hlxBalance } = useReadContract({
-    address: contracts.AlphaHelixToken,
-    abi: tokenAbi,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    query: { enabled: Boolean(address) },
-  });
+  // BOLT: Removed internal useReadContract for balanceOf to prevent extra RPC call.
+  // Data is now passed from parent which batches it with other market data.
 
   const [amount, setAmount] = useState('');
   const [choice, setChoice] = useState(1);
