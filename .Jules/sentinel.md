@@ -7,3 +7,8 @@
 **Vulnerability:** Smart contract functions `commitBet` and `_submitStatementInternal` performed external calls (`token.transferFrom`) *before* updating internal state (`commits`, `marketCount`). While mitigated by `ReentrancyGuard` and the trusted nature of the immutable `AlphaHelixToken`, this violated the Checks-Effects-Interactions (CEI) pattern, theoretically leaving the contract open to reentrancy if the token logic changed or if the guard was bypassed.
 **Learning:** Even when using "trusted" components like standard ERC20s and ReentrancyGuards, strictly adhering to CEI provides a robust defense-in-depth layer that protects against future refactors or unexpected cross-contract interactions. It decouples security from specific dependencies.
 **Prevention:** Always place external calls (interactions) at the very end of the function, after all state changes (effects) have been committed.
+
+## 2025-05-21 - Privileged Burn Backdoor
+**Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
+**Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
+**Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
