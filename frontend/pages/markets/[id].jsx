@@ -72,6 +72,13 @@ export default function MarketDetailPage() {
            abi: tokenAbi,
            functionName: 'allowance',
            args: [address, contracts.HelixMarket],
+        },
+        // BOLT: Batching balanceOf with other user data to prevent extra network request in BettingWidget
+        {
+           address: contracts.AlphaHelixToken,
+           abi: tokenAbi,
+           functionName: 'balanceOf',
+           args: [address],
         }
       );
     }
@@ -105,6 +112,7 @@ export default function MarketDetailPage() {
   const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
   const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
   const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
+  const hlxBalance = address ? readResults?.[userResultsBaseIndex + 5]?.result : undefined;
 
   const isLoading = isReading;
   const error = readError;
@@ -316,6 +324,7 @@ export default function MarketDetailPage() {
         expectedChainId={expectedChainId}
         allowance={allowance}
         committedAmount={committedBalance}
+        hlxBalance={hlxBalance}
       />
     </div>
   );
