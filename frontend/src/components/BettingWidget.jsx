@@ -7,6 +7,7 @@ import {
   usePublicClient,
   useConnect,
   useReadContract,
+  useSwitchChain,
 } from 'wagmi';
 import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -39,6 +40,7 @@ function BettingWidget({
   const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
   const { connectors, connect } = useConnect();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
 
   const { data: hlxBalance } = useReadContract({
     address: contracts.AlphaHelixToken,
@@ -284,6 +286,21 @@ function BettingWidget({
       <div className="card" style={{ borderColor: '#fee2e2' }}>
         <h3 className="font-semibold">Wrong network</h3>
         <p className="helper">Switch to the configured Helix chain to continue.</p>
+        <button
+          className="button primary"
+          onClick={() => switchChain({ chainId: expectedChainId })}
+          disabled={isSwitching}
+          style={{ marginTop: '0.75rem' }}
+        >
+          {isSwitching ? (
+            <>
+              <Spinner />
+              Switching...
+            </>
+          ) : (
+            'Switch Network'
+          )}
+        </button>
       </div>
     );
   }
