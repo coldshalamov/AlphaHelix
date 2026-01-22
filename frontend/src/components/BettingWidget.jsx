@@ -23,6 +23,37 @@ const CHOICES = [
 
 const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
 
+// BOLT: Extracted and memoized to prevent re-renders when typing amount
+const Choices = memo(function Choices({ choice, isLocked, onChange }) {
+  return (
+    <fieldset className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
+      <legend className="visually-hidden">Select outcome</legend>
+      {CHOICES.map((c) => (
+      <label
+        key={c.value}
+        className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+        style={{
+          margin: 0,
+          opacity: isLocked ? 0.6 : 1,
+          cursor: isLocked ? 'not-allowed' : 'pointer',
+        }}
+      >
+        <input
+          type="radio"
+          name="choice"
+          value={c.value}
+          checked={choice === c.value}
+          onChange={onChange}
+          className="visually-hidden"
+          disabled={isLocked}
+        />
+        {c.label}
+      </label>
+      ))}
+    </fieldset>
+  );
+});
+
 function BettingWidget({
   marketId,
   commitEnd,
@@ -379,31 +410,7 @@ function BettingWidget({
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
       <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
-        <fieldset className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
-          <legend className="visually-hidden">Select outcome</legend>
-          {CHOICES.map((c) => (
-            <label
-              key={c.value}
-              className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
-              style={{
-                margin: 0,
-                opacity: isLocked ? 0.6 : 1,
-                cursor: isLocked ? 'not-allowed' : 'pointer',
-              }}
-            >
-              <input
-                type="radio"
-                name="choice"
-                value={c.value}
-                checked={choice === c.value}
-                onChange={handleChoiceChange}
-                className="visually-hidden"
-                disabled={isLocked}
-              />
-              {c.label}
-            </label>
-          ))}
-        </fieldset>
+        <Choices choice={choice} isLocked={isLocked} onChange={handleChoiceChange} />
 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
