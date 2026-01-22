@@ -139,7 +139,8 @@ function BettingWidget({
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      if (val.length <= 20) setAmount(val);
+      // SENTINEL: Increased limit to 50 to accommodate full 18-decimal precision from formatEther
+      if (val.length <= 50) setAmount(val);
     }
   }, []);
 
@@ -450,7 +451,7 @@ function BettingWidget({
             autoComplete="off"
             min="0"
             step="0.01"
-            maxLength="20"
+            maxLength="50"
             className="input"
             style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
             placeholder="Amount of HLX"

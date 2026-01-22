@@ -39,7 +39,7 @@ const BuyCard = memo(function BuyCard({
         autoComplete="off"
         min="0"
         step="0.01"
-        maxLength="20"
+        maxLength="50"
         className="input"
         placeholder="0.1"
         value={buyAmount}
@@ -102,7 +102,7 @@ const SellCard = memo(function SellCard({
         autoComplete="off"
         min="0"
         step="0.01"
-        maxLength="20"
+        maxLength="50"
         className="input"
         placeholder="100"
         value={sellAmount}
@@ -201,7 +201,8 @@ function Bank() {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      if (val.length <= 20) setBuyAmount(val);
+      // SENTINEL: Increased limit to 50
+      if (val.length <= 50) setBuyAmount(val);
     }
   }, []);
 
@@ -209,7 +210,8 @@ function Bank() {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      if (val.length <= 20) setSellAmount(val);
+      // SENTINEL: Increased limit to 50
+      if (val.length <= 50) setSellAmount(val);
     }
   }, []);
 
