@@ -83,6 +83,15 @@ function BettingWidget({
 
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
+  const formattedBalance = useMemo(() => {
+    if (!hlxBalance) return '0';
+    const val = formatEther(hlxBalance);
+    // Truncate to 4 decimals for display
+    const [int, dec] = val.split('.');
+    if (dec) return `${int}.${dec.slice(0, 4)}`;
+    return int;
+  }, [hlxBalance]);
+
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
@@ -410,15 +419,22 @@ function BettingWidget({
             <label htmlFor="bet-amount" className="label" style={{ display: 'block' }}>
               Amount to Stake
             </label>
-            <button
-              type="button"
-              onClick={handleMax}
-              className="badge"
-              aria-label="Stake maximum available HLX"
-              disabled={isLocked}
-            >
-              Max
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {hlxBalance > 0n && (
+                <span className="helper" style={{ fontSize: '0.85em', margin: 0 }}>
+                  Avail: {formattedBalance}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleMax}
+                className="badge"
+                aria-label="Stake maximum available HLX"
+                disabled={isLocked}
+              >
+                Max
+              </button>
+            </div>
           </div>
           <input
             id="bet-amount"
