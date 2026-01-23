@@ -231,43 +231,6 @@ code {
   font-size: var(--text-sm);
 }
 
-/* Market Cards */
-.market-card {
-  position: relative;
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-}
-
-.market-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 15, 15, 0.7);
-  z-index: 0;
-}
-
-.market-card>* {
-  position: relative;
-  z-index: 1;
-}
-
-.market-card.active {
-  background-image: url('/images/market_active.png');
-  border-color: var(--amber-uncertainty);
-}
-
-.market-card.resolved-true {
-  background-image: url('/images/market_resolved_true.png');
-  border-color: var(--cyan-truth);
-  box-shadow: var(--shadow-glow-cyan);
-}
-
-.market-card.resolved-false {
-  background-image: url('/images/market_resolved_false.png');
-  border-color: var(--crimson-false);
-  box-shadow: var(--shadow-glow-crimson);
-}
 
 /* ========== Buttons ========== */
 
