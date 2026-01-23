@@ -16,9 +16,9 @@ import Spinner from './Spinner';
 import Countdown from './Countdown';
 
 const CHOICES = [
-  { value: 1, label: 'YES' },
-  { value: 0, label: 'NO' },
-  { value: 2, label: 'UNALIGNED' },
+  { value: 1, label: 'YES', variant: 'primary' },
+  { value: 0, label: 'NO', variant: 'danger' },
+  { value: 2, label: 'UNALIGNED', variant: 'secondary' },
 ];
 
 const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
@@ -31,7 +31,7 @@ const Choices = memo(function Choices({ choice, isLocked, onChange }) {
       {CHOICES.map((c) => (
       <label
         key={c.value}
-        className={`button ${choice === c.value ? 'primary' : 'secondary'}`}
+        className={`button ${choice === c.value ? c.variant : 'outline'}`}
         style={{
           margin: 0,
           opacity: isLocked ? 0.6 : 1,
