@@ -95,12 +95,13 @@ contract HelixMarket is ReentrancyGuard {
             block.timestamp >= s.commitEndTime) {
 
             // Compute hash from multiple entropy sources
+            // SECURITY: Removed tx.gasprice to prevent user manipulation (grinding)
             bytes32 closeHash = keccak256(abi.encodePacked(
                 blockhash(block.number - 1),    // Recent block hash
                 blockhash(block.number - 2),    // 2 blocks ago
                 blockhash(block.number - 3),    // 3 blocks ago
                 msg.sender,                      // Current transaction sender
-                tx.gasprice,                     // Gas price of this tx
+                block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
                 s.yesPool,                       // Current YES pool state
                 s.noPool,                        // Current NO pool state
                 s.unalignedPool,                 // Current UNALIGNED pool state
@@ -475,7 +476,7 @@ contract HelixMarket is ReentrancyGuard {
             blockhash(block.number - 2),
             blockhash(block.number - 3),
             msg.sender,
-            tx.gasprice,
+            block.prevrandao,
             s.yesPool,
             s.noPool,
             s.unalignedPool,
