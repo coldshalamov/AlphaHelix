@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, memo } from 'react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
@@ -155,6 +155,7 @@ function Bank() {
 
   const { writeContractAsync, isPending: isWriting } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
 
   const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
@@ -350,6 +351,21 @@ function Bank() {
           <div className="card" style={{ marginTop: '1.5rem', borderColor: '#fee2e2' }}>
             <h3 className="font-semibold">Wrong network</h3>
             <p className="helper">Switch to the configured Helix chain to continue.</p>
+            <button
+              className="button primary"
+              onClick={() => switchChain({ chainId: expectedChainId })}
+              disabled={isSwitching}
+              style={{ marginTop: '0.75rem' }}
+            >
+              {isSwitching ? (
+                <>
+                  <Spinner />
+                  Switching...
+                </>
+              ) : (
+                'Switch Network'
+              )}
+            </button>
           </div>
         )}
 
