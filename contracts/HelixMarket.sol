@@ -20,8 +20,6 @@ contract HelixMarket is ReentrancyGuard {
     uint256 public constant MAX_COMMIT_DURATION = 52 weeks; // Fallback max duration
     uint256 public constant PING_REWARD = 1 * 10**18;       // 1 HLX reward for closing a market via ping
     uint256 public marketCount;
-    // Use a dead address for burning since we can't transfer to address(0)
-    address constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
 
     struct Statement {
         string ipfsCid;
@@ -204,7 +202,7 @@ contract HelixMarket is ReentrancyGuard {
 
             // Burn statement fee minus the reserved ping reward.
             require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
-            require(token.transfer(BURN_ADDRESS, STATEMENT_FEE - PING_REWARD), "Burn transfer failed");
+            token.burn(STATEMENT_FEE - PING_REWARD);
 
             emit MarketCreatedWithRandomClose(marketId, s.difficultyTarget, avgCommitDuration);
         } else {
@@ -213,7 +211,7 @@ contract HelixMarket is ReentrancyGuard {
             s.difficultyTarget = 0; // Not used
             s.commitPhaseClosed = 0; // Not used for fixed-time markets
             s.hardCommitEndTime = s.commitEndTime;
-            require(token.transfer(BURN_ADDRESS, STATEMENT_FEE), "Burn transfer failed");
+            token.burn(STATEMENT_FEE);
         }
 
         emit StatementCreated(marketId, ipfsCid, s.commitEndTime, s.revealEndTime, msg.sender);
@@ -372,7 +370,7 @@ contract HelixMarket is ReentrancyGuard {
         uint256 refund = amount - penalty;
 
         if (penalty > 0) {
-            require(token.transfer(BURN_ADDRESS, penalty), "Penalty transfer failed");
+            token.burn(penalty);
         }
 
         require(token.transfer(msg.sender, refund), "Refund transfer failed");

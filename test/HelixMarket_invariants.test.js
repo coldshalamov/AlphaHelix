@@ -255,18 +255,18 @@ describe("HelixMarket Invariant Tests", function () {
       await time.increase(biddingDuration + revealDuration + 2);
 
       const userBefore = await token.balanceOf(userA.address);
-      const burnBefore = await token.balanceOf(burnAddress);
+      const supplyBefore = await token.totalSupply();
 
       await market.connect(userA).withdrawUnrevealed(marketId);
 
       const userAfter = await token.balanceOf(userA.address);
-      const burnAfter = await token.balanceOf(burnAddress);
+      const supplyAfter = await token.totalSupply();
 
       // INVARIANT: User receives nothing
       expect(userAfter - userBefore).to.equal(0);
 
       // INVARIANT: Full amount burned
-      expect(burnAfter - burnBefore).to.equal(committedAmount);
+      expect(supplyBefore - supplyAfter).to.equal(committedAmount);
     });
 
     it("fuzzing: 100% burn penalty holds for random amounts", async function () {
@@ -288,12 +288,12 @@ describe("HelixMarket Invariant Tests", function () {
 
         await time.increase(biddingDuration + revealDuration + 2);
 
-        const burnBefore = await token.balanceOf(burnAddress);
+        const supplyBefore = await token.totalSupply();
         await market.connect(userA).withdrawUnrevealed(marketId);
-        const burnAfter = await token.balanceOf(burnAddress);
+        const supplyAfter = await token.totalSupply();
 
         // INVARIANT: Exact burn amount
-        expect(burnAfter - burnBefore).to.equal(randomAmount);
+        expect(supplyBefore - supplyAfter).to.equal(randomAmount);
       }
     }).timeout(120000);
   });
