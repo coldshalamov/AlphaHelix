@@ -9,3 +9,7 @@
 ## 2024-05-25 - [Active Recovery]
 **Learning:** Passive error messages ("Wrong network") leave users stranded, forcing them to figure out the solution manually.
 **Action:** Always provide an action button (e.g., "Switch Network") directly within the error state to allow immediate recovery.
+
+## 2024-10-24 - [Local Secret Anxiety]
+**Learning:** Users in commit-reveal systems fear losing their local storage (and thus funds). A simple "Backup Secret" button provides immense psychological safety.
+**Action:** When handling local-only secrets, always provide a one-click "Copy Backup" action in the success state.
