@@ -132,15 +132,15 @@ describe("HelixMarket", function () {
       await time.increase(biddingDuration + revealDuration + 2);
 
       const userBalanceBefore = await token.balanceOf(userB.address);
-      const burnBefore = await token.balanceOf(burnAddress);
+      const supplyBefore = await token.totalSupply();
 
       await market.connect(userB).withdrawUnrevealed(marketId);
 
       const userBalanceAfter = await token.balanceOf(userB.address);
-      const burnAfter = await token.balanceOf(burnAddress);
+      const supplyAfter = await token.totalSupply();
 
       expect(userBalanceAfter - userBalanceBefore).to.equal(0);
-      expect(burnAfter - burnBefore).to.equal(amount);
+      expect(supplyBefore - supplyAfter).to.equal(amount);
 
       await expect(market.connect(userB).withdrawUnrevealed(marketId)).to.be.revertedWith("No unrevealed stake");
     });
