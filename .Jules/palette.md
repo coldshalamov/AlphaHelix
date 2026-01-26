@@ -13,3 +13,7 @@
 ## 2024-10-24 - [Local Secret Anxiety]
 **Learning:** Users in commit-reveal systems fear losing their local storage (and thus funds). A simple "Backup Secret" button provides immense psychological safety.
 **Action:** When handling local-only secrets, always provide a one-click "Copy Backup" action in the success state.
+
+## 2024-10-25 - [Input Suffix Patterns]
+**Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
+**Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.

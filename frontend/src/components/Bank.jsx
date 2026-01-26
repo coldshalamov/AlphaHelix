@@ -32,24 +32,42 @@ const BuyCard = memo(function BuyCard({
           Max
         </button>
       </div>
-      <input
-        id="buy-amount"
-        type="number"
-        inputMode="decimal"
-        autoComplete="off"
-        min="0"
-        step="0.01"
-        maxLength="50"
-        className="input"
-        placeholder="0.1"
-        value={buyAmount}
-        onChange={handleBuyAmountChange}
-        aria-label="Amount of ETH to spend"
-        aria-describedby="bank-status"
-        aria-invalid={isBuyError}
-        disabled={Boolean(activeAction)}
-        style={isBuyError ? { borderColor: 'var(--danger)' } : {}}
-      />
+      <div style={{ position: 'relative' }}>
+        <input
+          id="buy-amount"
+          type="number"
+          inputMode="decimal"
+          autoComplete="off"
+          min="0"
+          step="0.01"
+          maxLength="50"
+          className="input"
+          placeholder="0.1"
+          value={buyAmount}
+          onChange={handleBuyAmountChange}
+          aria-label="Amount of ETH to spend"
+          aria-describedby="bank-status"
+          aria-invalid={isBuyError}
+          disabled={Boolean(activeAction)}
+          style={{
+            paddingRight: '3.5rem',
+            ...(isBuyError ? { borderColor: 'var(--danger)' } : {})
+          }}
+        />
+        <span
+          className="font-mono text-secondary"
+          style={{
+            position: 'absolute',
+            right: '1rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            fontSize: '0.9em'
+          }}
+        >
+          ETH
+        </span>
+      </div>
       <button
         className="button primary"
         style={{ marginTop: '0.75rem' }}
@@ -95,24 +113,42 @@ const SellCard = memo(function SellCard({
           Max
         </button>
       </div>
-      <input
-        id="sell-amount"
-        type="number"
-        inputMode="decimal"
-        autoComplete="off"
-        min="0"
-        step="0.01"
-        maxLength="50"
-        className="input"
-        placeholder="100"
-        value={sellAmount}
-        onChange={handleSellAmountChange}
-        aria-label="Amount of HLX to sell"
-        aria-describedby="bank-status"
-        aria-invalid={isSellError}
-        disabled={Boolean(activeAction)}
-        style={isSellError ? { borderColor: 'var(--danger)' } : {}}
-      />
+      <div style={{ position: 'relative' }}>
+        <input
+          id="sell-amount"
+          type="number"
+          inputMode="decimal"
+          autoComplete="off"
+          min="0"
+          step="0.01"
+          maxLength="50"
+          className="input"
+          placeholder="100"
+          value={sellAmount}
+          onChange={handleSellAmountChange}
+          aria-label="Amount of HLX to sell"
+          aria-describedby="bank-status"
+          aria-invalid={isSellError}
+          disabled={Boolean(activeAction)}
+          style={{
+            paddingRight: '3.5rem',
+            ...(isSellError ? { borderColor: 'var(--danger)' } : {})
+          }}
+        />
+        <span
+          className="font-mono text-secondary"
+          style={{
+            position: 'absolute',
+            right: '1rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            fontSize: '0.9em'
+          }}
+        >
+          HLX
+        </span>
+      </div>
       <button
         className="button danger"
         style={{ marginTop: '0.75rem' }}
