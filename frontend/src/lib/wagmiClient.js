@@ -16,7 +16,13 @@ const config = createConfig({
   transports,
 });
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 4_000, // BOLT: Cache data for 4s (approx 1 block) to prevent RPC spam
+    },
+  },
+});
 
 export function WagmiProvider({ children }) {
   return (
