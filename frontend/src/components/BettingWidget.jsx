@@ -467,23 +467,41 @@ function BettingWidget({
               </button>
             </div>
           </div>
-          <input
-            id="bet-amount"
-            type="number"
-            inputMode="decimal"
-            autoComplete="off"
-            min="0"
-            step="0.01"
-            maxLength="50"
-            className="input"
-            style={isAmountError ? { borderColor: 'var(--danger)' } : {}}
-            placeholder="Amount of HLX"
-            value={amount}
-            onChange={handleAmountChange}
-            aria-describedby="status-message"
-            aria-invalid={isAmountError}
-            disabled={isLocked}
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              id="bet-amount"
+              type="number"
+              inputMode="decimal"
+              autoComplete="off"
+              min="0"
+              step="0.01"
+              maxLength="50"
+              className="input"
+              style={{
+                paddingRight: '3.5rem',
+                ...(isAmountError ? { borderColor: 'var(--danger)' } : {})
+              }}
+              placeholder="Amount of HLX"
+              value={amount}
+              onChange={handleAmountChange}
+              aria-describedby="status-message"
+              aria-invalid={isAmountError}
+              disabled={isLocked}
+            />
+            <span
+              className="font-mono text-secondary"
+              style={{
+                position: 'absolute',
+                right: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none',
+                fontSize: '0.9em'
+              }}
+            >
+              HLX
+            </span>
+          </div>
         </div>
 
         <button className="button primary" onClick={handleCommit} disabled={isLocked}>
