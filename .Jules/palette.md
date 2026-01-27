@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2024-05-22 - [Financial Input Unit Accessibility]
+**Learning:** Screen readers often announce inputs as just numbers, causing confusion about units (e.g., "0.1" vs "0.1 ETH").
+**Action:** Use `aria-describedby` to link the input to its visual unit suffix (e.g., `<span id="unit-eth">ETH</span>`). This provides context without redundant labels.

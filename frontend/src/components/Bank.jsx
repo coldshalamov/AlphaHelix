@@ -46,7 +46,7 @@ const BuyCard = memo(function BuyCard({
           value={buyAmount}
           onChange={handleBuyAmountChange}
           aria-label="Amount of ETH to spend"
-          aria-describedby="bank-status"
+          aria-describedby="bank-status buy-amount-unit"
           aria-invalid={isBuyError}
           disabled={Boolean(activeAction)}
           style={{
@@ -55,6 +55,7 @@ const BuyCard = memo(function BuyCard({
           }}
         />
         <span
+          id="buy-amount-unit"
           className="font-mono text-secondary"
           style={{
             position: 'absolute',
@@ -127,7 +128,7 @@ const SellCard = memo(function SellCard({
           value={sellAmount}
           onChange={handleSellAmountChange}
           aria-label="Amount of HLX to sell"
-          aria-describedby="bank-status"
+          aria-describedby="bank-status sell-amount-unit"
           aria-invalid={isSellError}
           disabled={Boolean(activeAction)}
           style={{
@@ -136,6 +137,7 @@ const SellCard = memo(function SellCard({
           }}
         />
         <span
+          id="sell-amount-unit"
           className="font-mono text-secondary"
           style={{
             position: 'absolute',
