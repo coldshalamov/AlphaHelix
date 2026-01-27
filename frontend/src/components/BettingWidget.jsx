@@ -484,11 +484,12 @@ function BettingWidget({
               placeholder="Amount of HLX"
               value={amount}
               onChange={handleAmountChange}
-              aria-describedby="status-message"
+              aria-describedby="status-message bet-amount-unit"
               aria-invalid={isAmountError}
               disabled={isLocked}
             />
             <span
+              id="bet-amount-unit"
               className="font-mono text-secondary"
               style={{
                 position: 'absolute',
