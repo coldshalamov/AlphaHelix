@@ -12,3 +12,8 @@
 **Vulnerability:** Sending tokens to `0x...dEaD` removes them from circulation effectively but fails to update the `totalSupply` metric, potentially leading to incorrect market capitalization data and accounting discrepancies.
 **Learning:** When using burnable tokens (ERC20Burnable), `token.transfer(dEaD, amount)` is an anti-pattern. The contract holding the tokens should call `token.burn(amount)` to correctly decrease `totalSupply`. This requires the holding contract to have ownership of the tokens (which it does in `HelixMarket` after `transferFrom`).
 **Prevention:** Always prefer native `burn()` functions over transferring to dead addresses to ensure on-chain metrics reflect the true state of the economy.
+
+## 2024-05-26 - [Sender Grinding for Randomness]
+**Vulnerability:** `HelixMarket.sol` used `msg.sender` in the entropy calculation for `checkRandomClose`. This allowed attackers to simulate market interactions from thousands of different wallet addresses ("grinding") to find one that forces a favorable market close (or avoids an unfavorable one) within the same block.
+**Learning:** Including `msg.sender` in on-chain randomness seeds allows any entity with the ability to generate multiple addresses (Sybil) to manipulate the outcome. By removing `msg.sender` and relying on block properties (like `prevrandao`), the outcome becomes "global" for that block—deterministic and unchangeable by the sender, effectively removing the incentive to grind.
+**Prevention:** Exclude `msg.sender` from entropy sources when the random outcome affects global state (like closing a market), unless the randomness is specifically intended to be user-unique and non-critical to others.
