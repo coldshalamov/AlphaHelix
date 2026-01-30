@@ -66,7 +66,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, refetch: refetchCount, isRefetching: isRefetchingCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -140,7 +140,23 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <div className="card text-center" style={{ borderColor: 'var(--color-border)', padding: 'var(--space-12) var(--space-6)', marginTop: 'var(--space-6)' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-4)' }} role="img" aria-label="Empty mailbox">📭</div>
+          <h3 className="font-semibold" style={{ marginBottom: 'var(--space-2)' }}>No Active Markets</h3>
+          <p className="helper" style={{ marginBottom: 'var(--space-6)', maxWidth: '300px', marginInline: 'auto' }}>
+            There are currently no prediction markets open for betting. Check back later.
+          </p>
+          <button
+            onClick={() => refetchCount()}
+            className="button secondary"
+            disabled={isRefetchingCount}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', marginInline: 'auto' }}
+          >
+            {isRefetchingCount ? 'Checking...' : 'Refresh Markets'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
