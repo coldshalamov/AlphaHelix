@@ -45,5 +45,7 @@ jobs:
             
             # 2. Attempt to merge
             echo "Merging PR #$PR..."
-            gh pr merge $PR --merge --delete-branch --auto || gh pr merge $PR --merge --delete-branch || echo "Failed to merge PR #$PR. It might have conflicts or require manual intervention."
+            # Try auto-merge first (for protected branches), then immediate merge.
+            # Swallow errors so one failure doesn't stop the loop or fail the workflow.
+            (gh pr merge $PR --merge --delete-branch --auto || gh pr merge $PR --merge --delete-branch) || echo "Failed to merge PR #$PR. It might have conflicts or require manual intervention."
           done
