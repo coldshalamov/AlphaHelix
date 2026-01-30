@@ -9,3 +9,7 @@
 ## 2024-05-23 - Manual Hex Conversion Performance
 **Learning:** Manual hex string generation (`Array.from().map().join()`) is significantly slower (~4.5x) than using `viem`'s `toHex` utility, especially for cryptographic operations like salt generation.
 **Action:** Always prefer `toHex` from `viem` for converting byte arrays to hex strings.
+
+## 2026-01-30 - CI Deprecations and Log Pipe
+**Learning:** GitHub Actions v3 (checkout, setup-node, upload-artifact) are deprecated and fail on modern runners (Node 12/16 EOL). Also, creating files in CI via `>` (redirect) suppresses console output, making debugging impossible.
+**Action:** Always use v4+ actions. Use `| tee output.txt` instead of `> output.txt` in CI steps when the output is needed both in logs and as a file.
