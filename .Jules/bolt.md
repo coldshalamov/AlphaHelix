@@ -5,3 +5,7 @@
 ## 2024-05-22 - Conflicting Visual Implementations
 **Learning:** Found a case where a component (`Spinner`) implemented a visual effect (SVG path) while reusing a CSS class (`.spinner`) that implemented the same effect differently (border rotation), resulting in a double-spinner artifact.
 **Action:** When creating or optimizing UI components, verify that utility classes (like `.spinner`) do not impose conflicting visual styles (borders, backgrounds) on elements that provide their own visuals (SVGs, canvases). Use atomic utility classes (e.g., `.animate-spin`) for behavior to avoid this collision.
+
+## 2024-05-23 - Manual Hex Conversion Performance
+**Learning:** Manual hex string generation (`Array.from().map().join()`) is significantly slower (~4.5x) than using `viem`'s `toHex` utility, especially for cryptographic operations like salt generation.
+**Action:** Always prefer `toHex` from `viem` for converting byte arrays to hex strings.
