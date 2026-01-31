@@ -5,6 +5,7 @@ import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
+import EmptyState from '@/components/EmptyState';
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
@@ -66,7 +67,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, refetch: refetchCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -76,7 +77,7 @@ export default function MarketsPage() {
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
-  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
+  const { data: marketsResults, isLoading, error: queryError, refetch: refetchMarkets } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
       return Array.from({ length: numericCount }).map((_, i) => ({
@@ -118,6 +119,11 @@ export default function MarketsPage() {
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
+  const handleRefresh = () => {
+    refetchCount();
+    refetchMarkets();
+  };
+
   return (
     <div className="grid section">
       <div className="card">
@@ -140,7 +146,13 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <EmptyState
+          title="No active markets"
+          description="There are currently no prediction markets open. Check back later."
+          onRetry={handleRefresh}
+        />
+      )}
     </div>
   );
 }
