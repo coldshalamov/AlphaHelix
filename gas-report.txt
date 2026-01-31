@@ -1,0 +1,190 @@
+
+> app@1.0.0 test
+> npx hardhat test
+
+
+
+  HelixMarket
+    Lifecycle and economics
+      ✔ YES wins, sweeps unaligned, and originator receives 1% fee (272ms)
+      ✔ Tie refunds all bettors without originator fee (64ms)
+    Unrevealed commitments
+      ✔ punishes unrevealed stake with total forfeiture (50ms)
+    Negative flows
+      ✔ reverts resolve before reveal end
+      ✔ reverts reveal before commit end
+      ✔ reverts unrevealed withdrawal before reveal end
+    Invariant payouts and protections
+      ✔ maintains pool accounting when YES sweeps unaligned with modest fee (60ms)
+      ✔ maintains pool accounting when NO whale vs small YES (56ms)
+      ✔ maintains pool accounting when exact tie refunds everyone (60ms)
+      ✔ maintains pool accounting when multiple YES winners share pool (78ms)
+      ✔ maintains pool accounting when very small stakes behave (50ms)
+      ✔ prevents losing side from withdrawing more than zero (38ms)
+    Random close markets
+      ✔ Creates random close market with correct parameters
+      ✔ Fixed-time markets still work (backwards compatibility)
+      ✔ Fixed-time markets also work with submitStatementWithRandomClose
+Market tested with 0 attempts, closed: false
+      ✔ Random close market can close during commit
+      ✔ Cannot commit after random close
+      ✔ Can reveal after random close (43ms)
+      ✔ previewCloseCheck returns correct values
+      ✔ getRandomCloseStatus returns correct values for both market types
+      ✔ Rejects invalid random close parameters
+Ping test: Got reward after 1 attempts
+      ✔ Ping reward works for closing market
+
+  HelixMarket Token Burn
+Verified: Supply decreased after market creation.
+Total Supply: 900.0 HLX
+Verified: Supply decreased after penalty.
+Total Supply: 850.0 HLX
+    ✔ VERIFICATION: Tokens are correctly burned from total supply (78ms)
+
+  HelixMarket Edge Cases
+    ✔ reverts malformed reveal (wrong salt) (89ms)
+    ✔ reverts malformed reveal (invalid choice even if hash matches)
+    ✔ reverts double-claim attempts (40ms)
+    ✔ handles zero NO pool (YES wins with no opposition) (39ms)
+
+  HelixMarket Randomness Security
+Hash 1 (1 gwei): 0x4cf38ccafdfc52bcb4816571018998d5d58cac45564addefba22977dba5b0972
+Hash 2 (2 gwei): 0x4cf38ccafdfc52bcb4816571018998d5d58cac45564addefba22977dba5b0972
+    ✔ should generate SAME hashes for different gas prices (Fix Verified)
+
+  HelixMarket Sender Entropy Vulnerability
+Hash 1 (user1): 0x214df0adfb93be9b9921b0ee21b0f9d64e394ed760bb534a478aa84e3b1fe1d9
+Hash 2 (user2): 0x214df0adfb93be9b9921b0ee21b0f9d64e394ed760bb534a478aa84e3b1fe1d9
+    ✔ should generate SAME hashes for different senders (Sender Grinding Fix Verified)
+
+  HelixMarket - Fuzzing & Invariant Tests
+    Pool Accounting Invariants
+      ✔ Total pool = yesPool + noPool + unalignedPool (invariant) (129ms)
+      ✔ Payouts + fees = total pool (conservation of funds) (47ms)
+      ✔ Multiple winners share pool correctly (pro-rata) (78ms)
+    Extreme Pool Ratios
+      ✔ Handles 1:1000000 pool ratio (tiny YES vs huge NO) (44ms)
+      ✔ Handles exact tie with large numbers (55ms)
+      ✔ Handles minimum stake (1 wei) (50ms)
+    Maximum Participants
+      ✔ Handles 6 participants with mixed choices (73ms)
+    Random Close Stress Tests
+      ✔ Random close with extreme difficulty (very fast close)
+      ✔ Random close with low difficulty (slow close) (56ms)
+    Griefing Attack Resistance
+      ✔ Cannot grief by committing but never revealing (41ms)
+      ✔ Cannot grief by spamming ping on non-random markets (55ms)
+    Edge Cases
+      ✔ Handles market with only UNALIGNED bets (42ms)
+      ✔ Handles market with single participant
+      ✔ Prevents double claiming
+
+  HelixMarket Security - Griefing
+    ✔ should fail to create a market with extremely short reveal duration (59ms)
+    ✔ should fail to create a market with extremely short bidding duration
+
+  HelixMarket Invariant Tests
+    INVARIANT: Pool Conservation
+      ✔ fuzzing: total payouts never exceed pool (50 random scenarios) (5221ms)
+    INVARIANT: Pro-Rata Fairness
+      ✔ larger stakes always receive larger payouts (51ms)
+    INVARIANT: Accounting Consistency
+      ✔ sum of individual bets equals pool totals
+    INVARIANT: No Double-Claiming
+      ✔ prevents users from claiming twice
+    INVARIANT: Unrevealed Withdrawal Burns
+      ✔ 100% penalty is always burned, never refunded
+      ✔ fuzzing: 100% burn penalty holds for random amounts (713ms)
+    INVARIANT: Tie Refunds
+      ✔ tie refunds are always 100% of original stake (61ms)
+    INVARIANT: Originator Fee Calculation
+      ✔ fuzzing: originator fee is always exactly 1% (floor division) (2177ms)
+
+  HelixMarket Security - Max Duration
+    ✔ should fail to create a market with extremely long bidding duration (46ms)
+    ✔ should fail to create a market with extremely long reveal duration
+
+  HelixMarket Security: Overwrite Commitment
+Protection verified: User could not overwrite commitment.
+    ✔ PROTECTION: Prevents overwriting commitment (69ms)
+
+  HelixMarket Security: Input Validation
+    ✔ should revert if CID is empty (51ms)
+    ✔ should revert if CID is too long
+    ✔ should accept CID of max length
+    ✔ should revert on invalid marketId across entrypoints
+    ✔ should not allow resolving random-close markets before reveal starts
+
+  HelixReserve
+    ✔ Buy HLX (43ms)
+    ✔ Sell HLX
+    ✔ Sell with insufficient ETH in reserve
+    ✔ seedMarket uses HLX already in reserve
+    ✔ Buy with zero ETH reverts
+    ✔ Sell rejects HLX that cannot convert to whole wei
+
+
+  67 passing (11s)
+
+····························································································································
+|  [32m[1mSolidity and Network Configuration[22m[39m                                                                                      │
+·······································|·················|···············|·················|································
+|  [36mSolidity: 0.8.20[39m                    ·  [36mOptim: true[39m    ·  [36mRuns: 200[39m    ·  [36mviaIR: true[39m    ·     [36mBlock: 30,000,000 gas[39m     │
+·······································|·················|···············|·················|································
+|  [32m[1mMethods[22m[39m                                                                                                                 │
+·······································|·················|···············|·················|················|···············
+|  [32m[1mContracts / Methods[22m[39m                 ·  [1mMin[22m            ·  [1mMax[22m          ·  [1mAvg[22m            ·  [1m# calls[22m       ·  [1musd (avg)[22m   │
+·······································|·················|···············|·················|················|···············
+|  [1mAlphaHelixToken[22m                     ·                                                                                   │
+·······································|·················|···············|·················|················|···············
+|      approve                         ·         [36m26,127[39m  ·       [31m46,027[39m  ·         29,951  ·           469  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      grantRole                       ·              [90m-[39m  ·            [90m-[39m  ·         51,218  ·            13  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      mint                            ·         [36m36,279[39m  ·       [31m70,503[39m  ·         37,897  ·           470  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [1mHelixMarket[22m                         ·                                                                                   │
+·······································|·················|···············|·················|················|···············
+|      claim                           ·         [36m54,534[39m  ·       [31m98,859[39m  ·         79,602  ·           127  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      commitBet                       ·        [36m123,448[39m  ·      [31m140,656[39m  ·        128,130  ·           402  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      pingMarket                      ·         [36m28,445[39m  ·      [31m127,828[39m  ·         51,010  ·            13  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      resolve                         ·         [36m42,317[39m  ·       [31m58,276[39m  ·         57,488  ·           123  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      revealBet                       ·         [36m67,987[39m  ·       [31m85,207[39m  ·         82,370  ·           374  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      submitStatement                 ·        [36m199,451[39m  ·      [31m308,233[39m  ·        206,001  ·           159  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      submitStatementWithRandomClose  ·        [36m216,977[39m  ·      [31m278,890[39m  ·        271,999  ·            13  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      withdrawUnrevealed              ·         [36m52,008[39m  ·       [31m52,017[39m  ·         52,015  ·            24  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [1mHelixReserve[22m                        ·                                                                                   │
+·······································|·················|···············|·················|················|···············
+|      buy                             ·         [36m60,099[39m  ·       [31m77,199[39m  ·         68,649  ·             4  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      seedMarket                      ·              [90m-[39m  ·            [90m-[39m  ·        109,951  ·             1  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|      sell                            ·              [90m-[39m  ·            [90m-[39m  ·         66,385  ·             2  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [32m[1mDeployments[22m[39m                                           ·                                 ·  [1m% of limit[22m    ·              │
+·······································|·················|···············|·················|················|···············
+|  [1mAlphaHelixToken[22m                     ·              [90m-[39m  ·            [90m-[39m  ·        811,599  ·         2.7 %  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [1mDummyMarketAMM[22m                      ·              [90m-[39m  ·            [90m-[39m  ·        190,464  ·         0.6 %  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [1mHelixMarket[22m                         ·      [36m2,479,642[39m  ·    [31m2,479,654[39m  ·      2,479,653  ·         8.3 %  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [1mHelixReserve[22m                        ·              [90m-[39m  ·            [90m-[39m  ·        726,752  ·         2.4 %  ·           [32m[90m-[39m[32m[39m  │
+·······································|·················|···············|·················|················|···············
+|  [32m[1mKey[22m[39m                                                                                                                     │
+····························································································································
+|  [35m[1m◯[22m[39m  Execution gas for this method does not include intrinsic gas overhead                                                │
+····························································································································
+|  [35m[1m△[22m[39m  Cost was non-zero but below the precision setting for the currency display (see options)                             │
+····························································································································
+|  [35mToolchain:[39m  hardhat                                                                                                     │
+····························································································································
