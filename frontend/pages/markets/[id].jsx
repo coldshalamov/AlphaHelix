@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { formatEther } from 'viem';
-import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { useAccount, useChainId, useReadContract, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
@@ -34,88 +34,82 @@ export default function MarketDetailPage() {
     abi: marketAbi,
   }), []);
 
-  const contractsArray = useMemo(() => {
-    // Basic read for market data
-    const reqs = [
+  // BOLT: Split market data fetch from user data fetch.
+  // This ensures stable market data is not refetched when user connects/disconnects wallet.
+  const { data: marketData, isLoading: isMarketLoading, error: marketError } = useReadContract({
+    ...contractConfig,
+    functionName: 'markets',
+    args: marketId !== undefined ? [marketId] : undefined,
+    query: {
+      enabled: marketId !== undefined,
+      // Smart polling: stop if resolved
+      refetchInterval: (data) => {
+        const resolved = data?.[6];
+        return resolved ? false : 5000;
+      }
+    }
+  });
+
+  const userContractsArray = useMemo(() => {
+    if (marketId === undefined || !address) return [];
+    return [
       {
         ...contractConfig,
-        functionName: 'markets',
-        args: marketId !== undefined ? [marketId] : undefined,
+        functionName: 'bets',
+        args: [marketId, address, 1], // Yes bet
+      },
+      {
+        ...contractConfig,
+        functionName: 'bets',
+        args: [marketId, address, 0], // No bet
+      },
+      {
+        ...contractConfig,
+        functionName: 'bets',
+        args: [marketId, address, 2], // Unaligned bet
+      },
+      {
+        ...contractConfig,
+        functionName: 'committedAmount',
+        args: [marketId, address],
+      },
+      {
+         address: contracts.AlphaHelixToken,
+         abi: tokenAbi,
+         functionName: 'allowance',
+         args: [address, contracts.HelixMarket],
+      },
+      {
+         address: contracts.AlphaHelixToken,
+         abi: tokenAbi,
+         functionName: 'balanceOf',
+         args: [address],
       }
     ];
-
-    // If user is connected, append user-specific reads to batch them
-    if (marketId !== undefined && address) {
-      reqs.push(
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 1], // Yes bet
-        },
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 0], // No bet
-        },
-        {
-          ...contractConfig,
-          functionName: 'bets',
-          args: [marketId, address, 2], // Unaligned bet
-        },
-        {
-          ...contractConfig,
-          functionName: 'committedAmount',
-          args: [marketId, address],
-        },
-        {
-           address: contracts.AlphaHelixToken,
-           abi: tokenAbi,
-           functionName: 'allowance',
-           args: [address, contracts.HelixMarket],
-        },
-        // BOLT: Batching balanceOf with other user data to prevent extra network request in BettingWidget
-        {
-           address: contracts.AlphaHelixToken,
-           abi: tokenAbi,
-           functionName: 'balanceOf',
-           args: [address],
-        }
-      );
-    }
-    return reqs;
   }, [contractConfig, marketId, address]);
 
-  // Optimization: Batch multiple contract reads into a single multicall/RPC request
-  // This reduces network waterfall and synchronizes loading states
-  const { data: readResults, isLoading: isReading, error: readError, refetch } = useReadContracts({
-    contracts: contractsArray,
+  const { data: userDataResults, isLoading: isUserLoading, refetch: refetchUser } = useReadContracts({
+    contracts: userContractsArray,
     query: {
-       enabled: marketId !== undefined,
-       // BOLT: Smart polling. If market is resolved, stop polling (return false) to save RPC calls and re-renders.
-       // Otherwise, poll every 5s for live updates.
+       enabled: !!address && !!marketId,
+       // Stop polling user data if market is resolved (unless we need to track claims, but claim status is usually static until action)
        refetchInterval: (data) => {
-         const market = data?.[0]?.result;
-         const resolved = market?.[6];
+         // We can use marketData from the other hook here
+         const resolved = marketData?.[6];
          return resolved ? false : 5000;
        }
     }
   });
 
-  const market = readResults?.[0]?.result;
-
-  // Destructure based on whether address was present.
-  // If address is missing, these will be undefined as the array is shorter.
-  // Note: We check address presence to align indices.
-  const userResultsBaseIndex = 1;
-  const yesBet = address ? readResults?.[userResultsBaseIndex]?.result : undefined;
-  const noBet = address ? readResults?.[userResultsBaseIndex + 1]?.result : undefined;
-  const unalignedBet = address ? readResults?.[userResultsBaseIndex + 2]?.result : undefined;
-  const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
-  const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
-  const hlxBalance = address ? readResults?.[userResultsBaseIndex + 5]?.result : undefined;
-
-  const isLoading = isReading;
-  const error = readError;
+  // Combine loading states (market data is critical, user data is secondary but needed for interaction)
+  // We block rendering only on market data. User data can load progressively or we can wait.
+  // Previously it waited for everything. Let's wait for everything to avoid UI jumps.
+  const isLoading = isMarketLoading || (address && isUserLoading);
+  const error = marketError; // User data error might be less critical or handled separately?
+  // Actually, keep it simple:
+  // const error = marketError || (address && userDataResults?.error);
+  // userDataResults doesn't have a top level error property in the same way? useReadContracts returns error?
+  // Yes, it has error property.
 
   const { writeContractAsync, isPending: isClaimPending } = useWriteContract();
   const [status, setStatus] = useState('');
@@ -124,10 +118,18 @@ export default function MarketDetailPage() {
 
   const [marketState, setMarketState] = useState('UNKNOWN');
 
-  const marketData = market || [];
-  const commitEndTime = marketData[1];
-  const revealEndTime = marketData[2];
-  const resolved = marketData[6];
+  const market = marketData; // Directly from useReadContract
+  const resolved = market?.[6];
+  const commitEndTime = market?.[1];
+  const revealEndTime = market?.[2];
+
+  // Destructure user results
+  const yesBet = userDataResults?.[0]?.result;
+  const noBet = userDataResults?.[1]?.result;
+  const unalignedBet = userDataResults?.[2]?.result;
+  const committedBalance = userDataResults?.[3]?.result;
+  const allowance = userDataResults?.[4]?.result;
+  const hlxBalance = userDataResults?.[5]?.result;
 
   useEffect(() => {
     if (!commitEndTime || !revealEndTime) return;
@@ -162,14 +164,13 @@ export default function MarketDetailPage() {
     if (isClaimConfirming) setStatus('Claim transaction pending...');
     else if (isClaimSuccess) {
       setStatus('Claim confirmed. Balances will refresh shortly.');
-      // BOLT: Manual refetch required because smart polling is disabled for resolved markets.
-      refetch();
+      refetchUser();
     }
-  }, [isClaimConfirming, isClaimSuccess, refetch]);
+  }, [isClaimConfirming, isClaimSuccess, refetchUser]);
 
   if (!id) return <div className="status">Loading market...</div>;
   if (error) return <div className="status">Failed to load market.</div>;
-  if (isLoading || !market) return <div className="status">Fetching market data...</div>;
+  if (isMarketLoading || !market) return <div className="status">Fetching market data...</div>;
 
   const [ipfsCid, , , yesPool, noPool, unalignedPool, , outcome, tie, originator] = market;
 
