@@ -5,6 +5,7 @@ import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
+import EmptyState from '@/components/EmptyState';
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
@@ -66,7 +67,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, refetch: refetchCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -140,7 +141,13 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <EmptyState
+          title="No markets found"
+          description="There are currently no active markets. Check back later or try refreshing."
+          onRetry={refetchCount}
+        />
+      )}
     </div>
   );
 }
