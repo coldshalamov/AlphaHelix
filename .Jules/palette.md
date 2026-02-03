@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2026-01-20 - [Contextual Connection Prompts]
+**Learning:** Users arriving at transactional pages (like Bank) without a wallet connected feel stranded if the page only shows "Not connected" labels without actionable buttons.
+**Action:** Always provide direct "Connect Wallet" buttons in the empty state of transactional components, rather than relying on the header.

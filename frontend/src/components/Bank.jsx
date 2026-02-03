@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, memo } from 'react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain, useConnect } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
@@ -170,9 +170,11 @@ const SellCard = memo(function SellCard({
 });
 
 function Bank() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
+  const { connectors, connect } = useConnect();
+
   const [buyAmount, setBuyAmount] = useState('');
   const [sellAmount, setSellAmount] = useState('');
   const [status, setStatus] = useState('');
@@ -351,6 +353,31 @@ function Bank() {
       setStatus(err?.shortMessage || err?.message || 'Sell failed');
     }
   }, [sellAmount, publicClient, writeContractAsync]);
+
+  if (!isConnected) {
+    return (
+      <div className="bank-container">
+        <h2>Helix Bank</h2>
+        <p>Swap ETH for HLX on the reserve contract.</p>
+        <div className="card" style={{ marginTop: 'var(--space-6)', borderColor: 'var(--slate-200)' }}>
+          <h3 className="font-semibold">Connect to Bank</h3>
+          <p className="helper">Connect your wallet to exchange ETH/HLX.</p>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}>
+            {connectors.map((connector) => (
+              <button
+                key={connector.uid}
+                className="button primary"
+                onClick={() => connect({ connector })}
+                type="button"
+              >
+                Connect {connector.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bank-container">
