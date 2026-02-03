@@ -359,10 +359,10 @@ function Bank() {
       <div className="bank-container">
         <h2>Helix Bank</h2>
         <p>Swap ETH for HLX on the reserve contract.</p>
-        <div className="card" style={{ marginTop: '1.5rem', borderColor: '#e5e7eb' }}>
+        <div className="card" style={{ marginTop: 'var(--space-6)', borderColor: 'var(--slate-200)' }}>
           <h3 className="font-semibold">Connect to Bank</h3>
           <p className="helper">Connect your wallet to exchange ETH/HLX.</p>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}>
             {connectors.map((connector) => (
               <button
                 key={connector.uid}
