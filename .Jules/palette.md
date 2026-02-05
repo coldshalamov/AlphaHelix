@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2024-05-27 - [Consistent Disconnected States]
+**Learning:** In Web3 dApps, page-level components (like Bank) often default to a "broken" or "read-only" UI when disconnected, which is confusing compared to widget-level "Connect" prompts.
+**Action:** If a page's primary function requires a wallet, replace the entire functional area with a clear "Connect Wallet" state instead of showing disabled inputs.
