@@ -7,6 +7,14 @@ const { ARBITRUM_SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ARBISCAN_API_KEY } = pro
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   defaultNetwork: "hardhat",
+  gasReporter: {
+    enabled: process.env.REPORT_GAS ? true : false,
+    outputFile: "gas-report.txt",
+    noColors: true,
+    currency: "USD",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    token: "ETH",
+  },
   solidity: {
     version: "0.8.20",
     settings: {
