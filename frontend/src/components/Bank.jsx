@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, memo } from 'react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain, useConnect } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
@@ -170,7 +170,8 @@ const SellCard = memo(function SellCard({
 });
 
 function Bank() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { connectors, connect } = useConnect();
   const chainId = useChainId();
   const publicClient = usePublicClient();
   const [buyAmount, setBuyAmount] = useState('');
@@ -357,78 +358,99 @@ function Bank() {
       <h2>Helix Bank</h2>
       <p>Swap ETH for HLX on the reserve contract.</p>
 
-      <div className="wallet-info table-like">
-        <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>Wallet</strong>
-          {address ? (
-            <button
-              className="badge"
-              onClick={handleCopy}
-              type="button"
-              aria-label="Copy wallet address"
-            >
-              <span>{copied ? 'Copied!' : shortAddress}</span>
-            </button>
-          ) : (
-            <span>Not connected</span>
-          )}
-        </div>
-        <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>ETH Balance</strong>
-          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{ethBalance ? `${Number(ethBalance.formatted).toFixed(4)} ${ethBalance.symbol}` : '—'}</span>
-        </div>
-        <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>HLX Balance</strong>
-          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{formattedHlx} HLX</span>
-        </div>
-      </div>
-
-        {isWrongNetwork && (
-          <div className="card" style={{ marginTop: '1.5rem', borderColor: '#fee2e2' }}>
-            <h3 className="font-semibold">Wrong network</h3>
-            <p className="helper">Switch to the configured Helix chain to continue.</p>
-            <button
-              className="button primary"
-              onClick={() => switchChain({ chainId: expectedChainId })}
-              disabled={isSwitching}
-              style={{ marginTop: '0.75rem' }}
-            >
-              {isSwitching ? (
-                <>
-                  <Spinner />
-                  Switching...
-                </>
-              ) : (
-                'Switch Network'
-              )}
-            </button>
+      {!isConnected ? (
+        <div className="card" style={{ borderColor: '#e5e7eb', marginTop: '1.5rem' }}>
+          <h3 className="font-semibold">Connect to banking</h3>
+          <p className="helper">Connect your wallet to swap ETH and HLX.</p>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+            {connectors.map((connector) => (
+              <button
+                key={connector.uid}
+                className="button primary"
+                onClick={() => connect({ connector })}
+                type="button"
+              >
+                Connect {connector.name}
+              </button>
+            ))}
           </div>
-        )}
-
-        <div className="grid two" style={{ marginTop: '1.5rem', opacity: isWrongNetwork ? 0.5 : 1, pointerEvents: isWrongNetwork ? 'none' : 'auto' }}>
-          <BuyCard
-            buyAmount={buyAmount}
-            handleBuyAmountChange={handleBuyAmountChange}
-            isBuyError={isBuyError}
-            activeAction={activeAction}
-            ethBalance={ethBalance}
-            handleMaxBuy={handleMaxBuy}
-            handleBuy={handleBuy}
-          />
-          <SellCard
-            sellAmount={sellAmount}
-            handleSellAmountChange={handleSellAmountChange}
-            isSellError={isSellError}
-            activeAction={activeAction}
-            handleMaxSell={handleMaxSell}
-            handleSell={handleSell}
-          />
         </div>
+      ) : (
+        <>
+          <div className="wallet-info table-like">
+            <div>
+              <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>Wallet</strong>
+              {address ? (
+                <button
+                  className="badge"
+                  onClick={handleCopy}
+                  type="button"
+                  aria-label="Copy wallet address"
+                >
+                  <span>{copied ? 'Copied!' : shortAddress}</span>
+                </button>
+              ) : (
+                <span>Not connected</span>
+              )}
+            </div>
+            <div>
+              <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>ETH Balance</strong>
+              <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{ethBalance ? `${Number(ethBalance.formatted).toFixed(4)} ${ethBalance.symbol}` : '—'}</span>
+            </div>
+            <div>
+              <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>HLX Balance</strong>
+              <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{formattedHlx} HLX</span>
+            </div>
+          </div>
 
-        <div id="bank-status" role="status" aria-live="polite">
-          {liveStatus ? <div className="status">{liveStatus}</div> : null}
-        </div>
-      </div>
+          {isWrongNetwork && (
+            <div className="card" style={{ marginTop: '1.5rem', borderColor: '#fee2e2' }}>
+              <h3 className="font-semibold">Wrong network</h3>
+              <p className="helper">Switch to the configured Helix chain to continue.</p>
+              <button
+                className="button primary"
+                onClick={() => switchChain({ chainId: expectedChainId })}
+                disabled={isSwitching}
+                style={{ marginTop: '0.75rem' }}
+              >
+                {isSwitching ? (
+                  <>
+                    <Spinner />
+                    Switching...
+                  </>
+                ) : (
+                  'Switch Network'
+                )}
+              </button>
+            </div>
+          )}
+
+          <div className="grid two" style={{ marginTop: '1.5rem', opacity: isWrongNetwork ? 0.5 : 1, pointerEvents: isWrongNetwork ? 'none' : 'auto' }}>
+            <BuyCard
+              buyAmount={buyAmount}
+              handleBuyAmountChange={handleBuyAmountChange}
+              isBuyError={isBuyError}
+              activeAction={activeAction}
+              ethBalance={ethBalance}
+              handleMaxBuy={handleMaxBuy}
+              handleBuy={handleBuy}
+            />
+            <SellCard
+              sellAmount={sellAmount}
+              handleSellAmountChange={handleSellAmountChange}
+              isSellError={isSellError}
+              activeAction={activeAction}
+              handleMaxSell={handleMaxSell}
+              handleSell={handleSell}
+            />
+          </div>
+
+          <div id="bank-status" role="status" aria-live="polite">
+            {liveStatus ? <div className="status">{liveStatus}</div> : null}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
