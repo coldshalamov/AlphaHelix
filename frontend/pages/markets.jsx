@@ -5,6 +5,7 @@ import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
+import Spinner from '@/components/Spinner';
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
@@ -66,7 +67,11 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const {
+    data: marketCount,
+    refetch: refetchCount,
+    isRefetching: isRefetchingCount,
+  } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -76,7 +81,13 @@ export default function MarketsPage() {
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
-  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
+  const {
+    data: marketsResults,
+    isLoading,
+    error: queryError,
+    refetch: refetchMarkets,
+    isRefetching: isRefetchingMarkets,
+  } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
       return Array.from({ length: numericCount }).map((_, i) => ({
@@ -140,7 +151,41 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <div
+          className="card text-center"
+          style={{
+            padding: 'var(--space-12) var(--space-6)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--space-4)',
+          }}
+        >
+          <div style={{ fontSize: '3rem' }}>📭</div>
+          <h3 className="font-semibold">No active markets</h3>
+          <p className="helper">
+            Check back later or refresh to see if new statements have been added.
+          </p>
+          <button
+            className="button primary"
+            onClick={() => {
+              refetchCount();
+              refetchMarkets();
+            }}
+            disabled={isRefetchingCount || isRefetchingMarkets}
+          >
+            {isRefetchingCount || isRefetchingMarkets ? (
+              <>
+                <Spinner />
+                Refreshing...
+              </>
+            ) : (
+              'Refresh Markets'
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
