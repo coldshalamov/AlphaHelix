@@ -9,3 +9,7 @@
 ## 2026-03-02 - GitHub Actions Deprecations
 **Learning:** `actions/upload-artifact@v3` is deprecated and causes hard failures in CI pipelines due to Node 16 end-of-life on GitHub runners.
 **Action:** Upgrade to `actions/upload-artifact@v4`. Note that v4 artifacts are immutable by default and cannot be overwritten without explicit configuration.
+
+## 2026-03-02 - GitHub Actions Permissions
+**Learning:** When using `actions/github-script` to post comments on PRs, the default GITHUB_TOKEN permissions are often insufficient (read-only) for `pull-requests`.
+**Action:** Explicitly define `permissions: { pull-requests: write }` in the job configuration to avoid 403 Forbidden errors.
