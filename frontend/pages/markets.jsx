@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,7 +65,11 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const ITEMS_PER_PAGE = 12;
+
 export default function MarketsPage() {
+  const [page, setPage] = useState(1);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -76,16 +80,19 @@ export default function MarketsPage() {
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  // BOLT: Added pagination to prevent fetching all markets at once (O(1) vs O(N)).
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end = Math.min(start + ITEMS_PER_PAGE, numericCount);
+      return Array.from({ length: end - start }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(start + i)],
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
@@ -100,7 +107,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: (page - 1) * ITEMS_PER_PAGE + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +121,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +148,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {numericCount > ITEMS_PER_PAGE && (
+        <div className="pagination" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem', alignItems: 'center' }}>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1 || isLoading}
+          >
+            Previous
+          </button>
+          <span className="helper">
+            Page {page} of {Math.ceil(numericCount / ITEMS_PER_PAGE)}
+          </span>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.min(Math.ceil(numericCount / ITEMS_PER_PAGE), p + 1))}
+            disabled={page >= Math.ceil(numericCount / ITEMS_PER_PAGE) || isLoading}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
