@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2024-05-28 - [Rich Empty States]
+**Learning:** "No results" text is a dead end. Users prefer empty states that explain *why* it's empty and provide a path forward (e.g., "Refresh").
+**Action:** Replace text-only empty states with a "Rich Empty State" pattern: Icon + Title + Description + Action Button.
