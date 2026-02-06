@@ -152,17 +152,8 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && (
-        <div
-          className="card text-center"
-          style={{
-            padding: 'var(--space-12) var(--space-6)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 'var(--space-4)',
-          }}
-        >
-          <div style={{ fontSize: '3rem' }}>📭</div>
+        <div className="card text-center empty-state">
+          <div className="empty-icon">📭</div>
           <h3 className="font-semibold">No active markets</h3>
           <p className="helper">
             Check back later or refresh to see if new statements have been added.
@@ -186,6 +177,18 @@ export default function MarketsPage() {
           </button>
         </div>
       )}
+      <style jsx>{`
+        .empty-state {
+          padding: var(--space-12) var(--space-6);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-4);
+        }
+        .empty-icon {
+          font-size: 3rem;
+        }
+      `}</style>
     </div>
   );
 }
