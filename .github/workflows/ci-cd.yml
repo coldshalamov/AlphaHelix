@@ -73,7 +73,7 @@ jobs:
         run: slither . --json slither-report.json || true
         
       - name: Upload Slither report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: slither-report
           path: slither-report.json
@@ -104,13 +104,21 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            try {
+              if (fs.existsSync('gas-report.txt')) {
+                const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+                });
+              } else {
+                console.log("Gas report file not found, skipping comment.");
+              }
+            } catch (error) {
+              console.error("Error reading gas report:", error);
+            }
 
   lint:
     name: Code Linting
@@ -157,7 +165,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
