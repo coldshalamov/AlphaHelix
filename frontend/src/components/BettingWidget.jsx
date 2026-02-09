@@ -25,6 +25,8 @@ const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
 
 // BOLT: Extracted and memoized to prevent re-renders when typing amount
 const Choices = memo(function Choices({ choice, isLocked, onChange }) {
+  const [focusedValue, setFocusedValue] = useState(null);
+
   return (
     <fieldset className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
       <legend className="visually-hidden">Select outcome</legend>
@@ -36,6 +38,8 @@ const Choices = memo(function Choices({ choice, isLocked, onChange }) {
           margin: 0,
           opacity: isLocked ? 0.6 : 1,
           cursor: isLocked ? 'not-allowed' : 'pointer',
+          outline: focusedValue === c.value ? '2px solid var(--color-accent-primary)' : 'none',
+          outlineOffset: '2px',
         }}
       >
         <input
@@ -44,6 +48,8 @@ const Choices = memo(function Choices({ choice, isLocked, onChange }) {
           value={c.value}
           checked={choice === c.value}
           onChange={onChange}
+          onFocus={() => setFocusedValue(c.value)}
+          onBlur={() => setFocusedValue(null)}
           className="visually-hidden"
           disabled={isLocked}
         />
@@ -425,7 +431,7 @@ function BettingWidget({
               className="badge"
               onClick={handleCopySecret}
               type="button"
-              aria-label="Copy bet secret to clipboard"
+              aria-label={secretCopied ? 'Secret copied to clipboard' : 'Copy bet secret to clipboard'}
               style={{ marginTop: '0.5rem', cursor: 'pointer' }}
             >
               {secretCopied ? '✓ Copied!' : '📋 Backup Secret'}

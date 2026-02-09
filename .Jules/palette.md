@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2026-02-09 - [Invisible Focus on Custom Controls]
+**Learning:** Visually hidden inputs (`.visually-hidden`) strip default browser focus indicators, leaving keyboard users lost. While `:focus-within` works, explicit state tracking (`onFocus`/`onBlur`) provides the most robust and customizable focus ring for complex custom components.
+**Action:** Always add explicit `onFocus` handlers to hidden inputs that toggle a high-contrast outline on the visible label wrapper.
