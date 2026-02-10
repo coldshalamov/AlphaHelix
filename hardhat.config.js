@@ -14,6 +14,11 @@ module.exports = {
       viaIR: true,
     },
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS ? true : false,
+    outputFile: "gas-report.txt",
+    noColors: true,
+  },
   networks: {
     hardhat: {},
     arbitrumSepolia: {
