@@ -4,6 +4,7 @@ import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
+import CopyButton from './CopyButton';
 
 // BOLT: Extracted and memoized BuyCard to prevent re-renders when typing in Sell input
 const BuyCard = memo(function BuyCard({
@@ -178,7 +179,6 @@ function Bank() {
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
-  const [copied, setCopied] = useState(false);
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -251,14 +251,6 @@ function Bank() {
       if (val.length <= 50) setSellAmount(val);
     }
   }, []);
-
-  const handleCopy = useCallback(() => {
-    if (address) {
-      navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [address]);
 
   const handleMaxBuy = useCallback(() => {
     if (ethBalance) {
@@ -361,14 +353,13 @@ function Bank() {
         <div>
           <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>Wallet</strong>
           {address ? (
-            <button
+            <CopyButton
+              value={address}
+              ariaLabel="Copy wallet address"
               className="badge"
-              onClick={handleCopy}
-              type="button"
-              aria-label="Copy wallet address"
             >
-              <span>{copied ? 'Copied!' : shortAddress}</span>
-            </button>
+              <span>{shortAddress}</span>
+            </CopyButton>
           ) : (
             <span>Not connected</span>
           )}
