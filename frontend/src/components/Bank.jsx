@@ -357,31 +357,37 @@ function Bank() {
       <h2>Helix Bank</h2>
       <p>Swap ETH for HLX on the reserve contract.</p>
 
-      <div className="wallet-info table-like">
+      <dl className="wallet-info table-like">
         <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>Wallet</strong>
-          {address ? (
-            <button
-              className="badge"
-              onClick={handleCopy}
-              type="button"
-              aria-label="Copy wallet address"
-            >
-              <span>{copied ? 'Copied!' : shortAddress}</span>
-            </button>
-          ) : (
-            <span>Not connected</span>
-          )}
+          <dt className="label" style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Wallet</dt>
+          <dd style={{ margin: 0 }}>
+            {address ? (
+              <button
+                className="badge"
+                onClick={handleCopy}
+                type="button"
+                aria-label="Copy wallet address"
+              >
+                <span>{copied ? 'Copied!' : shortAddress}</span>
+              </button>
+            ) : (
+              <span>Not connected</span>
+            )}
+          </dd>
         </div>
         <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>ETH Balance</strong>
-          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{ethBalance ? `${Number(ethBalance.formatted).toFixed(4)} ${ethBalance.symbol}` : '—'}</span>
+          <dt className="label" style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>ETH Balance</dt>
+          <dd style={{ margin: 0 }}>
+            <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{ethBalance ? `${Number(ethBalance.formatted).toFixed(4)} ${ethBalance.symbol}` : '—'}</span>
+          </dd>
         </div>
         <div>
-          <strong className="label" style={{ display: 'block', marginBottom: '0.25rem' }}>HLX Balance</strong>
-          <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{formattedHlx} HLX</span>
+          <dt className="label" style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>HLX Balance</dt>
+          <dd style={{ margin: 0 }}>
+            <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{formattedHlx} HLX</span>
+          </dd>
         </div>
-      </div>
+      </dl>
 
         {isWrongNetwork && (
           <div className="card" style={{ marginTop: '1.5rem', borderColor: '#fee2e2' }}>
