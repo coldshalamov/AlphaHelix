@@ -212,43 +212,43 @@ export default function MarketDetailPage() {
         <h2 className="text-xl font-bold" style={{ marginTop: '0.25rem' }}>
           {ipfsCid || 'Untitled statement'}
         </h2>
-        <div className="table-like" style={{ marginTop: '0.75rem' }}>
+        <dl className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
-            <div className="label">Commit end</div>
-            <div className="value">{dateTimeFormatter.format(new Date(Number(commitEndTime) * 1000))}</div>
+            <dt className="label">Commit end</dt>
+            <dd className="value" style={{ margin: 0 }}>{dateTimeFormatter.format(new Date(Number(commitEndTime) * 1000))}</dd>
             <Countdown
               targetSeconds={Number(commitEndTime)}
               render={renderTimeLeft}
             />
           </div>
           <div>
-            <div className="label">Reveal end</div>
-            <div className="value">{dateTimeFormatter.format(new Date(Number(revealEndTime) * 1000))}</div>
+            <dt className="label">Reveal end</dt>
+            <dd className="value" style={{ margin: 0 }}>{dateTimeFormatter.format(new Date(Number(revealEndTime) * 1000))}</dd>
             <Countdown
               targetSeconds={Number(revealEndTime)}
               render={renderTimeLeft}
             />
           </div>
           <div>
-            <div className="label">Originator</div>
-            <div className="value">{originator}</div>
+            <dt className="label">Originator</dt>
+            <dd className="value" style={{ margin: 0 }}>{originator}</dd>
           </div>
-        </div>
+        </dl>
 
-        <div className="table-like" style={{ marginTop: '0.75rem' }}>
+        <dl className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
-            <div className="label">YES Pool</div>
-            <div className="value">{formatEther(yesPool)} HLX</div>
+            <dt className="label">YES Pool</dt>
+            <dd className="value" style={{ margin: 0 }}>{formatEther(yesPool)} HLX</dd>
           </div>
           <div>
-            <div className="label">NO Pool</div>
-            <div className="value">{formatEther(noPool)} HLX</div>
+            <dt className="label">NO Pool</dt>
+            <dd className="value" style={{ margin: 0 }}>{formatEther(noPool)} HLX</dd>
           </div>
           <div>
-            <div className="label">UNALIGNED Pool</div>
-            <div className="value">{formatEther(unalignedPool)} HLX</div>
+            <dt className="label">UNALIGNED Pool</dt>
+            <dd className="value" style={{ margin: 0 }}>{formatEther(unalignedPool)} HLX</dd>
           </div>
-        </div>
+        </dl>
 
         <div className="status" style={{ marginTop: '0.75rem' }}>
           Phase: {marketState === 'AFTER_REVEAL_NOT_RESOLVED' ? 'Awaiting resolution' : marketState}
@@ -259,24 +259,24 @@ export default function MarketDetailPage() {
           </div>
         )}
 
-        <div className="table-like" style={{ marginTop: '0.75rem' }}>
+        <dl className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
-            <div className="label">Your revealed YES</div>
-            <div className="value">{yesBet ? `${formatEther(yesBet)} HLX` : '—'}</div>
+            <dt className="label">Your revealed YES</dt>
+            <dd className="value" style={{ margin: 0 }}>{yesBet ? `${formatEther(yesBet)} HLX` : '—'}</dd>
           </div>
           <div>
-            <div className="label">Your revealed NO</div>
-            <div className="value">{noBet ? `${formatEther(noBet)} HLX` : '—'}</div>
+            <dt className="label">Your revealed NO</dt>
+            <dd className="value" style={{ margin: 0 }}>{noBet ? `${formatEther(noBet)} HLX` : '—'}</dd>
           </div>
           <div>
-            <div className="label">Your UNALIGNED</div>
-            <div className="value">{unalignedBet ? `${formatEther(unalignedBet)} HLX` : '—'}</div>
+            <dt className="label">Your UNALIGNED</dt>
+            <dd className="value" style={{ margin: 0 }}>{unalignedBet ? `${formatEther(unalignedBet)} HLX` : '—'}</dd>
           </div>
           <div>
-            <div className="label">Committed (unrevealed)</div>
-            <div className="value">{committedBalance ? `${formatEther(committedBalance)} HLX` : '—'}</div>
+            <dt className="label">Committed (unrevealed)</dt>
+            <dd className="value" style={{ margin: 0 }}>{committedBalance ? `${formatEther(committedBalance)} HLX` : '—'}</dd>
           </div>
-        </div>
+        </dl>
 
         {isConnected && (
           <div className="card" style={{ marginTop: '0.75rem', borderColor: '#e5e7eb' }}>
