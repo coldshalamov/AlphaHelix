@@ -66,7 +66,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, isLoading: isCountLoading } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -118,13 +118,15 @@ export default function MarketsPage() {
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
+  const isLoadingTotal = isCountLoading || isLoading;
+
   return (
     <div className="grid section">
       <div className="card">
         <h2 className="text-xl font-bold">Markets</h2>
         <p className="helper">Live statements pulled directly from the HelixMarket contract.</p>
       </div>
-      {isLoading && <div className="status">Loading markets...</div>}
+      {isLoadingTotal && <div className="status">Loading markets...</div>}
       {error && <div className="status">{error}</div>}
       <div className="grid two">
         {markets.map((m) => (
@@ -140,7 +142,29 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoadingTotal && markets.length === 0 && !error && (
+        <div className="card text-center" style={{ padding: 'var(--space-12)' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-4)',
+            color: 'var(--color-text-tertiary)',
+            background: 'var(--charcoal-elevated)',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold" style={{ marginBottom: 'var(--space-2)' }}>No active markets</h3>
+          <p className="helper" style={{ maxWidth: '400px', margin: '0 auto' }}>
+            There are currently no prediction markets open. Check back later.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
