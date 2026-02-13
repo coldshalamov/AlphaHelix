@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2026-02-13 - [Feedback Consistency]
+**Learning:** Inconsistent copy-to-clipboard interactions (different timeouts, button styles, error handling) create a fragmented user experience and reduce trust.
+**Action:** Centralize micro-interactions like "Copy to Clipboard" into reusable components that handle loading, success, and error states uniformly, ensuring a consistent and predictable UI.
