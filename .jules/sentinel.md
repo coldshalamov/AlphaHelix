@@ -17,3 +17,8 @@
 **Vulnerability:** The random close mechanism in `HelixMarket.sol` included `msg.sender` in the entropy generation (`keccak256(..., msg.sender, ...)`). This allowed attackers to generate thousands of addresses off-chain (Sybil attack) to find one that produced a favorable hash to close (or keep open) a market.
 **Learning:** Including user-controllable inputs (like `msg.sender` or `gasPrice`) in randomness seeds destroys the security of the randomness, turning it into a Proof-of-Work game for the attacker.
 **Prevention:** Never include `msg.sender` in randomness calculations if the result affects the global state of the contract in a way that benefits the caller. Use environmental entropy like `block.prevrandao`, `blockhash`, and internal state.
+
+## 2026-02-14 - [CI Artifact Deprecation]
+**Vulnerability:** GitHub Actions workflows failed due to deprecated `actions/upload-artifact@v3` and missing file checks in scripts.
+**Learning:** CI pipelines must be maintained alongside code. Hardcoding file reads in `github-script` without existence checks (`fs.existsSync`) causes fragile builds. Using outdated actions risks sudden breakage when GitHub deprecates old Node.js runtimes.
+**Prevention:** Regularly audit and upgrade GitHub Actions versions. Always implement defensive file handling in CI scripts.
