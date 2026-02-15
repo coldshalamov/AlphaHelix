@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2024-10-26 - [Standardized Feedback Patterns]
+**Learning:** Inconsistent success states (checkmarks vs text changes vs nothing) across similar actions dilute the design system's trust.
+**Action:** Centralize repeated micro-interactions (like Copy) into single components to enforce consistent timing, iconography, and accessibility attributes.
