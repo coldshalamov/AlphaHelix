@@ -122,41 +122,54 @@ export default function MarketDetailPage() {
   const [txHash, setTxHash] = useState();
   const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
-  const [marketState, setMarketState] = useState('UNKNOWN');
+  // BOLT: Optimized to derive market state during render to prevent double-rendering.
+  // We use a 'tick' state only to trigger re-renders when time boundaries are crossed.
+  const [tick, setTick] = useState(0);
 
   const marketData = market || [];
   const commitEndTime = marketData[1];
   const revealEndTime = marketData[2];
   const resolved = marketData[6];
 
+  const marketState = useMemo(() => {
+    if (!commitEndTime || !revealEndTime) return 'UNKNOWN';
+    const now = Math.floor(Date.now() / 1000);
+    const commitEndSeconds = Number(commitEndTime);
+    const revealEndSeconds = Number(revealEndTime);
+
+    // Force dependency on tick to trigger re-calculation when timer fires
+    void tick;
+
+    if (now < commitEndSeconds) return 'COMMIT';
+    if (now < revealEndSeconds) return 'REVEAL';
+    if (resolved) return 'CLOSED';
+    return 'AFTER_REVEAL_NOT_RESOLVED';
+  }, [commitEndTime, revealEndTime, resolved, tick]);
+
   useEffect(() => {
-    if (!commitEndTime || !revealEndTime) return;
+    if (!commitEndTime || !revealEndTime || resolved) return;
 
-    let timer;
+    const now = Math.floor(Date.now() / 1000);
+    const commitEndSeconds = Number(commitEndTime);
+    const revealEndSeconds = Number(revealEndTime);
 
-    const checkState = () => {
-      const now = Math.floor(Date.now() / 1000);
-      const commitEndSeconds = Number(commitEndTime);
-      const revealEndSeconds = Number(revealEndTime);
+    let ms = 0;
 
-      if (now < commitEndSeconds) {
-        setMarketState('COMMIT');
-        const ms = (commitEndSeconds - now) * 1000;
-        if (ms < 2147483647) timer = setTimeout(checkState, ms + 1000);
-      } else if (now < revealEndSeconds) {
-        setMarketState('REVEAL');
-        const ms = (revealEndSeconds - now) * 1000;
-        if (ms < 2147483647) timer = setTimeout(checkState, ms + 1000);
-      } else if (resolved) {
-        setMarketState('CLOSED');
-      } else {
-        setMarketState('AFTER_REVEAL_NOT_RESOLVED');
-      }
-    };
+    if (now < commitEndSeconds) {
+      ms = (commitEndSeconds - now) * 1000;
+    } else if (now < revealEndSeconds) {
+      ms = (revealEndSeconds - now) * 1000;
+    } else {
+      return; // No pending time-based transitions
+    }
 
-    checkState();
-    return () => clearTimeout(timer);
-  }, [commitEndTime, revealEndTime, resolved]);
+    if (ms > 0 && ms < 2147483647) {
+      const timer = setTimeout(() => {
+        setTick(t => t + 1);
+      }, ms + 1000); // Add 1s buffer to ensure we are past the boundary
+      return () => clearTimeout(timer);
+    }
+  }, [commitEndTime, revealEndTime, resolved, marketState]);
 
   useEffect(() => {
     if (isClaimConfirming) setStatus('Claim transaction pending...');
