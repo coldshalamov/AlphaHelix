@@ -14,6 +14,7 @@ import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
 import Countdown from './Countdown';
+import CopyButton from './CopyButton';
 
 const CHOICES = [
   { value: 1, label: 'YES', variant: 'primary' },
@@ -82,7 +83,6 @@ function BettingWidget({
   const [storedBet, setStoredBet] = useState(null);
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
-  const [secretCopied, setSecretCopied] = useState(false);
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
@@ -144,17 +144,6 @@ function BettingWidget({
       if (val.length <= 50) setAmount(val);
     }
   }, []);
-
-  const handleCopySecret = useCallback(() => {
-    if (storedBet && navigator.clipboard) {
-      navigator.clipboard.writeText(JSON.stringify(storedBet))
-        .then(() => {
-          setSecretCopied(true);
-          setTimeout(() => setSecretCopied(false), 2000);
-        })
-        .catch((err) => console.error('Failed to copy backup:', err));
-    }
-  }, [storedBet]);
 
   const persistBet = useCallback(
     (data) => {
@@ -421,15 +410,15 @@ function BettingWidget({
               : '⚠️ Warning: Your secret was not found on this device. You may have used a different browser.'}
           </p>
           {storedBet && (
-            <button
-              className="badge"
-              onClick={handleCopySecret}
-              type="button"
-              aria-label="Copy bet secret to clipboard"
-              style={{ marginTop: '0.5rem', cursor: 'pointer' }}
-            >
-              {secretCopied ? '✓ Copied!' : '📋 Backup Secret'}
-            </button>
+            <div style={{ marginTop: '0.5rem' }}>
+              <CopyButton
+                text={JSON.stringify(storedBet)}
+                label="Copy bet secret to clipboard"
+                successText="Copied!"
+              >
+                <span>📋 Backup Secret</span>
+              </CopyButton>
+            </div>
           )}
         </div>
       </div>
