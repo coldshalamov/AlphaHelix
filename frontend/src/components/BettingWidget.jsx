@@ -84,14 +84,24 @@ function BettingWidget({
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
 
+  const isInsufficientBalance = useMemo(() => {
+    if (!amount || !hlxBalance) return false;
+    try {
+      return parseEther(amount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [amount, hlxBalance]);
+
   const isAmountError = useMemo(() => {
+    if (isInsufficientBalance) return true;
     if (!status) return false;
     return [
       'Enter an amount of HLX to stake.',
       'Invalid HLX amount.',
       'Enter an amount greater than zero.',
     ].includes(status);
-  }, [status]);
+  }, [status, isInsufficientBalance]);
 
   // Track what the current txHash actually represents
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
@@ -452,8 +462,11 @@ function BettingWidget({
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {hlxBalance > 0n && (
-                <span className="helper" style={{ fontSize: '0.85em', margin: 0 }}>
-                  Avail: {formattedBalance}
+                <span
+                  className={`helper ${isInsufficientBalance ? 'text-crimson' : ''}`}
+                  style={{ fontSize: '0.85em', margin: 0, transition: 'color 0.2s' }}
+                >
+                  {isInsufficientBalance ? 'Insufficient balance' : `Avail: ${formattedBalance}`}
                 </span>
               )}
               <button
@@ -504,7 +517,7 @@ function BettingWidget({
           </div>
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
+        <button className="button primary" onClick={handleCommit} disabled={isLocked || isInsufficientBalance}>
           {isLocked ? (
             <>
               <Spinner />
