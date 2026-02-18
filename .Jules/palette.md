@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2025-02-12 - [Preventative Validation]
+**Learning:** Users in financial apps often waste gas on failed transactions due to insufficient balance. Post-click validation is too late.
+**Action:** Implement real-time balance checks that update helper text color and disable action buttons immediately as the user types.

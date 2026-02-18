@@ -15,12 +15,21 @@ const BuyCard = memo(function BuyCard({
   handleMaxBuy,
   handleBuy
 }) {
+  const isInsufficientEth = useMemo(() => {
+    if (!buyAmount || !ethBalance) return false;
+    try {
+      return parseEther(buyAmount) > ethBalance.value;
+    } catch {
+      return false;
+    }
+  }, [buyAmount, ethBalance]);
+
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
       <h3 className="font-semibold">Buy HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <label htmlFor="buy-amount" className="helper">
-          Enter ETH to spend
+        <label htmlFor="buy-amount" className={`helper ${isInsufficientEth ? 'text-crimson' : ''}`} style={{ transition: 'color 0.2s' }}>
+          {isInsufficientEth ? 'Insufficient ETH balance' : 'Enter ETH to spend'}
         </label>
         <button
           type="button"
@@ -47,11 +56,11 @@ const BuyCard = memo(function BuyCard({
           onChange={handleBuyAmountChange}
           aria-label="Amount of ETH to spend"
           aria-describedby="bank-status"
-          aria-invalid={isBuyError}
+          aria-invalid={isBuyError || isInsufficientEth}
           disabled={Boolean(activeAction)}
           style={{
             paddingRight: '3.5rem',
-            ...(isBuyError ? { borderColor: 'var(--danger)' } : {})
+            ...(isBuyError || isInsufficientEth ? { borderColor: 'var(--color-danger)' } : {})
           }}
         />
         <span
@@ -72,7 +81,7 @@ const BuyCard = memo(function BuyCard({
         className="button primary"
         style={{ marginTop: '0.75rem' }}
         onClick={handleBuy}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficientEth}
       >
         {activeAction === 'buy' ? (
           <>
@@ -93,15 +102,25 @@ const SellCard = memo(function SellCard({
   handleSellAmountChange,
   isSellError,
   activeAction,
+  hlxBalance,
   handleMaxSell,
   handleSell
 }) {
+  const isInsufficientHlx = useMemo(() => {
+    if (!sellAmount || hlxBalance === undefined) return false;
+    try {
+      return parseEther(sellAmount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [sellAmount, hlxBalance]);
+
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
       <h3 className="font-semibold">Sell HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <label htmlFor="sell-amount" className="helper">
-          Approve and sell HLX back to ETH
+        <label htmlFor="sell-amount" className={`helper ${isInsufficientHlx ? 'text-crimson' : ''}`} style={{ transition: 'color 0.2s' }}>
+          {isInsufficientHlx ? 'Insufficient HLX balance' : 'Approve and sell HLX back to ETH'}
         </label>
         <button
           type="button"
@@ -128,11 +147,11 @@ const SellCard = memo(function SellCard({
           onChange={handleSellAmountChange}
           aria-label="Amount of HLX to sell"
           aria-describedby="bank-status"
-          aria-invalid={isSellError}
+          aria-invalid={isSellError || isInsufficientHlx}
           disabled={Boolean(activeAction)}
           style={{
             paddingRight: '3.5rem',
-            ...(isSellError ? { borderColor: 'var(--danger)' } : {})
+            ...(isSellError || isInsufficientHlx ? { borderColor: 'var(--color-danger)' } : {})
           }}
         />
         <span
@@ -153,7 +172,7 @@ const SellCard = memo(function SellCard({
         className="button danger"
         style={{ marginTop: '0.75rem' }}
         onClick={handleSell}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficientHlx}
       >
         {activeAction === 'sell' ? (
           <>
@@ -420,6 +439,7 @@ function Bank() {
             handleSellAmountChange={handleSellAmountChange}
             isSellError={isSellError}
             activeAction={activeAction}
+            hlxBalance={hlxBalance}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
           />
