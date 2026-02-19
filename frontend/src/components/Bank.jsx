@@ -35,7 +35,7 @@ const BuyCard = memo(function BuyCard({
       <div style={{ position: 'relative' }}>
         <input
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
           min="0"
@@ -116,7 +116,7 @@ const SellCard = memo(function SellCard({
       <div style={{ position: 'relative' }}>
         <input
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
           min="0"
