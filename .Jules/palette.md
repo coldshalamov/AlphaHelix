@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2024-10-26 - [Financial Input Safety]
+**Learning:** Using `type="number"` allows accidental scroll-wheel value changes, which is dangerous for financial inputs.
+**Action:** Prefer `type="text"` with `inputMode="decimal"` and explicit validation to prevent scroll-jacking while maintaining mobile usability.

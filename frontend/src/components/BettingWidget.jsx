@@ -470,7 +470,7 @@ function BettingWidget({
           <div style={{ position: 'relative' }}>
             <input
               id="bet-amount"
-              type="number"
+              type="text"
               inputMode="decimal"
               autoComplete="off"
               min="0"
