@@ -16,10 +16,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -37,8 +37,9 @@ jobs:
         run: npm run coverage
         
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
@@ -50,10 +51,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -73,7 +74,7 @@ jobs:
         run: slither . --json slither-report.json || true
         
       - name: Upload Slither report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: slither-report
           path: slither-report.json
@@ -84,10 +85,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -100,17 +101,23 @@ jobs:
         
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
+        permissions:
+          pull-requests: write
         uses: actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
-            const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            if (fs.existsSync('gas-report.txt')) {
+              const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+              });
+            } else {
+              console.log('gas-report.txt not found');
+            }
 
   lint:
     name: Code Linting
@@ -118,10 +125,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -142,10 +149,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -157,7 +164,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
@@ -173,10 +180,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -263,7 +270,7 @@ jobs:
   notify:
     name: Notify Status
     runs-on: ubuntu-latest
-    needs: [test, security, lint, build]
+    needs: [test, security, lint, build, gas-report]
     if: always()
     
     steps:
@@ -272,7 +279,8 @@ jobs:
           if [ "${{ needs.test.result }}" == "failure" ] || \
              [ "${{ needs.security.result }}" == "failure" ] || \
              [ "${{ needs.lint.result }}" == "failure" ] || \
-             [ "${{ needs.build.result }}" == "failure" ]; then
+             [ "${{ needs.build.result }}" == "failure" ] || \
+             [ "${{ needs.gas-report.result }}" == "failure" ]; then
             echo "❌ Pipeline failed"
             exit 1
           else
