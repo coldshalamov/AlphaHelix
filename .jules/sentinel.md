@@ -12,3 +12,8 @@
 **Vulnerability:** Sending tokens to `0x...dEaD` removes them from circulation effectively but fails to update the `totalSupply` metric, potentially leading to incorrect market capitalization data and accounting discrepancies.
 **Learning:** When using burnable tokens (ERC20Burnable), `token.transfer(dEaD, amount)` is an anti-pattern. The contract holding the tokens should call `token.burn(amount)` to correctly decrease `totalSupply`. This requires the holding contract to have ownership of the tokens (which it does in `HelixMarket` after `transferFrom`).
 **Prevention:** Always prefer native `burn()` functions over transferring to dead addresses to ensure on-chain metrics reflect the true state of the economy.
+
+## 2024-05-26 - [DoS of State Transition by Revert]
+**Vulnerability:** In `HelixMarket.sol`, `commitBet` triggered a market close (state transition) via the `checkRandomClose` modifier but then reverted because the market was now closed (`require(s.commitPhaseClosed == 0)`). This caused the close event to be reverted, leaving the market in an open "zombie" state indefinitely (until `pingMarket` is called).
+**Learning:** When a transaction triggers a state transition (like closing a market), reverting the transaction undoes that transition. If the condition for the transition is met by the transaction itself, the transaction *must* successfully complete (even if the primary user action, like betting, is rejected) to persist the state change.
+**Prevention:** In functions that can trigger irreversible state transitions (like market closure), use early returns instead of reverts when the transition occurs, to allow the state change to persist while gracefully rejecting the user's primary action.
