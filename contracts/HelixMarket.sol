@@ -232,7 +232,14 @@ contract HelixMarket is ReentrancyGuard {
 
         // Check commit phase is still open
         if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed == 0, "Commit phase closed");
+            if (s.commitPhaseClosed != 0) {
+                // If closed in this block (likely by checkRandomClose just now),
+                // we return early to allow the close to persist.
+                if (s.commitPhaseClosed == block.timestamp) {
+                    return;
+                }
+                revert("Commit phase closed");
+            }
         } else {
             require(block.timestamp < s.commitEndTime, "Commit phase over");
         }
