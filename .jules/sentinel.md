@@ -12,3 +12,8 @@
 **Vulnerability:** Sending tokens to `0x...dEaD` removes them from circulation effectively but fails to update the `totalSupply` metric, potentially leading to incorrect market capitalization data and accounting discrepancies.
 **Learning:** When using burnable tokens (ERC20Burnable), `token.transfer(dEaD, amount)` is an anti-pattern. The contract holding the tokens should call `token.burn(amount)` to correctly decrease `totalSupply`. This requires the holding contract to have ownership of the tokens (which it does in `HelixMarket` after `transferFrom`).
 **Prevention:** Always prefer native `burn()` functions over transferring to dead addresses to ensure on-chain metrics reflect the true state of the economy.
+
+## 2024-05-26 - [Self-Blocking State Transitions]
+**Vulnerability:** In `HelixMarket.sol`, `commitBet` inadvertently prevented the "random close" mechanism from executing because it reverted when the market state changed to "closed" within the same transaction. This created a DoS for the closing mechanism on the most frequent interaction path.
+**Learning:** When a modifier triggers a one-way state transition (like `Open -> Closed`), the modified function must explicitly check if the transition happened *in the current block* and handle it gracefully (e.g., return early) rather than enforcing the pre-transition state via `require`.
+**Prevention:** Allow functions to complete (or exit early without revert) if a critical state transition occurred during their execution flow (check `transitionTime == block.timestamp`).
