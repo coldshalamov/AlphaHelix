@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -15,6 +15,13 @@ const BuyCard = memo(function BuyCard({
   handleMaxBuy,
   handleBuy
 }) {
+  const inputRef = useRef(null);
+
+  const onMax = useCallback(() => {
+    handleMaxBuy();
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, [handleMaxBuy]);
+
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
       <h3 className="font-semibold">Buy HLX</h3>
@@ -24,7 +31,7 @@ const BuyCard = memo(function BuyCard({
         </label>
         <button
           type="button"
-          onClick={handleMaxBuy}
+          onClick={onMax}
           className="badge"
           aria-label="Buy with maximum safe ETH"
           disabled={!ethBalance || Boolean(activeAction)}
@@ -34,6 +41,7 @@ const BuyCard = memo(function BuyCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={inputRef}
           id="buy-amount"
           type="number"
           inputMode="decimal"
@@ -96,6 +104,13 @@ const SellCard = memo(function SellCard({
   handleMaxSell,
   handleSell
 }) {
+  const inputRef = useRef(null);
+
+  const onMax = useCallback(() => {
+    handleMaxSell();
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, [handleMaxSell]);
+
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
       <h3 className="font-semibold">Sell HLX</h3>
@@ -105,7 +120,7 @@ const SellCard = memo(function SellCard({
         </label>
         <button
           type="button"
-          onClick={handleMaxSell}
+          onClick={onMax}
           className="badge"
           aria-label="Sell maximum available HLX"
           disabled={Boolean(activeAction)}
@@ -115,6 +130,7 @@ const SellCard = memo(function SellCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={inputRef}
           id="sell-amount"
           type="number"
           inputMode="decimal"
