@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2026-01-16 - [Helper Button Focus]
+**Learning:** Helper buttons (like "Max") that populate inputs can confuse screen reader users if focus remains on the button, as the value change isn't announced.
+**Action:** When a helper button modifies an input value, explicitly shift focus to that input using `useRef` to provide immediate context and feedback.
