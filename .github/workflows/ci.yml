@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-and-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       HARDHAT_DISABLE_TELEMETRY: "1"
       NEXT_TELEMETRY_DISABLED: "1"
@@ -23,6 +23,14 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             frontend/package-lock.json
+
+      - name: Cache Hardhat
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/hardhat-nodejs
+          key: ${{ runner.os }}-hardhat-${{ hashFiles('contracts/**/*.sol') }}
+          restore-keys: |
+            ${{ runner.os }}-hardhat-
 
       - name: Install (root)
         run: npm ci
