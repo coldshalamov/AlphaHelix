@@ -12,3 +12,11 @@
 **Vulnerability:** Sending tokens to `0x...dEaD` removes them from circulation effectively but fails to update the `totalSupply` metric, potentially leading to incorrect market capitalization data and accounting discrepancies.
 **Learning:** When using burnable tokens (ERC20Burnable), `token.transfer(dEaD, amount)` is an anti-pattern. The contract holding the tokens should call `token.burn(amount)` to correctly decrease `totalSupply`. This requires the holding contract to have ownership of the tokens (which it does in `HelixMarket` after `transferFrom`).
 **Prevention:** Always prefer native `burn()` functions over transferring to dead addresses to ensure on-chain metrics reflect the true state of the economy.
+
+## 2026-02-26 - GitHub Actions Permissions
+**Learning:** GitHub Actions workflows attempting to create comments on Pull Requests must have explicit  defined. The default  permissions may be restrictive depending on repository settings.
+**Action:** Always include  for jobs that need to comment on PRs. Note that adding any permission disables the implicit read-all, so  is required for checkout.
+
+## 2026-02-26 - GitHub Actions Permissions
+**Learning:** GitHub Actions workflows attempting to create comments on Pull Requests must have explicit `permissions` defined. The default `GITHUB_TOKEN` permissions may be restrictive depending on repository settings.
+**Action:** Always include `permissions: { pull-requests: write, contents: read }` for jobs that need to comment on PRs. Note that adding any permission disables the implicit read-all, so `contents: read` is required for checkout.
