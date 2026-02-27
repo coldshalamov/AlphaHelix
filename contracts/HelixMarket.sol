@@ -82,6 +82,12 @@ contract HelixMarket is ReentrancyGuard {
     /// @notice Checks if market should randomly close based on hash difficulty
     /// @dev Runs on every market interaction (commit, reveal, ping)
     modifier checkRandomClose(uint256 marketId) {
+        _checkRandomClose(marketId);
+        _; // Continue with the function
+    }
+
+    /// @dev Internal function to check random close logic. Returns true if market closed in this specific call.
+    function _checkRandomClose(uint256 marketId) internal returns (bool closedNow) {
         Statement storage s = markets[marketId];
 
         // Only check if:
@@ -111,6 +117,7 @@ contract HelixMarket is ReentrancyGuard {
             if (uint256(closeHash) < s.difficultyTarget || block.timestamp >= s.hardCommitEndTime) {
                 // COMMIT PHASE CLOSES NOW
                 s.commitPhaseClosed = block.timestamp;
+                closedNow = true;
 
                 // Reveal phase starts immediately and lasts for the stored reveal duration
                 s.revealEndTime = block.timestamp + s.revealDuration;
@@ -124,8 +131,6 @@ contract HelixMarket is ReentrancyGuard {
                 }
             }
         }
-
-        _; // Continue with the function
     }
 
     /// @notice Create a new market statement with fixed commit duration (backwards compatible).
@@ -225,14 +230,17 @@ contract HelixMarket is ReentrancyGuard {
         external
         nonReentrant
         validMarket(marketId)
-        checkRandomClose(marketId)
     {
+        // Run random close check manually so we can handle the return value
+        bool closedNow = _checkRandomClose(marketId);
+
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
         // Check commit phase is still open
         if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed == 0, "Commit phase closed");
+            // Allow if open OR if it just closed in this exact transaction (closedNow)
+            require(s.commitPhaseClosed == 0 || closedNow, "Commit phase closed");
         } else {
             require(block.timestamp < s.commitEndTime, "Commit phase over");
         }
