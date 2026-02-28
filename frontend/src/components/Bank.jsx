@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -13,7 +13,8 @@ const BuyCard = memo(function BuyCard({
   activeAction,
   ethBalance,
   handleMaxBuy,
-  handleBuy
+  handleBuy,
+  buyInputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
@@ -34,6 +35,7 @@ const BuyCard = memo(function BuyCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={buyInputRef}
           id="buy-amount"
           type="number"
           inputMode="decimal"
@@ -94,7 +96,8 @@ const SellCard = memo(function SellCard({
   isSellError,
   activeAction,
   handleMaxSell,
-  handleSell
+  handleSell,
+  sellInputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
@@ -115,6 +118,7 @@ const SellCard = memo(function SellCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={sellInputRef}
           id="sell-amount"
           type="number"
           inputMode="decimal"
@@ -179,6 +183,9 @@ function Bank() {
   const [txHash, setTxHash] = useState();
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
   const [copied, setCopied] = useState(false);
+
+  const buyInputRef = useRef(null);
+  const sellInputRef = useRef(null);
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -267,6 +274,7 @@ function Bank() {
       const val = ethBalance.value - buffer;
       const safeValue = val > 0n ? val : 0n;
       setBuyAmount(formatEther(safeValue));
+      buyInputRef.current?.focus();
     }
   }, [ethBalance]);
 
@@ -303,6 +311,7 @@ function Bank() {
   const handleMaxSell = useCallback(() => {
     if (formattedHlx) {
       setSellAmount(formattedHlx);
+      sellInputRef.current?.focus();
     }
   }, [formattedHlx]);
 
@@ -414,6 +423,7 @@ function Bank() {
             ethBalance={ethBalance}
             handleMaxBuy={handleMaxBuy}
             handleBuy={handleBuy}
+            buyInputRef={buyInputRef}
           />
           <SellCard
             sellAmount={sellAmount}
@@ -422,6 +432,7 @@ function Bank() {
             activeAction={activeAction}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
+            sellInputRef={sellInputRef}
           />
         </div>
 
