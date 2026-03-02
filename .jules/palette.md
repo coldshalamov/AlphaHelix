@@ -1,0 +1,3 @@
+## 2025-03-02 - Financial Input Field UX Pattern
+**Learning:** Using `type="number"` for financial inputs causes scroll-jacking when users try to scroll the page. When implementing helper buttons (like 'Max'), clicking them removes focus from the input, causing poor accessibility feedback for keyboard/screen reader users.
+**Action:** Use `<input type="text" inputMode="decimal">` with regex validation for financial inputs to prevent scroll-jacking. When users click helper buttons that mutate input values, explicitly use `useRef` to call `focus()` on the corresponding input field to provide immediate state feedback.

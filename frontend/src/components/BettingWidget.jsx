@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -83,6 +83,7 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
+  const betInputRef = useRef(null);
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
@@ -127,6 +128,8 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      // Focus input field after max click for accessibility
+      setTimeout(() => betInputRef.current?.focus(), 0);
     }
   };
 
@@ -139,6 +142,7 @@ function BettingWidget({
   const handleAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // PALETTE: Enforce regex validation for text inputs to prevent non-numeric characters
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50 to accommodate full 18-decimal precision from formatEther
       if (val.length <= 50) setAmount(val);
@@ -470,7 +474,8 @@ function BettingWidget({
           <div style={{ position: 'relative' }}>
             <input
               id="bet-amount"
-              type="number"
+              type="text"
+              ref={betInputRef}
               inputMode="decimal"
               autoComplete="off"
               min="0"

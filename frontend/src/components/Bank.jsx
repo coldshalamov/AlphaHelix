@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -13,7 +13,8 @@ const BuyCard = memo(function BuyCard({
   activeAction,
   ethBalance,
   handleMaxBuy,
-  handleBuy
+  handleBuy,
+  inputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
@@ -35,7 +36,8 @@ const BuyCard = memo(function BuyCard({
       <div style={{ position: 'relative' }}>
         <input
           id="buy-amount"
-          type="number"
+          type="text"
+          ref={inputRef}
           inputMode="decimal"
           autoComplete="off"
           min="0"
@@ -94,7 +96,8 @@ const SellCard = memo(function SellCard({
   isSellError,
   activeAction,
   handleMaxSell,
-  handleSell
+  handleSell,
+  inputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
@@ -116,7 +119,8 @@ const SellCard = memo(function SellCard({
       <div style={{ position: 'relative' }}>
         <input
           id="sell-amount"
-          type="number"
+          type="text"
+          ref={inputRef}
           inputMode="decimal"
           autoComplete="off"
           min="0"
@@ -179,6 +183,8 @@ function Bank() {
   const [txHash, setTxHash] = useState();
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
   const [copied, setCopied] = useState(false);
+  const buyInputRef = useRef(null);
+  const sellInputRef = useRef(null);
 
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
@@ -237,6 +243,7 @@ function Bank() {
   const handleBuyAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // PALETTE: Enforce regex validation for text inputs to prevent non-numeric characters
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
@@ -246,6 +253,7 @@ function Bank() {
   const handleSellAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // PALETTE: Enforce regex validation for text inputs to prevent non-numeric characters
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
@@ -267,6 +275,8 @@ function Bank() {
       const val = ethBalance.value - buffer;
       const safeValue = val > 0n ? val : 0n;
       setBuyAmount(formatEther(safeValue));
+      // Focus input field after max click for accessibility
+      setTimeout(() => buyInputRef.current?.focus(), 0);
     }
   }, [ethBalance]);
 
@@ -303,6 +313,8 @@ function Bank() {
   const handleMaxSell = useCallback(() => {
     if (formattedHlx) {
       setSellAmount(formattedHlx);
+      // Focus input field after max click for accessibility
+      setTimeout(() => sellInputRef.current?.focus(), 0);
     }
   }, [formattedHlx]);
 
@@ -414,6 +426,7 @@ function Bank() {
             ethBalance={ethBalance}
             handleMaxBuy={handleMaxBuy}
             handleBuy={handleBuy}
+            inputRef={buyInputRef}
           />
           <SellCard
             sellAmount={sellAmount}
@@ -422,6 +435,7 @@ function Bank() {
             activeAction={activeAction}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
+            inputRef={sellInputRef}
           />
         </div>
 
