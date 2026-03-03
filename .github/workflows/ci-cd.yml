@@ -73,7 +73,7 @@ jobs:
         run: slither . --json slither-report.json || true
         
       - name: Upload Slither report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: slither-report
           path: slither-report.json
@@ -81,6 +81,9 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -96,21 +99,26 @@ jobs:
         run: npm ci
         
       - name: Generate gas report
-        run: REPORT_GAS=true npm test
+        run: REPORT_GAS=true npm test | tee gas-report.txt
         
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            if (fs.existsSync('gas-report.txt')) {
+              const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+              });
+            } else {
+              console.log("gas-report.txt not found");
+            }
 
   lint:
     name: Code Linting
@@ -157,7 +165,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
