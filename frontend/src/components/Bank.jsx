@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -15,6 +15,14 @@ const BuyCard = memo(function BuyCard({
   handleMaxBuy,
   handleBuy
 }) {
+  const buyInputRef = useRef(null);
+
+  const onMaxClick = useCallback(() => {
+    handleMaxBuy();
+    // PALETTE: Shift focus to input when max is clicked for better a11y
+    setTimeout(() => buyInputRef.current?.focus(), 0);
+  }, [handleMaxBuy]);
+
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
       <h3 className="font-semibold">Buy HLX</h3>
@@ -24,7 +32,7 @@ const BuyCard = memo(function BuyCard({
         </label>
         <button
           type="button"
-          onClick={handleMaxBuy}
+          onClick={onMaxClick}
           className="badge"
           aria-label="Buy with maximum safe ETH"
           disabled={!ethBalance || Boolean(activeAction)}
@@ -34,6 +42,7 @@ const BuyCard = memo(function BuyCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={buyInputRef}
           id="buy-amount"
           type="number"
           inputMode="decimal"
@@ -96,6 +105,14 @@ const SellCard = memo(function SellCard({
   handleMaxSell,
   handleSell
 }) {
+  const sellInputRef = useRef(null);
+
+  const onMaxClick = useCallback(() => {
+    handleMaxSell();
+    // PALETTE: Shift focus to input when max is clicked for better a11y
+    setTimeout(() => sellInputRef.current?.focus(), 0);
+  }, [handleMaxSell]);
+
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
       <h3 className="font-semibold">Sell HLX</h3>
@@ -105,7 +122,7 @@ const SellCard = memo(function SellCard({
         </label>
         <button
           type="button"
-          onClick={handleMaxSell}
+          onClick={onMaxClick}
           className="badge"
           aria-label="Sell maximum available HLX"
           disabled={Boolean(activeAction)}
@@ -115,6 +132,7 @@ const SellCard = memo(function SellCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={sellInputRef}
           id="sell-amount"
           type="number"
           inputMode="decimal"
