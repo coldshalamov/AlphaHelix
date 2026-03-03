@@ -81,6 +81,9 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -102,6 +105,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             if (fs.existsSync('gas-report.txt')) {
@@ -161,7 +165,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
