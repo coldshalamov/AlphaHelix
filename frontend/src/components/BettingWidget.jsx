@@ -192,8 +192,6 @@ function BettingWidget({
       } else if (pendingAction === 'reveal') {
         clearStoredBet();
         setStatus('Reveal confirmed and local commit cleared.');
-      } else if (pendingAction === 'approve') {
-        setStatus('Approve confirmed.');
       } else {
         setStatus('Transaction confirmed.');
       }
@@ -246,17 +244,22 @@ function BettingWidget({
       // If allowance is insufficient, approve first and *wait for it*
       if (!allowance || allowance < amountValue) {
         setPendingAction('approve');
+        setStatus('Please confirm approval in your wallet...');
         const approveHash = await writeContractAsync({
           address: contracts.AlphaHelixToken,
           abi: tokenAbi,
           functionName: 'approve',
           args: [contracts.HelixMarket, amountValue],
         });
-        setTxHash(approveHash);
+        // BOLT: Avoid setting txHash here to prevent redundant polling from useWaitForTransactionReceipt
+        // since we are already awaiting it imperatively below.
+
+        setStatus('Waiting for approval confirmation...');
 
         // Wait for approval receipt explicitly so we don't confuse receipts
         if (!publicClient) throw new Error('Public client unavailable to confirm approval.');
         await publicClient.waitForTransactionReceipt({ hash: approveHash });
+        setStatus('Approval confirmed.');
       }
 
       // Now commit
