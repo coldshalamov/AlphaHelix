@@ -1,0 +1,3 @@
+## 2024-05-24 - Focus Management on "Max" Buttons
+**Learning:** When users click a "Max" button to auto-fill an input (like max ETH to spend, or max HLX to stake), they often want to immediately interact with that input afterwards—either to fine-tune the amount slightly downwards for gas, or simply to hit "Enter" and submit the form. Without programmatic focus, keyboard users and screen reader users lose their place in the DOM and have to tab backwards to find the input again, breaking flow.
+**Action:** When implementing helper buttons that modify input values (e.g., "Max" buttons), explicitly shift focus to the modified input field using `useRef` and `focus()` to provide immediate feedback to assistive technologies and streamline the interaction loop.

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -77,6 +77,7 @@ function BettingWidget({
   // BOLT: Removed internal useReadContract for balanceOf to prevent extra RPC call.
   // Data is now passed from parent which batches it with other market data.
 
+  const inputRef = useRef(null);
   const [amount, setAmount] = useState('');
   const [choice, setChoice] = useState(1);
   const [storedBet, setStoredBet] = useState(null);
@@ -127,6 +128,7 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      inputRef.current?.focus();
     }
   };
 
@@ -469,6 +471,7 @@ function BettingWidget({
           </div>
           <div style={{ position: 'relative' }}>
             <input
+              ref={inputRef}
               id="bet-amount"
               type="number"
               inputMode="decimal"
