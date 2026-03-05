@@ -35,11 +35,9 @@ const BuyCard = memo(function BuyCard({
       <div style={{ position: 'relative' }}>
         <input
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -116,11 +114,9 @@ const SellCard = memo(function SellCard({
       <div style={{ position: 'relative' }}>
         <input
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -237,6 +233,8 @@ function Bank() {
   const handleBuyAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // PALETTE: Explicitly validate the input string against decimal regex /^\d*\.?\d*$/
+    // to allow valid amounts from text inputs.
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
@@ -246,6 +244,8 @@ function Bank() {
   const handleSellAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // PALETTE: Explicitly validate the input string against decimal regex /^\d*\.?\d*$/
+    // to allow valid amounts from text inputs.
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
