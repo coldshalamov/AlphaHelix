@@ -35,6 +35,9 @@ export default function Layout({ children, className = '' }) {
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                // BOLT: Next.js Image optimization - define sizes to prevent full-viewport
+                // downloads on ultra-wide screens when max-width is constrained to 1200px
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
