@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, memo } from 'react';
 import {
   useAccount,
   useChainId,
@@ -78,6 +78,7 @@ function BettingWidget({
   // Data is now passed from parent which batches it with other market data.
 
   const [amount, setAmount] = useState('');
+  const amountInputRef = useRef(null);
   const [choice, setChoice] = useState(1);
   const [storedBet, setStoredBet] = useState(null);
   const [status, setStatus] = useState('');
@@ -127,6 +128,9 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      if (amountInputRef.current) {
+        amountInputRef.current.focus();
+      }
     }
   };
 
@@ -139,6 +143,7 @@ function BettingWidget({
   const handleAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // explicitly check for numeric string to prevent invalid inputs since type="text"
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50 to accommodate full 18-decimal precision from formatEther
       if (val.length <= 50) setAmount(val);
@@ -470,11 +475,10 @@ function BettingWidget({
           <div style={{ position: 'relative' }}>
             <input
               id="bet-amount"
-              type="number"
+              ref={amountInputRef}
+              type="text"
               inputMode="decimal"
               autoComplete="off"
-              min="0"
-              step="0.01"
               maxLength="50"
               className="input"
               style={{

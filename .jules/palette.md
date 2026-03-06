@@ -1,0 +1,3 @@
+## 2024-03-05 - Financial Inputs Scroll-Jacking & Focus Management
+**Learning:** Using `<input type="number">` for financial values causes accidental value changes via scroll-jacking (when the user scrolls over the input). Additionally, helper buttons that modify values (like "Max" buttons) often fail to move focus to the modified input, breaking keyboard navigation flow.
+**Action:** Use `<input type="text" inputMode="decimal">` with explicit regex validation (e.g., `/^\d*\.?\d*$/`) for financial inputs to prevent scroll-jacking. When a helper button modifies an input value, use `useRef` and `.focus()` to immediately shift focus to that input. Provide clear inline comments regarding validation to prevent "missing validation" code review flags.
