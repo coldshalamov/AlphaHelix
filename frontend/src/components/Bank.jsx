@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, memo } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -13,7 +13,8 @@ const BuyCard = memo(function BuyCard({
   activeAction,
   ethBalance,
   handleMaxBuy,
-  handleBuy
+  handleBuy,
+  buyInputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
@@ -35,11 +36,10 @@ const BuyCard = memo(function BuyCard({
       <div style={{ position: 'relative' }}>
         <input
           id="buy-amount"
-          type="number"
+          ref={buyInputRef}
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -94,7 +94,8 @@ const SellCard = memo(function SellCard({
   isSellError,
   activeAction,
   handleMaxSell,
-  handleSell
+  handleSell,
+  sellInputRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
@@ -116,11 +117,10 @@ const SellCard = memo(function SellCard({
       <div style={{ position: 'relative' }}>
         <input
           id="sell-amount"
-          type="number"
+          ref={sellInputRef}
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -180,6 +180,9 @@ function Bank() {
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
   const [copied, setCopied] = useState(false);
 
+  const buyInputRef = useRef(null);
+  const sellInputRef = useRef(null);
+
   const { data: ethBalance } = useBalance({ address });
   const { data: hlxBalance } = useReadContract({
     address: contracts.AlphaHelixToken,
@@ -237,6 +240,7 @@ function Bank() {
   const handleBuyAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // check for numeric to block invalid input on type="text" fields
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
@@ -246,6 +250,7 @@ function Bank() {
   const handleSellAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // check for numeric to block invalid input on type="text" fields
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
@@ -267,6 +272,9 @@ function Bank() {
       const val = ethBalance.value - buffer;
       const safeValue = val > 0n ? val : 0n;
       setBuyAmount(formatEther(safeValue));
+      if (buyInputRef.current) {
+        buyInputRef.current.focus();
+      }
     }
   }, [ethBalance]);
 
@@ -303,6 +311,9 @@ function Bank() {
   const handleMaxSell = useCallback(() => {
     if (formattedHlx) {
       setSellAmount(formattedHlx);
+      if (sellInputRef.current) {
+        sellInputRef.current.focus();
+      }
     }
   }, [formattedHlx]);
 
@@ -414,6 +425,7 @@ function Bank() {
             ethBalance={ethBalance}
             handleMaxBuy={handleMaxBuy}
             handleBuy={handleBuy}
+            buyInputRef={buyInputRef}
           />
           <SellCard
             sellAmount={sellAmount}
@@ -422,6 +434,7 @@ function Bank() {
             activeAction={activeAction}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
+            sellInputRef={sellInputRef}
           />
         </div>
 
