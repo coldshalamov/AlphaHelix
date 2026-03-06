@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.x'
 
 jobs:
   test:
@@ -16,10 +16,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -37,11 +37,12 @@ jobs:
         run: npm run coverage
         
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
   security:
@@ -50,14 +51,22 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           
+      - name: Cache Hardhat NodeJS
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/hardhat-nodejs
+          key: ${{ runner.os }}-hardhat-nodejs-${{ hashFiles('contracts/**/*.sol') }}
+          restore-keys: |
+            ${{ runner.os }}-hardhat-nodejs-
+
       - name: Install dependencies
         run: npm ci
         
@@ -73,7 +82,7 @@ jobs:
         run: slither . --json slither-report.json || true
         
       - name: Upload Slither report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: slither-report
           path: slither-report.json
@@ -81,13 +90,16 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -96,7 +108,7 @@ jobs:
         run: npm ci
         
       - name: Generate gas report
-        run: REPORT_GAS=true npm test
+        run: REPORT_GAS=true npm test | tee gas-report.txt
         
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
@@ -104,13 +116,17 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            if (fs.existsSync('gas-report.txt')) {
+              const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+              });
+            } else {
+              console.log('gas-report.txt not found, skipping PR comment.');
+            }
 
   lint:
     name: Code Linting
@@ -118,10 +134,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -142,10 +158,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -157,7 +173,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
@@ -173,10 +189,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -211,10 +227,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -239,10 +255,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
