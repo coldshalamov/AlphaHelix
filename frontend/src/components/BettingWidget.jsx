@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -84,6 +84,8 @@ function BettingWidget({
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
 
+  const amountInputRef = useRef(null);
+
   const isAmountError = useMemo(() => {
     if (!status) return false;
     return [
@@ -127,6 +129,9 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      if (amountInputRef.current) {
+        amountInputRef.current.focus();
+      }
     }
   };
 
@@ -468,13 +473,14 @@ function BettingWidget({
             </div>
           </div>
           <div style={{ position: 'relative' }}>
+            {/* PALETTE: Using text input with decimal mode/pattern prevents scroll-jacking while keeping native constraints */}
             <input
+              ref={amountInputRef}
               id="bet-amount"
-              type="number"
+              type="text"
               inputMode="decimal"
+              pattern="^\d*\.?\d*$"
               autoComplete="off"
-              min="0"
-              step="0.01"
               maxLength="50"
               className="input"
               style={{
