@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, memo } from 'react';
 import {
   useAccount,
   useChainId,
@@ -83,6 +83,7 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
+  const amountInputRef = useRef(null);
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
@@ -124,11 +125,12 @@ function BettingWidget({
     return int;
   }, [hlxBalance]);
 
-  const handleMax = () => {
+  const handleMax = useCallback(() => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      amountInputRef.current?.focus();
     }
-  };
+  }, [hlxBalance]);
 
   // BOLT: Memoized handlers to prevent recreating functions on every render,
   // which avoids unnecessary re-rendering of input elements in the map loop.
@@ -469,6 +471,7 @@ function BettingWidget({
           </div>
           <div style={{ position: 'relative' }}>
             <input
+              ref={amountInputRef}
               id="bet-amount"
               type="number"
               inputMode="decimal"
