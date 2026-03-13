@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.x'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -82,6 +82,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
