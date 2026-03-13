@@ -33,13 +33,13 @@ const BuyCard = memo(function BuyCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* PALETTE: Used text input with pattern to prevent scroll-jacking while preserving HTML5 constraints */}
         <input
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern="^\d*\.?\d*$"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -114,13 +114,13 @@ const SellCard = memo(function SellCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* PALETTE: Used text input with pattern to prevent scroll-jacking while preserving HTML5 constraints */}
         <input
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern="^\d*\.?\d*$"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
