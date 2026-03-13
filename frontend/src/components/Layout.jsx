@@ -30,11 +30,14 @@ export default function Layout({ children, className = '' }) {
         <div className="header-banner">
           <Link href="/">
             <div className="banner-crop">
+              {/* BOLT: Added sizes prop matching CSS max-width constraint (1200px)
+                  to prevent downloading full-viewport images on ultra-wide screens */}
               <Image
                 src={bannerHelix}
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
