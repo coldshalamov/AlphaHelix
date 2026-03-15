@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -84,6 +84,8 @@ function BettingWidget({
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
 
+  const inputRef = useRef(null);
+
   const isAmountError = useMemo(() => {
     if (!status) return false;
     return [
@@ -128,6 +130,7 @@ function BettingWidget({
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
     }
+    inputRef.current?.focus();
   };
 
   // BOLT: Memoized handlers to prevent recreating functions on every render,
@@ -469,6 +472,7 @@ function BettingWidget({
           </div>
           <div style={{ position: 'relative' }}>
             <input
+              ref={inputRef}
               id="bet-amount"
               type="number"
               inputMode="decimal"
