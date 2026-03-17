@@ -13,12 +13,17 @@ const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr:
 
 const renderTimeLeft = (t) => <div className="helper">Time left: {t}</div>;
 
+const EXPECTED_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337);
+const MARKET_CONTRACT_CONFIG = {
+  address: contracts.HelixMarket,
+  abi: marketAbi,
+};
+
 export default function MarketDetailPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const router = useRouter();
   const { id } = router.query;
-  const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
 
   const marketId = useMemo(() => {
     if (id === undefined) return undefined;
@@ -29,16 +34,11 @@ export default function MarketDetailPage() {
     }
   }, [id]);
 
-  const contractConfig = useMemo(() => ({
-    address: contracts.HelixMarket,
-    abi: marketAbi,
-  }), []);
-
   const contractsArray = useMemo(() => {
     // Basic read for market data
     const reqs = [
       {
-        ...contractConfig,
+        ...MARKET_CONTRACT_CONFIG,
         functionName: 'markets',
         args: marketId !== undefined ? [marketId] : undefined,
       }
@@ -48,22 +48,22 @@ export default function MarketDetailPage() {
     if (marketId !== undefined && address) {
       reqs.push(
         {
-          ...contractConfig,
+          ...MARKET_CONTRACT_CONFIG,
           functionName: 'bets',
           args: [marketId, address, 1], // Yes bet
         },
         {
-          ...contractConfig,
+          ...MARKET_CONTRACT_CONFIG,
           functionName: 'bets',
           args: [marketId, address, 0], // No bet
         },
         {
-          ...contractConfig,
+          ...MARKET_CONTRACT_CONFIG,
           functionName: 'bets',
           args: [marketId, address, 2], // Unaligned bet
         },
         {
-          ...contractConfig,
+          ...MARKET_CONTRACT_CONFIG,
           functionName: 'committedAmount',
           args: [marketId, address],
         },
@@ -83,7 +83,7 @@ export default function MarketDetailPage() {
       );
     }
     return reqs;
-  }, [contractConfig, marketId, address]);
+  }, [marketId, address]);
 
   // Optimization: Batch multiple contract reads into a single multicall/RPC request
   // This reduces network waterfall and synchronizes loading states
@@ -187,7 +187,7 @@ export default function MarketDetailPage() {
       setStatus('Connect a wallet to claim.');
       return;
     }
-    if (chainId && chainId !== expectedChainId) {
+    if (chainId && chainId !== EXPECTED_CHAIN_ID) {
       setStatus('Wrong network selected. Switch to the configured Helix chain.');
       return;
     }
@@ -293,7 +293,7 @@ export default function MarketDetailPage() {
               style={{ marginTop: '0.5rem' }}
               onClick={handleClaim}
               disabled={
-                !resolved || claimable === 0n || isClaimPending || isClaimConfirming || (chainId && chainId !== expectedChainId)
+                !resolved || claimable === 0n || isClaimPending || isClaimConfirming || (chainId && chainId !== EXPECTED_CHAIN_ID)
               }
             >
               {isClaimPending || isClaimConfirming ? (
@@ -305,7 +305,7 @@ export default function MarketDetailPage() {
                 'Claim winnings / refund'
               )}
             </button>
-            {chainId && chainId !== expectedChainId && (
+            {chainId && chainId !== EXPECTED_CHAIN_ID && (
               <div className="helper">Wrong network detected. Switch chains to claim.</div>
             )}
             {status && <div className="status">{status}</div>}
@@ -321,7 +321,7 @@ export default function MarketDetailPage() {
         resolved={resolved}
         outcome={outcome}
         tie={tie}
-        expectedChainId={expectedChainId}
+        expectedChainId={EXPECTED_CHAIN_ID}
         allowance={allowance}
         committedAmount={committedBalance}
         hlxBalance={hlxBalance}
