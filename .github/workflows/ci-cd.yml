@@ -84,6 +84,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     
     steps:
       - name: Checkout code
