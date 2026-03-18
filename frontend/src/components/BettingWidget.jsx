@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -83,6 +83,7 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
+  const amountInputRef = useRef(null);
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
@@ -127,6 +128,7 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      setTimeout(() => amountInputRef.current?.focus(), 0);
     }
   };
 
@@ -477,6 +479,7 @@ function BettingWidget({
               step="0.01"
               maxLength="50"
               className="input"
+              ref={amountInputRef}
               style={{
                 paddingRight: '3.5rem',
                 ...(isAmountError ? { borderColor: 'var(--danger)' } : {})
