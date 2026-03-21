@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
@@ -13,7 +13,8 @@ const BuyCard = memo(function BuyCard({
   activeAction,
   ethBalance,
   handleMaxBuy,
-  handleBuy
+  handleBuy,
+  buyAmountRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#dbeafe' }}>
@@ -34,6 +35,7 @@ const BuyCard = memo(function BuyCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={buyAmountRef}
           id="buy-amount"
           type="number"
           inputMode="decimal"
@@ -94,7 +96,8 @@ const SellCard = memo(function SellCard({
   isSellError,
   activeAction,
   handleMaxSell,
-  handleSell
+  handleSell,
+  sellAmountRef
 }) {
   return (
     <div className="card" style={{ borderColor: '#ffe4e6' }}>
@@ -115,6 +118,7 @@ const SellCard = memo(function SellCard({
       </div>
       <div style={{ position: 'relative' }}>
         <input
+          ref={sellAmountRef}
           id="sell-amount"
           type="number"
           inputMode="decimal"
@@ -175,6 +179,8 @@ function Bank() {
   const publicClient = usePublicClient();
   const [buyAmount, setBuyAmount] = useState('');
   const [sellAmount, setSellAmount] = useState('');
+  const buyAmountRef = useRef(null);
+  const sellAmountRef = useRef(null);
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState();
   const [activeAction, setActiveAction] = useState(null); // 'buy' | 'sell'
@@ -261,6 +267,7 @@ function Bank() {
   }, [address]);
 
   const handleMaxBuy = useCallback(() => {
+    // We allow setting focus even if ethBalance isn't present, to handle edge cases where users click 'Max' when wallet isn't completely connected or loaded yet.
     if (ethBalance) {
       // Leave 0.01 ETH for gas
       const buffer = 10000000000000000n;
@@ -268,6 +275,7 @@ function Bank() {
       const safeValue = val > 0n ? val : 0n;
       setBuyAmount(formatEther(safeValue));
     }
+    setTimeout(() => buyAmountRef.current?.focus(), 0);
   }, [ethBalance]);
 
   const handleBuy = useCallback(async () => {
@@ -303,6 +311,7 @@ function Bank() {
   const handleMaxSell = useCallback(() => {
     if (formattedHlx) {
       setSellAmount(formattedHlx);
+      setTimeout(() => sellAmountRef.current?.focus(), 0);
     }
   }, [formattedHlx]);
 
@@ -414,6 +423,7 @@ function Bank() {
             ethBalance={ethBalance}
             handleMaxBuy={handleMaxBuy}
             handleBuy={handleBuy}
+            buyAmountRef={buyAmountRef}
           />
           <SellCard
             sellAmount={sellAmount}
@@ -422,6 +432,7 @@ function Bank() {
             activeAction={activeAction}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
+            sellAmountRef={sellAmountRef}
           />
         </div>
 
