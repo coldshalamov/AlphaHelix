@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -78,6 +78,7 @@ function BettingWidget({
   // Data is now passed from parent which batches it with other market data.
 
   const [amount, setAmount] = useState('');
+  const amountInputRef = useRef(null);
   const [choice, setChoice] = useState(1);
   const [storedBet, setStoredBet] = useState(null);
   const [status, setStatus] = useState('');
@@ -127,6 +128,7 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      setTimeout(() => amountInputRef.current?.focus(), 0);
     }
   };
 
@@ -470,6 +472,7 @@ function BettingWidget({
           <div style={{ position: 'relative' }}>
             <input
               id="bet-amount"
+              ref={amountInputRef}
               type="number"
               inputMode="decimal"
               autoComplete="off"
