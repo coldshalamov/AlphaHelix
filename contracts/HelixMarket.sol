@@ -93,12 +93,11 @@ contract HelixMarket is ReentrancyGuard {
             block.timestamp >= s.commitEndTime) {
 
             // Compute hash from multiple entropy sources
-            // SECURITY: Removed tx.gasprice to prevent user manipulation (grinding)
+            // SECURITY: Removed tx.gasprice and msg.sender to prevent user manipulation (grinding)
             bytes32 closeHash = keccak256(abi.encodePacked(
                 blockhash(block.number - 1),    // Recent block hash
                 blockhash(block.number - 2),    // 2 blocks ago
                 blockhash(block.number - 3),    // 3 blocks ago
-                msg.sender,                      // Current transaction sender
                 block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
                 s.yesPool,                       // Current YES pool state
                 s.noPool,                        // Current NO pool state
@@ -184,9 +183,9 @@ contract HelixMarket is ReentrancyGuard {
 
         if (enableRandomClose) {
             // Generate market-specific random seed
+            // SECURITY: Removed msg.sender to prevent Address Grinding
             s.closeSeed = keccak256(abi.encodePacked(
                 block.timestamp,
-                msg.sender,
                 marketId,
                 blockhash(block.number - 1)
             ));
@@ -469,11 +468,11 @@ contract HelixMarket is ReentrancyGuard {
         isRandomCloseEnabled = s.randomCloseEnabled;
         isCommitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
 
+        // SECURITY: Removed msg.sender to prevent Address Grinding
         closeHash = keccak256(abi.encodePacked(
             blockhash(block.number - 1),
             blockhash(block.number - 2),
             blockhash(block.number - 3),
-            msg.sender,
             block.prevrandao,
             s.yesPool,
             s.noPool,
