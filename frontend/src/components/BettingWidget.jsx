@@ -21,6 +21,12 @@ const CHOICES = [
   { value: 2, label: 'UNALIGNED', variant: 'secondary' },
 ];
 
+const AMOUNT_ERROR_MESSAGES = [
+  'Enter an amount of HLX to stake.',
+  'Invalid HLX amount.',
+  'Enter an amount greater than zero.',
+];
+
 const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
 
 // BOLT: Extracted and memoized to prevent re-renders when typing amount
@@ -86,11 +92,7 @@ function BettingWidget({
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
-    return [
-      'Enter an amount of HLX to stake.',
-      'Invalid HLX amount.',
-      'Enter an amount greater than zero.',
-    ].includes(status);
+    return AMOUNT_ERROR_MESSAGES.includes(status);
   }, [status]);
 
   // Track what the current txHash actually represents
