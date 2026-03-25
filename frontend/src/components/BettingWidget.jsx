@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
 import {
   useAccount,
   useChainId,
@@ -113,6 +113,7 @@ function BettingWidget({
     return `helix_bet_${marketId}_${address}`;
   }, [address, marketId]);
 
+  const amountInputRef = useRef(null);
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
   const formattedBalance = useMemo(() => {
@@ -127,6 +128,7 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      setTimeout(() => amountInputRef.current?.focus(), 0);
     }
   };
 
@@ -469,6 +471,7 @@ function BettingWidget({
           </div>
           <div style={{ position: 'relative' }}>
             <input
+              ref={amountInputRef}
               id="bet-amount"
               type="number"
               inputMode="decimal"
