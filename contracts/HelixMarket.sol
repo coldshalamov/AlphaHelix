@@ -81,7 +81,7 @@ contract HelixMarket is ReentrancyGuard {
 
     /// @notice Checks if market should randomly close based on hash difficulty
     /// @dev Runs on every market interaction (commit, reveal, ping)
-    modifier checkRandomClose(uint256 marketId) {
+    function _checkRandomClose(uint256 marketId) internal {
         Statement storage s = markets[marketId];
 
         // Only check if:
@@ -124,8 +124,6 @@ contract HelixMarket is ReentrancyGuard {
                 }
             }
         }
-
-        _; // Continue with the function
     }
 
     /// @notice Create a new market statement with fixed commit duration (backwards compatible).
@@ -225,7 +223,6 @@ contract HelixMarket is ReentrancyGuard {
         external
         nonReentrant
         validMarket(marketId)
-        checkRandomClose(marketId)
     {
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
@@ -250,6 +247,11 @@ contract HelixMarket is ReentrancyGuard {
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
+
+        // Security Fix: Execute random close check *after* bet is accepted
+        // to prevent `require(s.commitPhaseClosed == 0)` from reverting the tx
+        // if this interaction triggers the random close.
+        _checkRandomClose(marketId);
     }
 
     /// @notice Reveal a committed bet once the reveal window opens.
@@ -260,8 +262,9 @@ contract HelixMarket is ReentrancyGuard {
         external
         nonReentrant
         validMarket(marketId)
-        checkRandomClose(marketId)
     {
+        _checkRandomClose(marketId);
+
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -447,8 +450,8 @@ contract HelixMarket is ReentrancyGuard {
     /// @notice Manually trigger a random close check
     /// @dev Useful for low-activity markets where no one is committing
     /// @param marketId Market to ping
-    function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) checkRandomClose(marketId) {
-        // Intentionally empty: the checkRandomClose modifier is the effect.
+    function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) {
+        _checkRandomClose(marketId);
     }
 
     /// @notice View function to check current close probability
