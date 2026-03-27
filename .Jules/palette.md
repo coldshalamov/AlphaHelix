@@ -17,3 +17,7 @@
 ## 2024-10-25 - [Input Suffix Patterns]
 **Learning:** Users often lose context of the unit (ETH vs HLX) inside bare inputs. A visual suffix inside the input field reduces cognitive load.
 **Action:** Wrap financial inputs in a relative container and place an absolute-positioned unit label (with `pointer-events: none`) inside the right edge.
+
+## 2025-03-27 - [Input Value Modifiers and Focus Management]
+**Learning:** Users can lose keyboard/interaction context when using helper buttons (like "Max" balance buttons) that populate an input field, forcing them to manually re-focus the input to continue their task.
+**Action:** When a button modifies an input's value as a convenience, explicitly shift focus back to the target input field using `useRef` and `.focus()` (wrapped in a setTimeout in React to ensure state updates finish first).
