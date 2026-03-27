@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, useState, memo } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,7 +65,11 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const PAGE_SIZE = 10;
+
 export default function MarketsPage() {
+  const [page, setPage] = useState(1);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -74,25 +78,36 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
-  // BOLT: Replaced manual Promise.all loop with useReadContracts.
-  // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  const totalPages = useMemo(() => Math.ceil(numericCount / PAGE_SIZE) || 1, [numericCount]);
+
+  // BOLT: Replaced full array fetch with paginated fetch.
+  // Unbounded multicall (Array.from(length: total)) causes O(N) network payload
+  // explosion as the contract grows, blocking UI and exceeding RPC limits.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+
+      const startIndex = Math.max(0, numericCount - page * PAGE_SIZE);
+      const endIndex = numericCount - (page - 1) * PAGE_SIZE;
+      const currentCount = endIndex - startIndex;
+
+      return Array.from({ length: currentCount }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(endIndex - 1 - i)], // Fetch newest first
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
   });
 
   const markets = useMemo(() => {
-    if (!marketsResults) return [];
+    if (!marketsResults || !numericCount) return [];
+
+    const endIndex = numericCount - (page - 1) * PAGE_SIZE;
+
     return marketsResults
       .map((res, i) => {
         if (res.status !== 'success') return null;
@@ -100,7 +115,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: endIndex - 1 - i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +129,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, numericCount, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +156,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {numericCount > PAGE_SIZE && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+          <button
+            className="button outline"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="helper" style={{ alignSelf: 'center' }}>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            className="button outline"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
