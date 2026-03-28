@@ -12,3 +12,8 @@
 **Vulnerability:** Sending tokens to `0x...dEaD` removes them from circulation effectively but fails to update the `totalSupply` metric, potentially leading to incorrect market capitalization data and accounting discrepancies.
 **Learning:** When using burnable tokens (ERC20Burnable), `token.transfer(dEaD, amount)` is an anti-pattern. The contract holding the tokens should call `token.burn(amount)` to correctly decrease `totalSupply`. This requires the holding contract to have ownership of the tokens (which it does in `HelixMarket` after `transferFrom`).
 **Prevention:** Always prefer native `burn()` functions over transferring to dead addresses to ensure on-chain metrics reflect the true state of the economy.
+
+## 2026-03-28 - [Revert Paradox in Random Close]
+**Vulnerability:** State-changing termination logic was implemented as a modifier running before phase checks, causing a revert paradox where a closure undone itself if the function subsequently reverted.
+**Learning:** Modifiers should not be used for state-changing logic if the wrapped function might revert based on that new state.
+**Prevention:** Implement such logic as internal functions and handle the state change gracefully without reverting.
