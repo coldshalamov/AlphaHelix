@@ -11,13 +11,10 @@ require("dotenv").config();
 const RPC_URL = process.env.RPC_URL || "http://localhost:8545";
 const MARKET_ADDRESS = process.env.HELIX_MARKET_ADDRESS;
 const START_BLOCK = Number.parseInt(process.env.INDEXER_START_BLOCK || "0", 10);
-const OUTPUT_FILE =
-  process.env.INDEXER_OUTPUT || path.join(__dirname, "../cache/index.json");
+const OUTPUT_FILE = process.env.INDEXER_OUTPUT || path.join(__dirname, "../cache/index.json");
 
 if (!MARKET_ADDRESS) {
-  console.error(
-    "Missing HELIX_MARKET_ADDRESS env var. Set the deployed HelixMarket address.",
-  );
+  console.error("Missing HELIX_MARKET_ADDRESS env var. Set the deployed HelixMarket address.");
   process.exit(1);
 }
 
@@ -25,11 +22,7 @@ const helixArtifact = require("../artifacts/contracts/HelixMarket.sol/HelixMarke
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const market = new ethers.Contract(MARKET_ADDRESS, helixArtifact.abi, provider);
 
-const defaultState = () => ({
-  markets: {},
-  bets: {},
-  meta: { lastProcessedBlock: START_BLOCK - 1, lastUpdated: null },
-});
+const defaultState = () => ({ markets: {}, bets: {}, meta: { lastProcessedBlock: START_BLOCK - 1, lastUpdated: null } });
 
 function loadState() {
   try {
@@ -54,8 +47,7 @@ async function getTimestamp(blockNumber) {
   return blockTimeCache.get(blockNumber);
 }
 
-const toStringValue = (value) =>
-  typeof value === "bigint" ? value.toString() : String(value);
+const toStringValue = (value) => (typeof value === "bigint" ? value.toString() : String(value));
 const addStrings = (a, b) => (BigInt(a || 0) + BigInt(b || 0)).toString();
 
 function ensureMarket(state, marketId) {
@@ -101,8 +93,7 @@ function ensureBet(state, marketId, user) {
 }
 
 async function handleStatementCreated(state, log) {
-  const { marketId, ipfsCid, commitEndTime, revealEndTime, originator } =
-    log.args;
+  const { marketId, ipfsCid, commitEndTime, revealEndTime, originator } = log.args;
   const marketEntry = ensureMarket(state, toStringValue(marketId));
   marketEntry.ipfsCid = ipfsCid;
   marketEntry.commitEndTime = Number(commitEndTime);
@@ -135,10 +126,7 @@ async function handleBetRevealed(state, log) {
   } else if (side === 0) {
     marketEntry.noPool = addStrings(marketEntry.noPool, amountStr);
   } else if (side === 2) {
-    marketEntry.unalignedPool = addStrings(
-      marketEntry.unalignedPool,
-      amountStr,
-    );
+    marketEntry.unalignedPool = addStrings(marketEntry.unalignedPool, amountStr);
   }
   marketEntry.totalPool = addStrings(marketEntry.totalPool, amountStr);
 }
@@ -150,10 +138,7 @@ async function handleMarketResolved(state, log) {
   marketEntry.outcome = Boolean(outcome);
   marketEntry.tie = Boolean(tie);
   marketEntry.totalPool = toStringValue(totalPool);
-  marketEntry.totalFeeCollected = addStrings(
-    marketEntry.totalFeeCollected,
-    originatorFee.toString(),
-  );
+  marketEntry.totalFeeCollected = addStrings(marketEntry.totalFeeCollected, originatorFee.toString());
 }
 
 async function handleClaimed(state, log) {
@@ -213,9 +198,7 @@ async function main() {
     return;
   }
 
-  console.log(
-    `Indexing HelixMarket at ${MARKET_ADDRESS} from block ${fromBlock} to ${latestBlock} ...`,
-  );
+  console.log(`Indexing HelixMarket at ${MARKET_ADDRESS} from block ${fromBlock} to ${latestBlock} ...`);
   await processEvents(state, fromBlock, latestBlock);
   state.meta.lastProcessedBlock = latestBlock;
   state.meta.lastUpdated = new Date().toISOString();

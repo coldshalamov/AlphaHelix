@@ -1,7 +1,5 @@
 const { expect } = require("chai");
-const {
-  loadFixture,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -24,16 +22,12 @@ describe("HelixReserve", function () {
   }
 
   it("Buy HLX", async function () {
-    const { token, reserve, user } = await loadFixture(
-      deployHelixReserveFixture,
-    );
+    const { token, reserve, user } = await loadFixture(deployHelixReserveFixture);
 
     const oneEth = ethers.parseEther("1");
     const expectedHLX = ethers.parseEther("1000");
 
-    const reserveBalanceBefore = await ethers.provider.getBalance(
-      reserve.target,
-    );
+    const reserveBalanceBefore = await ethers.provider.getBalance(reserve.target);
     expect(reserveBalanceBefore).to.equal(0n);
 
     await reserve.connect(user).buy({ value: oneEth });
@@ -41,16 +35,12 @@ describe("HelixReserve", function () {
     const hlxBalance = await token.balanceOf(user.address);
     expect(hlxBalance).to.equal(expectedHLX);
 
-    const reserveBalanceAfter = await ethers.provider.getBalance(
-      reserve.target,
-    );
+    const reserveBalanceAfter = await ethers.provider.getBalance(reserve.target);
     expect(reserveBalanceAfter - reserveBalanceBefore).to.equal(oneEth);
   });
 
   it("Sell HLX", async function () {
-    const { token, reserve, user } = await loadFixture(
-      deployHelixReserveFixture,
-    );
+    const { token, reserve, user } = await loadFixture(deployHelixReserveFixture);
 
     const oneEth = ethers.parseEther("1");
     await reserve.connect(user).buy({ value: oneEth });
@@ -58,21 +48,16 @@ describe("HelixReserve", function () {
 
     await token.connect(user).approve(reserve.target, hlxAmount);
 
-    const reserveBalanceBefore = await ethers.provider.getBalance(
-      reserve.target,
-    );
+    const reserveBalanceBefore = await ethers.provider.getBalance(reserve.target);
     const userBalanceBefore = await ethers.provider.getBalance(user.address);
 
     const sellTx = await reserve.connect(user).sell(hlxAmount);
     const receipt = await sellTx.wait();
-    const gasPrice =
-      sellTx.gasPrice ?? sellTx.maxFeePerGas ?? receipt.effectiveGasPrice;
+    const gasPrice = sellTx.gasPrice ?? sellTx.maxFeePerGas ?? receipt.effectiveGasPrice;
     const gasCost = gasPrice ? BigInt(receipt.gasUsed) * BigInt(gasPrice) : 0n;
 
     const userBalanceAfter = await ethers.provider.getBalance(user.address);
-    const reserveBalanceAfter = await ethers.provider.getBalance(
-      reserve.target,
-    );
+    const reserveBalanceAfter = await ethers.provider.getBalance(reserve.target);
 
     const ethAmount = BigInt(hlxAmount) / 1000n;
     expect(userBalanceAfter + gasCost).to.equal(userBalanceBefore + ethAmount);
@@ -83,23 +68,19 @@ describe("HelixReserve", function () {
   });
 
   it("Sell with insufficient ETH in reserve", async function () {
-    const { token, reserve, owner, user } = await loadFixture(
-      deployHelixReserveFixture,
-    );
+    const { token, reserve, owner, user } = await loadFixture(deployHelixReserveFixture);
 
     const hlxAmount = ethers.parseEther("1000");
     await token.connect(owner).mint(user.address, hlxAmount);
     await token.connect(user).approve(reserve.target, hlxAmount);
 
     await expect(reserve.connect(user).sell(hlxAmount)).to.be.revertedWith(
-      "Insufficient ETH in reserve",
+      "Insufficient ETH in reserve"
     );
   });
 
   it("seedMarket uses HLX already in reserve", async function () {
-    const { token, reserve, owner, other } = await loadFixture(
-      deployHelixReserveFixture,
-    );
+    const { token, reserve, owner, other } = await loadFixture(deployHelixReserveFixture);
 
     const DummyMarketAMM = await ethers.getContractFactory("DummyMarketAMM");
     const dummyMarket = await DummyMarketAMM.deploy(token.target);
@@ -123,9 +104,7 @@ describe("HelixReserve", function () {
     expect(lastCaller).to.equal(reserve.target);
 
     const buyer = other;
-    const buyTx = await reserve
-      .connect(buyer)
-      .buy({ value: ethers.parseEther("0.1") });
+    const buyTx = await reserve.connect(buyer).buy({ value: ethers.parseEther("0.1") });
     await buyTx.wait();
     const buyerBalance = await token.balanceOf(buyer.address);
     expect(buyerBalance).to.equal(ethers.parseEther("100"));
@@ -133,22 +112,16 @@ describe("HelixReserve", function () {
 
   it("Buy with zero ETH reverts", async function () {
     const { reserve, user } = await loadFixture(deployHelixReserveFixture);
-    await expect(reserve.connect(user).buy({ value: 0n })).to.be.revertedWith(
-      "No ETH sent",
-    );
+    await expect(reserve.connect(user).buy({ value: 0n })).to.be.revertedWith("No ETH sent");
   });
 
   it("Sell rejects HLX that cannot convert to whole wei", async function () {
-    const { token, reserve, owner, user } = await loadFixture(
-      deployHelixReserveFixture,
-    );
+    const { token, reserve, owner, user } = await loadFixture(deployHelixReserveFixture);
 
     const hlxAmount = ethers.parseEther("1") + 1n; // not divisible by RATE=1000
     await token.connect(owner).mint(user.address, hlxAmount);
     await token.connect(user).approve(reserve.target, hlxAmount);
 
-    await expect(reserve.connect(user).sell(hlxAmount)).to.be.revertedWith(
-      "HLX amount must convert to whole wei",
-    );
+    await expect(reserve.connect(user).sell(hlxAmount)).to.be.revertedWith("HLX amount must convert to whole wei");
   });
 });

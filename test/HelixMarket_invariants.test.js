@@ -1,8 +1,5 @@
 const { expect } = require("chai");
-const {
-  loadFixture,
-  time,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -19,8 +16,7 @@ require("@nomicfoundation/hardhat-chai-matchers");
  */
 describe("HelixMarket Invariant Tests", function () {
   async function deployHelixMarketFixture() {
-    const [owner, originator, userA, userB, userC, userD] =
-      await ethers.getSigners();
+    const [owner, originator, userA, userB, userC, userD] = await ethers.getSigners();
 
     const AlphaHelixToken = await ethers.getContractFactory("AlphaHelixToken");
     const token = await AlphaHelixToken.deploy();
@@ -45,10 +41,7 @@ describe("HelixMarket Invariant Tests", function () {
   const burnAddress = "0x000000000000000000000000000000000000dEaD";
 
   function buildCommit(choice, salt, user) {
-    return ethers.solidityPackedKeccak256(
-      ["uint8", "uint256", "address"],
-      [choice, salt, user.address],
-    );
+    return ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [choice, salt, user.address]);
   }
 
   function randomBigInt(min, max) {
@@ -58,8 +51,7 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: Pool Conservation", function () {
     it("fuzzing: total payouts never exceed pool (50 random scenarios)", async function () {
-      const { market, token, owner, originator, userA, userB, userC, userD } =
-        await loadFixture(deployHelixMarketFixture);
+      const { market, token, owner, originator, userA, userB, userC, userD } = await loadFixture(deployHelixMarketFixture);
 
       for (let iteration = 0; iteration < 50; iteration++) {
         // Re-mint and re-approve tokens for each iteration to avoid running out
@@ -70,57 +62,19 @@ describe("HelixMarket Invariant Tests", function () {
           await token.connect(user).approve(market.target, refreshAmount);
         }
         // Random amounts between 1 and 1000 HLX
-        const yesAmount1 = ethers.parseEther(
-          String(1 + Math.floor(Math.random() * 999)),
-        );
-        const yesAmount2 = ethers.parseEther(
-          String(1 + Math.floor(Math.random() * 999)),
-        );
-        const noAmount1 = ethers.parseEther(
-          String(1 + Math.floor(Math.random() * 999)),
-        );
-        const unalignedAmount = ethers.parseEther(
-          String(1 + Math.floor(Math.random() * 999)),
-        );
+        const yesAmount1 = ethers.parseEther(String(1 + Math.floor(Math.random() * 999)));
+        const yesAmount2 = ethers.parseEther(String(1 + Math.floor(Math.random() * 999)));
+        const noAmount1 = ethers.parseEther(String(1 + Math.floor(Math.random() * 999)));
+        const unalignedAmount = ethers.parseEther(String(1 + Math.floor(Math.random() * 999)));
 
         const marketId = iteration;
-        await market
-          .connect(originator)
-          .submitStatement(
-            `ipfs://fuzz${iteration}`,
-            biddingDuration,
-            revealDuration,
-          );
+        await market.connect(originator).submitStatement(`ipfs://fuzz${iteration}`, biddingDuration, revealDuration);
 
         // Commit bets
-        await market
-          .connect(userA)
-          .commitBet(
-            marketId,
-            buildCommit(1, 100 + iteration, userA),
-            yesAmount1,
-          );
-        await market
-          .connect(userB)
-          .commitBet(
-            marketId,
-            buildCommit(1, 200 + iteration, userB),
-            yesAmount2,
-          );
-        await market
-          .connect(userC)
-          .commitBet(
-            marketId,
-            buildCommit(0, 300 + iteration, userC),
-            noAmount1,
-          );
-        await market
-          .connect(userD)
-          .commitBet(
-            marketId,
-            buildCommit(2, 400 + iteration, userD),
-            unalignedAmount,
-          );
+        await market.connect(userA).commitBet(marketId, buildCommit(1, 100 + iteration, userA), yesAmount1);
+        await market.connect(userB).commitBet(marketId, buildCommit(1, 200 + iteration, userB), yesAmount2);
+        await market.connect(userC).commitBet(marketId, buildCommit(0, 300 + iteration, userC), noAmount1);
+        await market.connect(userD).commitBet(marketId, buildCommit(2, 400 + iteration, userD), unalignedAmount);
 
         // Fast-forward and reveal
         await time.increase(biddingDuration + 1);
@@ -161,7 +115,7 @@ describe("HelixMarket Invariant Tests", function () {
           try {
             await market.connect(winner).claim(marketId);
             const after = await token.balanceOf(winner.address);
-            totalClaimed += after - before;
+            totalClaimed += (after - before);
           } catch (e) {
             // User has no winning bet (shouldn't happen but handle gracefully)
           }
@@ -178,27 +132,18 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: Pro-Rata Fairness", function () {
     it("larger stakes always receive larger payouts", async function () {
-      const { market, token, originator, userA, userB, userC } =
-        await loadFixture(deployHelixMarketFixture);
+      const { market, token, originator, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
 
-      await market
-        .connect(originator)
-        .submitStatement("ipfs://prorata", biddingDuration, revealDuration);
+      await market.connect(originator).submitStatement("ipfs://prorata", biddingDuration, revealDuration);
       const marketId = 0;
 
       const smallStake = ethers.parseEther("10");
       const largeStake = ethers.parseEther("100");
       const losingStake = ethers.parseEther("50");
 
-      await market
-        .connect(userA)
-        .commitBet(marketId, buildCommit(1, 111, userA), smallStake);
-      await market
-        .connect(userB)
-        .commitBet(marketId, buildCommit(1, 222, userB), largeStake);
-      await market
-        .connect(userC)
-        .commitBet(marketId, buildCommit(0, 333, userC), losingStake);
+      await market.connect(userA).commitBet(marketId, buildCommit(1, 111, userA), smallStake);
+      await market.connect(userB).commitBet(marketId, buildCommit(1, 222, userB), largeStake);
+      await market.connect(userC).commitBet(marketId, buildCommit(0, 333, userC), losingStake);
 
       await time.increase(biddingDuration + 1);
       await market.connect(userA).revealBet(marketId, 1, 111);
@@ -232,36 +177,27 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: Accounting Consistency", function () {
     it("sum of individual bets equals pool totals", async function () {
-      const { market, token, originator, userA, userB, userC, userD } =
-        await loadFixture(deployHelixMarketFixture);
+      const { market, token, originator, userA, userB, userC, userD } = await loadFixture(deployHelixMarketFixture);
 
-      await market
-        .connect(originator)
-        .submitStatement("ipfs://accounting", biddingDuration, revealDuration);
+      await market.connect(originator).submitStatement("ipfs://accounting", biddingDuration, revealDuration);
       const marketId = 0;
 
       const yesAmounts = [
         ethers.parseEther("17.5"),
         ethers.parseEther("23.1"),
-        ethers.parseEther("99.9"),
+        ethers.parseEther("99.9")
       ];
-      const noAmounts = [ethers.parseEther("45.6")];
+      const noAmounts = [
+        ethers.parseEther("45.6")
+      ];
 
       // Commit YES bets
-      await market
-        .connect(userA)
-        .commitBet(marketId, buildCommit(1, 100, userA), yesAmounts[0]);
-      await market
-        .connect(userB)
-        .commitBet(marketId, buildCommit(1, 200, userB), yesAmounts[1]);
-      await market
-        .connect(userC)
-        .commitBet(marketId, buildCommit(1, 300, userC), yesAmounts[2]);
+      await market.connect(userA).commitBet(marketId, buildCommit(1, 100, userA), yesAmounts[0]);
+      await market.connect(userB).commitBet(marketId, buildCommit(1, 200, userB), yesAmounts[1]);
+      await market.connect(userC).commitBet(marketId, buildCommit(1, 300, userC), yesAmounts[2]);
 
       // Commit NO bet
-      await market
-        .connect(userD)
-        .commitBet(marketId, buildCommit(0, 400, userD), noAmounts[0]);
+      await market.connect(userD).commitBet(marketId, buildCommit(0, 400, userD), noAmounts[0]);
 
       // Reveal all
       await time.increase(biddingDuration + 1);
@@ -283,29 +219,13 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: No Double-Claiming", function () {
     it("prevents users from claiming twice", async function () {
-      const { market, token, originator, userA, userB } = await loadFixture(
-        deployHelixMarketFixture,
-      );
+      const { market, token, originator, userA, userB } = await loadFixture(deployHelixMarketFixture);
 
-      await market
-        .connect(originator)
-        .submitStatement("ipfs://double", biddingDuration, revealDuration);
+      await market.connect(originator).submitStatement("ipfs://double", biddingDuration, revealDuration);
       const marketId = 0;
 
-      await market
-        .connect(userA)
-        .commitBet(
-          marketId,
-          buildCommit(1, 111, userA),
-          ethers.parseEther("100"),
-        );
-      await market
-        .connect(userB)
-        .commitBet(
-          marketId,
-          buildCommit(0, 222, userB),
-          ethers.parseEther("50"),
-        );
+      await market.connect(userA).commitBet(marketId, buildCommit(1, 111, userA), ethers.parseEther("100"));
+      await market.connect(userB).commitBet(marketId, buildCommit(0, 222, userB), ethers.parseEther("50"));
 
       await time.increase(biddingDuration + 1);
       await market.connect(userA).revealBet(marketId, 1, 111);
@@ -318,27 +238,19 @@ describe("HelixMarket Invariant Tests", function () {
       await market.connect(userA).claim(marketId);
 
       // INVARIANT: Second claim fails
-      await expect(market.connect(userA).claim(marketId)).to.be.revertedWith(
-        "No winning bet",
-      );
+      await expect(market.connect(userA).claim(marketId)).to.be.revertedWith("No winning bet");
     });
   });
 
   describe("INVARIANT: Unrevealed Withdrawal Burns", function () {
     it("100% penalty is always burned, never refunded", async function () {
-      const { market, token, originator, userA } = await loadFixture(
-        deployHelixMarketFixture,
-      );
+      const { market, token, originator, userA } = await loadFixture(deployHelixMarketFixture);
 
-      await market
-        .connect(originator)
-        .submitStatement("ipfs://unrevealed", biddingDuration, revealDuration);
+      await market.connect(originator).submitStatement("ipfs://unrevealed", biddingDuration, revealDuration);
       const marketId = 0;
 
       const committedAmount = ethers.parseEther("77.77");
-      await market
-        .connect(userA)
-        .commitBet(marketId, buildCommit(1, 999, userA), committedAmount);
+      await market.connect(userA).commitBet(marketId, buildCommit(1, 999, userA), committedAmount);
 
       await time.increase(biddingDuration + revealDuration + 2);
 
@@ -358,33 +270,21 @@ describe("HelixMarket Invariant Tests", function () {
     });
 
     it("fuzzing: 100% burn penalty holds for random amounts", async function () {
-      const { market, token, owner, originator, userA } = await loadFixture(
-        deployHelixMarketFixture,
-      );
+      const { market, token, owner, originator, userA } = await loadFixture(deployHelixMarketFixture);
       const MINTER_ROLE = await token.MINTER_ROLE();
 
       for (let i = 0; i < 20; i++) {
-        const randomAmount = ethers.parseEther(
-          String(0.001 + Math.random() * 999.999),
-        );
+        const randomAmount = ethers.parseEther(String(0.001 + Math.random() * 999.999));
         const marketId = i;
 
         // Refresh tokens and approval
-        await token
-          .connect(owner)
-          .mint(originator.address, ethers.parseEther("1000"));
+        await token.connect(owner).mint(originator.address, ethers.parseEther("1000"));
         await token.connect(owner).mint(userA.address, randomAmount * 2n);
-        await token
-          .connect(originator)
-          .approve(market.target, ethers.parseEther("1000"));
+        await token.connect(originator).approve(market.target, ethers.parseEther("1000"));
         await token.connect(userA).approve(market.target, randomAmount * 2n);
 
-        await market
-          .connect(originator)
-          .submitStatement(`ipfs://burn${i}`, biddingDuration, revealDuration);
-        await market
-          .connect(userA)
-          .commitBet(marketId, buildCommit(1, 1000 + i, userA), randomAmount);
+        await market.connect(originator).submitStatement(`ipfs://burn${i}`, biddingDuration, revealDuration);
+        await market.connect(userA).commitBet(marketId, buildCommit(1, 1000 + i, userA), randomAmount);
 
         await time.increase(biddingDuration + revealDuration + 2);
 
@@ -400,27 +300,18 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: Tie Refunds", function () {
     it("tie refunds are always 100% of original stake", async function () {
-      const { market, token, originator, userA, userB, userC } =
-        await loadFixture(deployHelixMarketFixture);
+      const { market, token, originator, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
 
-      await market
-        .connect(originator)
-        .submitStatement("ipfs://tie", biddingDuration, revealDuration);
+      await market.connect(originator).submitStatement("ipfs://tie", biddingDuration, revealDuration);
       const marketId = 0;
 
       const yesStake = ethers.parseEther("123.456");
       const noStake = ethers.parseEther("123.456"); // Exact tie
       const unalignedStake = ethers.parseEther("99.999");
 
-      await market
-        .connect(userA)
-        .commitBet(marketId, buildCommit(1, 111, userA), yesStake);
-      await market
-        .connect(userB)
-        .commitBet(marketId, buildCommit(0, 222, userB), noStake);
-      await market
-        .connect(userC)
-        .commitBet(marketId, buildCommit(2, 333, userC), unalignedStake);
+      await market.connect(userA).commitBet(marketId, buildCommit(1, 111, userA), yesStake);
+      await market.connect(userB).commitBet(marketId, buildCommit(0, 222, userB), noStake);
+      await market.connect(userC).commitBet(marketId, buildCommit(2, 333, userC), unalignedStake);
 
       await time.increase(biddingDuration + 1);
       await market.connect(userA).revealBet(marketId, 1, 111);
@@ -453,43 +344,26 @@ describe("HelixMarket Invariant Tests", function () {
 
   describe("INVARIANT: Originator Fee Calculation", function () {
     it("fuzzing: originator fee is always exactly 1% (floor division)", async function () {
-      const { market, token, owner, originator, userA, userB } =
-        await loadFixture(deployHelixMarketFixture);
+      const { market, token, owner, originator, userA, userB } = await loadFixture(deployHelixMarketFixture);
       const MINTER_ROLE = await token.MINTER_ROLE();
 
       for (let i = 0; i < 50; i++) {
         const marketId = i;
-        const yesAmount = randomBigInt(
-          ethers.parseEther("1"),
-          ethers.parseEther("500"),
-        );
-        const noAmount = randomBigInt(
-          ethers.parseEther("1"),
-          ethers.parseEther("500"),
-        );
+        const yesAmount = randomBigInt(ethers.parseEther("1"), ethers.parseEther("500"));
+        const noAmount = randomBigInt(ethers.parseEther("1"), ethers.parseEther("500"));
 
         // Refresh tokens and approvals
-        await token
-          .connect(owner)
-          .mint(originator.address, ethers.parseEther("200"));
+        await token.connect(owner).mint(originator.address, ethers.parseEther("200"));
         await token.connect(owner).mint(userA.address, yesAmount * 2n);
         await token.connect(owner).mint(userB.address, noAmount * 2n);
-        await token
-          .connect(originator)
-          .approve(market.target, ethers.parseEther("200"));
+        await token.connect(originator).approve(market.target, ethers.parseEther("200"));
         await token.connect(userA).approve(market.target, yesAmount * 2n);
         await token.connect(userB).approve(market.target, noAmount * 2n);
 
-        await market
-          .connect(originator)
-          .submitStatement(`ipfs://fee${i}`, biddingDuration, revealDuration);
+        await market.connect(originator).submitStatement(`ipfs://fee${i}`, biddingDuration, revealDuration);
 
-        await market
-          .connect(userA)
-          .commitBet(marketId, buildCommit(1, 1000 + i, userA), yesAmount);
-        await market
-          .connect(userB)
-          .commitBet(marketId, buildCommit(0, 2000 + i, userB), noAmount);
+        await market.connect(userA).commitBet(marketId, buildCommit(1, 1000 + i, userA), yesAmount);
+        await market.connect(userB).commitBet(marketId, buildCommit(0, 2000 + i, userB), noAmount);
 
         await time.increase(biddingDuration + 1);
         await market.connect(userA).revealBet(marketId, 1, 1000 + i);
