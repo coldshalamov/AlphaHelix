@@ -1,0 +1,3 @@
+## 2024-05-24 - Prevent Scroll-Jacking on Financial Inputs
+**Learning:** Using `type="number"` on numeric inputs causes unintended scroll-jacking (value changes when scrolling over the input).
+**Action:** Changed financial input fields in `Bank.jsx` and `BettingWidget.jsx` to `<input type="text" inputMode="decimal">` and added explicit regex validation comments, improving accessibility and preventing scroll-jacking while keeping mobile number pads.
