@@ -105,7 +105,8 @@ function BettingWidget({
   });
 
   const isLoading = isPending || isConfirming;
-  const isLocked = isPending || isConfirming;
+  // BOLT: Includes pendingAction to keep UI locked during manual approval wait (no hook polling)
+  const isLocked = isPending || isConfirming || Boolean(pendingAction);
 
   const commitEndSeconds = useMemo(() => Number(commitEnd || 0n), [commitEnd]);
   const revealEndSeconds = useMemo(() => Number(revealEnd || 0n), [revealEnd]);
@@ -195,8 +196,6 @@ function BettingWidget({
       } else if (pendingAction === 'reveal') {
         clearStoredBet();
         setStatus('Reveal confirmed and local commit cleared.');
-      } else if (pendingAction === 'approve') {
-        setStatus('Approve confirmed.');
       } else {
         setStatus('Transaction confirmed.');
       }
@@ -255,11 +254,15 @@ function BettingWidget({
           functionName: 'approve',
           args: [contracts.HelixMarket, amountValue],
         });
-        setTxHash(approveHash);
+        // BOLT: Removed setTxHash(approveHash) to avoid double-polling with useWaitForTransactionReceipt.
+        // We manually wait for the receipt here.
+        setStatus('Transaction pending...');
 
         // Wait for approval receipt explicitly so we don't confuse receipts
         if (!publicClient) throw new Error('Public client unavailable to confirm approval.');
         await publicClient.waitForTransactionReceipt({ hash: approveHash });
+
+        setStatus('Approve confirmed.');
       }
 
       // Now commit
