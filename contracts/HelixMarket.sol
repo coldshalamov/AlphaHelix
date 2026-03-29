@@ -94,11 +94,11 @@ contract HelixMarket is ReentrancyGuard {
 
             // Compute hash from multiple entropy sources
             // SECURITY: Removed tx.gasprice to prevent user manipulation (grinding)
+            // SECURITY: Removed msg.sender to prevent address grinding (Sybil attacks)
             bytes32 closeHash = keccak256(abi.encodePacked(
                 blockhash(block.number - 1),    // Recent block hash
                 blockhash(block.number - 2),    // 2 blocks ago
                 blockhash(block.number - 3),    // 3 blocks ago
-                msg.sender,                      // Current transaction sender
                 block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
                 s.yesPool,                       // Current YES pool state
                 s.noPool,                        // Current NO pool state
@@ -232,7 +232,7 @@ contract HelixMarket is ReentrancyGuard {
 
         // Check commit phase is still open
         if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed == 0, "Commit phase closed");
+            require(s.commitPhaseClosed == 0 || s.commitPhaseClosed == block.timestamp, "Commit phase closed");
         } else {
             require(block.timestamp < s.commitEndTime, "Commit phase over");
         }
@@ -473,7 +473,6 @@ contract HelixMarket is ReentrancyGuard {
             blockhash(block.number - 1),
             blockhash(block.number - 2),
             blockhash(block.number - 3),
-            msg.sender,
             block.prevrandao,
             s.yesPool,
             s.noPool,
