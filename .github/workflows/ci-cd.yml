@@ -101,7 +101,7 @@ jobs:
         run: npm ci
         
       - name: Generate gas report
-        run: REPORT_GAS=true npm test
+        run: REPORT_GAS=true npm test | tee gas-report.txt
         
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
@@ -109,13 +109,17 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            if (fs.existsSync('gas-report.txt')) {
+              const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+              });
+            } else {
+              console.log('gas-report.txt not found. Skipping comment.');
+            }
 
   lint:
     name: Code Linting
