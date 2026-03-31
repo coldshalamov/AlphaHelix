@@ -242,8 +242,10 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    let val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // Remove invalid characters manually since type="text" doesn't block them natively
+    val = val.replace(/[^\d.]/g, '');
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
@@ -251,8 +253,10 @@ function Bank() {
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    let val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // Remove invalid characters manually since type="text" doesn't block them natively
+    val = val.replace(/[^\d.]/g, '');
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
