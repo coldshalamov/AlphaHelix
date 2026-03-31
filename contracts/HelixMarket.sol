@@ -93,19 +93,7 @@ contract HelixMarket is ReentrancyGuard {
             block.timestamp >= s.commitEndTime) {
 
             // Compute hash from multiple entropy sources
-            // SECURITY: Removed tx.gasprice to prevent user manipulation (grinding)
-            bytes32 closeHash = keccak256(abi.encodePacked(
-                blockhash(block.number - 1),    // Recent block hash
-                blockhash(block.number - 2),    // 2 blocks ago
-                blockhash(block.number - 3),    // 3 blocks ago
-                msg.sender,                      // Current transaction sender
-                block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
-                s.yesPool,                       // Current YES pool state
-                s.noPool,                        // Current NO pool state
-                s.unalignedPool,                 // Current UNALIGNED pool state
-                s.closeSeed,                     // Market-specific seed
-                block.timestamp                  // Current timestamp
-            ));
+            bytes32 closeHash = _calculateCloseHash(marketId);
 
             // Check if hash meets difficulty target
             if (uint256(closeHash) < s.difficultyTarget || block.timestamp >= s.hardCommitEndTime) {
@@ -469,23 +457,31 @@ contract HelixMarket is ReentrancyGuard {
         isRandomCloseEnabled = s.randomCloseEnabled;
         isCommitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
 
-        closeHash = keccak256(abi.encodePacked(
-            blockhash(block.number - 1),
-            blockhash(block.number - 2),
-            blockhash(block.number - 3),
-            msg.sender,
-            block.prevrandao,
-            s.yesPool,
-            s.noPool,
-            s.unalignedPool,
-            s.closeSeed,
-            block.timestamp
-        ));
+        closeHash = _calculateCloseHash(marketId);
 
         willClose = (s.randomCloseEnabled &&
                      s.commitPhaseClosed == 0 &&
                      block.timestamp >= s.commitEndTime &&
                      (uint256(closeHash) < s.difficultyTarget || block.timestamp >= s.hardCommitEndTime));
+    }
+
+    /// @dev Internal helper to calculate the close hash.
+    /// @param marketId The market to calculate for.
+    /// @return Hash used to determine if market closes.
+    function _calculateCloseHash(uint256 marketId) internal view returns (bytes32) {
+        Statement storage s = markets[marketId];
+        return keccak256(abi.encodePacked(
+            blockhash(block.number - 1),    // Recent block hash
+            blockhash(block.number - 2),    // 2 blocks ago
+            blockhash(block.number - 3),    // 3 blocks ago
+            // SECURITY: Removed msg.sender to prevent address grinding
+            block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
+            s.yesPool,                       // Current YES pool state
+            s.noPool,                        // Current NO pool state
+            s.unalignedPool,                 // Current UNALIGNED pool state
+            s.closeSeed,                     // Market-specific seed
+            block.timestamp                  // Current timestamp
+        ));
     }
 
     /// @notice Get random close status for a market
