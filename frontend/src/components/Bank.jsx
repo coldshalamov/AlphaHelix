@@ -34,14 +34,14 @@ const BuyCard = memo(function BuyCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* Validation logic: native HTML pattern ensures only valid decimal numbers, type="text" prevents scroll-jacking */}
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
+          pattern="^\d*\.?\d*$"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -117,14 +117,14 @@ const SellCard = memo(function SellCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* Validation logic: native HTML pattern ensures only valid decimal numbers, type="text" prevents scroll-jacking */}
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
+          pattern="^\d*\.?\d*$"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -242,8 +242,10 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    let val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // Remove invalid characters manually since type="text" doesn't block them natively
+    val = val.replace(/[^\d.]/g, '');
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
@@ -251,8 +253,10 @@ function Bank() {
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    let val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
+    // Remove invalid characters manually since type="text" doesn't block them natively
+    val = val.replace(/[^\d.]/g, '');
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
