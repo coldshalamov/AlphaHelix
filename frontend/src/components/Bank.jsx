@@ -37,11 +37,9 @@ const BuyCard = memo(function BuyCard({
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -120,11 +118,9 @@ const SellCard = memo(function SellCard({
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
