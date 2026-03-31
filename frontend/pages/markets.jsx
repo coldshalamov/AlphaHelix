@@ -66,7 +66,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, refetch: refetchCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -140,7 +140,18 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <div className="card text-center" style={{ padding: 'var(--space-12)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>📭</div>
+          <h3 className="font-semibold">No active markets</h3>
+          <p className="helper" style={{ maxWidth: '400px', margin: '0 auto var(--space-6)' }}>
+            There are currently no open markets. Check back later or refresh to see if new statements have been proposed.
+          </p>
+          <button className="button secondary" onClick={() => refetchCount()}>
+            Refresh Markets
+          </button>
+        </div>
+      )}
     </div>
   );
 }
