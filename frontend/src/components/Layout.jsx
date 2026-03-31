@@ -1,23 +1,14 @@
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAccount } from 'wagmi';
 import bannerHelix from '../assets/banner_helix.jpg';
+import CopyButton from './CopyButton';
 
 export default function Layout({ children, className = '' }) {
   const { address, isConnected } = useAccount();
   const router = useRouter();
-  const [copied, setCopied] = useState(false);
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected';
-
-  const handleCopy = () => {
-    if (address) {
-      navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const isActive = (path) => router.pathname === path;
 
@@ -64,18 +55,17 @@ export default function Layout({ children, className = '' }) {
             </Link>
           </nav>
           {isConnected ? (
-            <button
+            <CopyButton
+              text={address}
+              label="Copy wallet address"
               className="badge cyan"
-              onClick={handleCopy}
-              type="button"
-              aria-label="Copy wallet address"
               style={{
                 border: 'none',
                 cursor: 'pointer',
               }}
             >
-              <span>{copied ? '✓ Copied!' : shortAddress}</span>
-            </button>
+              {shortAddress}
+            </CopyButton>
           ) : (
             <div className="badge">
               <span>Connect Wallet</span>
