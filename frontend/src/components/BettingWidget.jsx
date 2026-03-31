@@ -471,14 +471,14 @@ function BettingWidget({
             </div>
           </div>
           <div style={{ position: 'relative' }}>
+            {/* Validation logic: native HTML pattern ensures only valid decimal numbers, type="text" prevents scroll-jacking */}
             <input
               ref={amountInputRef}
               id="bet-amount"
-              type="number"
+              type="text"
+              pattern="^\d*\.?\d*$"
               inputMode="decimal"
               autoComplete="off"
-              min="0"
-              step="0.01"
               maxLength="50"
               className="input"
               style={{
