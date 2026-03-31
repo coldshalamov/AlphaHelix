@@ -1,3 +1,7 @@
 ## 2026-01-26 - Wagmi & React Query Stale Time
 **Learning:** Wagmi v2 uses standard TanStack Query defaults which set `staleTime: 0`. For dApps, this causes aggressive refetching of on-chain data (balance, reads) on every focus/mount, leading to RPC throttling and UI jitter.
 **Action:** Always configure `QueryClient` with a global `staleTime` (e.g., 4000ms) matching the chain's block time to prevent redundant network requests.
+
+## 2026-03-31 - Unbounded Wagmi useReadContracts Multicall Payload Explosion
+**Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to total contract counters (e.g., `marketCount`) cause O(N) payload explosions leading to RPC limitations or sluggish load times.
+**Action:** Always implement offset pagination (e.g., fetching fixed `PAGE_SIZE` slices) when querying dynamic lists using `useReadContracts` to prevent exceeding RPC limits and to ensure fast frontend load times.
