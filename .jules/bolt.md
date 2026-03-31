@@ -1,3 +1,15 @@
-## 2026-01-26 - Wagmi & React Query Stale Time
-**Learning:** Wagmi v2 uses standard TanStack Query defaults which set `staleTime: 0`. For dApps, this causes aggressive refetching of on-chain data (balance, reads) on every focus/mount, leading to RPC throttling and UI jitter.
-**Action:** Always configure `QueryClient` with a global `staleTime` (e.g., 4000ms) matching the chain's block time to prevent redundant network requests.
+## 2026-02-16 - GitHub Actions Permissions
+**Learning:** `actions/github-script` requires explicit `permissions: { pull-requests: write }` (or broader) to comment on PRs. The default token permissions are often read-only, leading to "Resource not accessible by integration" errors.
+**Action:** Always verify and explicitly set `permissions` in workflows that interact with the GitHub API (commenting, labeling, etc.).
+
+## 2026-02-16 - Handling Decimals in Ethers.js Fuzzing Tests
+**Learning:** When generating random floating-point numbers for fuzzing tests and converting them to BigInt with `ethers.parseEther`, you must truncate the decimal precision (e.g., using `.toFixed(18)`). `Math.random()` can produce values with more than 18 decimal places (like `0.0029515265517127036`), causing `ethers` to throw a `RangeError` ("too many decimals").
+**Action:** Always format random float inputs to strings with a fixed precision (<= 18) before parsing them as Ether in tests.
+
+## 2026-02-16 - Hardhat Gas Reporter Output
+**Learning:** The `hardhat-gas-reporter` plugin does not write to a file by default even if `REPORT_GAS=true`. For CI workflows that depend on reading a report file (e.g., `gas-report.txt`), you must explicitly configure `outputFile: "gas-report.txt"` and `noColors: true` in `hardhat.config.js`.
+**Action:** Verify `hardhat.config.js` includes file output configuration if the CI pipeline expects to read gas stats.
+
+## 2026-02-16 - Deprecated GitHub Actions
+**Learning:** `actions/upload-artifact@v3` and `codecov/codecov-action@v3` are deprecated and may cause immediate workflow failures on newer runners.
+**Action:** Proactively upgrade these actions to `v4` in `.github/workflows` when touching CI configurations.
