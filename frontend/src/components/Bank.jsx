@@ -173,6 +173,11 @@ const SellCard = memo(function SellCard({
   );
 });
 
+// BOLT: Extracted static arrays and constants outside component scope to prevent unnecessary allocations and useMemo overhead
+const EXPECTED_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337);
+const BUY_ERRORS = ['Enter an amount of ETH to spend.', 'Buy failed'];
+const SELL_ERRORS = ['Enter an amount of HLX to sell.', 'Sell failed', 'Invalid amount format'];
+
 function Bank() {
   const { address } = useAccount();
   const chainId = useChainId();
@@ -200,8 +205,7 @@ function Bank() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
   const { switchChain, isPending: isSwitching } = useSwitchChain();
 
-  const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
-  const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
+  const isWrongNetwork = chainId && EXPECTED_CHAIN_ID && chainId !== EXPECTED_CHAIN_ID;
 
   useEffect(() => {
     if (isConfirming) setStatus('Transaction pending...');
@@ -231,12 +235,12 @@ function Bank() {
 
   const isBuyError = useMemo(() => {
     if (!status) return false;
-    return ['Enter an amount of ETH to spend.', 'Buy failed'].some(msg => status.includes(msg));
+    return BUY_ERRORS.some(msg => status.includes(msg));
   }, [status]);
 
   const isSellError = useMemo(() => {
     if (!status) return false;
-    return ['Enter an amount of HLX to sell.', 'Sell failed', 'Invalid amount format'].some(msg => status.includes(msg));
+    return SELL_ERRORS.some(msg => status.includes(msg));
   }, [status]);
 
   // BOLT: Memoized to prevent function recreation on every render,
@@ -398,7 +402,7 @@ function Bank() {
             <p className="helper">Switch to the configured Helix chain to continue.</p>
             <button
               className="button primary"
-              onClick={() => switchChain({ chainId: expectedChainId })}
+              onClick={() => switchChain({ chainId: EXPECTED_CHAIN_ID })}
               disabled={isSwitching}
               style={{ marginTop: '0.75rem' }}
             >
