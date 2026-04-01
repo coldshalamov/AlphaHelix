@@ -81,8 +81,9 @@ contract HelixMarket is ReentrancyGuard {
 
     /// @notice Checks if market should randomly close based on hash difficulty
     /// @dev Runs on every market interaction (commit, reveal, ping)
-    modifier checkRandomClose(uint256 marketId) {
+    function _checkRandomClose(uint256 marketId) internal returns (bool triggerPingReward) {
         Statement storage s = markets[marketId];
+        triggerPingReward = false;
 
         // Only check if:
         // 1. Random close is enabled for this market
@@ -120,12 +121,10 @@ contract HelixMarket is ReentrancyGuard {
                 // Pay ping reward once, funded by the statement fee for random-close markets.
                 if (!s.pingRewardPaid) {
                     s.pingRewardPaid = true;
-                    require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+                    triggerPingReward = true;
                 }
             }
         }
-
-        _; // Continue with the function
     }
 
     /// @notice Create a new market statement with fixed commit duration (backwards compatible).
@@ -225,8 +224,8 @@ contract HelixMarket is ReentrancyGuard {
         external
         nonReentrant
         validMarket(marketId)
-        checkRandomClose(marketId)
     {
+        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -250,6 +249,10 @@ contract HelixMarket is ReentrancyGuard {
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
+
+        if (triggerPingReward) {
+            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+        }
     }
 
     /// @notice Reveal a committed bet once the reveal window opens.
@@ -260,8 +263,8 @@ contract HelixMarket is ReentrancyGuard {
         external
         nonReentrant
         validMarket(marketId)
-        checkRandomClose(marketId)
     {
+        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -297,6 +300,10 @@ contract HelixMarket is ReentrancyGuard {
         }
 
         emit BetRevealed(marketId, msg.sender, choice, amount);
+
+        if (triggerPingReward) {
+            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+        }
     }
 
     /// @notice Resolve a market after the reveal period ends.
@@ -447,8 +454,13 @@ contract HelixMarket is ReentrancyGuard {
     /// @notice Manually trigger a random close check
     /// @dev Useful for low-activity markets where no one is committing
     /// @param marketId Market to ping
-    function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) checkRandomClose(marketId) {
-        // Intentionally empty: the checkRandomClose modifier is the effect.
+    function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) {
+        bool triggerPingReward = _checkRandomClose(marketId);
+
+        if (triggerPingReward) {
+            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            // PingReward event emitting isn't necessary because pingMarket relies on triggerPingReward
+        }
     }
 
     /// @notice View function to check current close probability
