@@ -21,3 +21,7 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2024-05-30 - [Input Field UX]
+**Learning:** Financial input fields should use `<input type="text" inputMode="decimal">` with the HTML `pattern` attribute (e.g., `pattern="^\d*\.?\d*$"`) to prevent scroll-jacking. Because `pattern` only validates on submission, you must manually strip non-numeric characters in the `onChange` handler to block invalid keystrokes.
+**Action:** When converting existing `type="number"` inputs to `type="text"`, ensure number-specific attributes like `min` and `step` are removed, and validation logic is explicitly added to block invalid keystrokes.
