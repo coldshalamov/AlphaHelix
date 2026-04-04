@@ -17,3 +17,8 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## 2026-04-04 - CEI Violation in HelixMarket.sol
+**Vulnerability:** External interactions (`token.transferFrom` and `token.burn`) were embedded inside conditional branches within the `_submitStatementInternal` function.
+**Learning:** This violates the Checks-Effects-Interactions (CEI) pattern and can introduce potential reentrancy issues. Slither flagged it as a `reentrancy-benign` issue because the token is standard and state variables were updated after the external call.
+**Prevention:** Always declare local variables (e.g., `uint256 burnAmount`) to calculate the required external call parameters inside conditional logic, and execute the actual external calls (e.g., `token.transferFrom`, `token.burn`) at the very end of the function after all state changes have been applied.
