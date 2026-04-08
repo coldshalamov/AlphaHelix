@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -66,6 +66,9 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(0);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -73,21 +76,28 @@ export default function MarketsPage() {
   });
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE);
+
+  // BOLT: Added offset pagination to limit the number of markets fetched per page
+  // instead of fetching all of them at once.
+  const startIndex = page * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, numericCount);
+  const itemsToFetch = Math.max(0, endIndex - startIndex);
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
-      if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      if (!itemsToFetch) return [];
+      return Array.from({ length: itemsToFetch }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(startIndex + i)],
       }));
-    }, [numericCount]),
+    }, [itemsToFetch, startIndex]),
     query: {
-      enabled: numericCount > 0,
+      enabled: itemsToFetch > 0,
     },
   });
 
@@ -100,7 +110,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: startIndex + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +124,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, startIndex]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +151,30 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1.5rem', alignItems: 'center' }}>
+          <button
+            className="button secondary"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            type="button"
+          >
+            Previous
+          </button>
+          <span className="helper" style={{ margin: 0 }}>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className="button secondary"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            type="button"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
