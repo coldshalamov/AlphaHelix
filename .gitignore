@@ -15,3 +15,6 @@ coverage.json
 .coverage_cache/
 .coverage_contracts/
 *.log
+
+# Reports
+gas-report.txt
