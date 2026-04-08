@@ -471,11 +471,13 @@ function BettingWidget({
             </div>
           </div>
           <div style={{ position: 'relative' }}>
+            {/* Validation logic: inputMode="decimal" and pattern prevent scroll-jacking while preserving HTML5 validation constraints */}
             <input
               ref={amountInputRef}
               id="bet-amount"
-              type="number"
+              type="text"
               inputMode="decimal"
+              pattern="^\d*\.?\d*$"
               autoComplete="off"
               min="0"
               step="0.01"
