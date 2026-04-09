@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,7 +65,11 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const PAGE_SIZE = 10;
+
 export default function MarketsPage() {
+  const [page, setPage] = useState(0);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -74,18 +78,25 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE);
+
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  // BOLT: Added pagination to prevent O(N) payload explosions on large market counts.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      const start = page * PAGE_SIZE;
+      const end = Math.min((page + 1) * PAGE_SIZE, numericCount);
+      const length = Math.max(0, end - start);
+
+      return Array.from({ length }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(start + i)],
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
@@ -100,7 +111,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: page * PAGE_SIZE + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +125,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +152,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+          <button
+            className="button outline"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+          >
+            Previous
+          </button>
+          <span style={{ alignSelf: 'center', color: 'var(--text-secondary)' }}>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className="button outline"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
