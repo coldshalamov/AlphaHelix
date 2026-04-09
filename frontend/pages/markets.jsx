@@ -124,8 +124,25 @@ export default function MarketsPage() {
         <h2 className="text-xl font-bold">Markets</h2>
         <p className="helper">Live statements pulled directly from the HelixMarket contract.</p>
       </div>
-      {isLoading && <div className="status">Loading markets...</div>}
-      {error && <div className="status">{error}</div>}
+      {isLoading && (
+        <div className="grid two" aria-busy="true" aria-label="Loading markets">
+          {[1, 2].map((i) => (
+            <div key={i} className="card">
+              <div className="skeleton" style={{ width: '30%', height: '1rem', marginBottom: '0.5rem' }} />
+              <div className="skeleton" style={{ width: '80%', height: '2rem', marginBottom: '1rem' }} />
+              <div className="grid two" style={{ marginBottom: '1rem', gap: '0.5rem' }}>
+                <div className="skeleton" style={{ height: '3rem' }} />
+                <div className="skeleton" style={{ height: '3rem' }} />
+              </div>
+              <div className="skeleton" style={{ width: '100%', height: '5rem', marginBottom: '1rem' }} />
+              <div className="skeleton" style={{ width: '40%', height: '2.5rem' }} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && <div className="status error" role="alert">{error}</div>}
+
       <div className="grid two">
         {markets.map((m) => (
           <MarketCard
@@ -140,7 +157,16 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {!isLoading && markets.length === 0 && !error && (
+        <div className="card text-center" style={{ gridColumn: '1 / -1', padding: 'var(--space-12)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }} role="img" aria-label="Empty mailbox">📭</div>
+          <h3 className="text-xl font-bold">No Active Markets</h3>
+          <p className="helper" style={{ maxWidth: '400px', margin: '0 auto' }}>
+            There are currently no prediction markets available. Check back later or deploy a new market.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
