@@ -30,11 +30,13 @@ export default function Layout({ children, className = '' }) {
         <div className="header-banner">
           <Link href="/">
             <div className="banner-crop">
+              {/* BOLT: Added sizes prop to prevent Next.js from downloading full-viewport images on large screens when container is max-width constrained */}
               <Image
                 src={bannerHelix}
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
