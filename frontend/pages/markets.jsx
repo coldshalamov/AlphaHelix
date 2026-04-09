@@ -5,6 +5,7 @@ import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
+import Spinner from '@/components/Spinner';
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
@@ -66,7 +67,7 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
-  const { data: marketCount } = useReadContract({
+  const { data: marketCount, isLoading: isCountLoading, refetch: refetchCount, isRefetching: isCountRefetching } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
     functionName: 'marketCount',
@@ -76,7 +77,7 @@ export default function MarketsPage() {
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
-  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
+  const { data: marketsResults, isLoading: isMarketsLoading, error: queryError, refetch, isRefetching } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
       return Array.from({ length: numericCount }).map((_, i) => ({
@@ -116,6 +117,7 @@ export default function MarketsPage() {
       .filter((m) => m !== null);
   }, [marketsResults]);
 
+  const isLoading = isCountLoading || isMarketsLoading;
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
   return (
@@ -140,7 +142,31 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && markets.length === 0 && !error && (
+        <div className="card text-center" style={{ padding: 'var(--space-12) var(--space-6)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            marginBottom: 'var(--space-4)',
+            color: 'var(--color-text-tertiary)'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+          </div>
+          <h3 className="font-semibold text-secondary">No active markets</h3>
+          <p className="helper" style={{ maxWidth: '400px', margin: '0 auto var(--space-6)' }}>
+            The protocol is currently quiet. Check back later for new truth claims.
+          </p>
+          <button
+            className="button outline"
+            onClick={() => { refetchCount(); refetch(); }}
+            disabled={isRefetching || isCountRefetching}
+          >
+            {isRefetching || isCountRefetching ? <><Spinner /> Refreshing...</> : 'Refresh Markets'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
