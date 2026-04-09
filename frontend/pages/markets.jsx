@@ -1,10 +1,12 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
 import contracts from '@/config/contracts.json';
 import { marketAbi } from '@/abis';
 import { dateTimeFormatter } from '@/lib/formatters';
+
+const PAGE_SIZE = 10;
 
 // BOLT: Replaced .toLocaleString() with shared dateTimeFormatter to prevent
 // re-initializing localization data on every render.
@@ -66,6 +68,8 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
+  const [page, setPage] = useState(0);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -73,19 +77,32 @@ export default function MarketsPage() {
   });
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE);
+
+  // BOLT: Added useEffect to prevent out-of-bounds rendering if chain switch reduces marketCount
+  useEffect(() => {
+    if (numericCount > 0 && page * PAGE_SIZE >= numericCount) {
+      setPage(0);
+    }
+  }, [numericCount, page]);
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  // ⚡ BOLT: Implemented offset pagination to limit unbounded array map on marketCount which causes O(N) payload explosion
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      const offset = page * PAGE_SIZE;
+      const length = Math.min(PAGE_SIZE, numericCount - offset);
+      if (length <= 0) return [];
+
+      return Array.from({ length }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(offset + i)],
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
@@ -93,6 +110,7 @@ export default function MarketsPage() {
 
   const markets = useMemo(() => {
     if (!marketsResults) return [];
+    const offset = page * PAGE_SIZE;
     return marketsResults
       .map((res, i) => {
         if (res.status !== 'success') return null;
@@ -100,7 +118,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: offset + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +132,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +159,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Previous
+          </button>
+          <span style={{ display: 'flex', alignItems: 'center' }} className="helper">
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            disabled={page >= totalPages - 1}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
