@@ -17,3 +17,8 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## $(date +%Y-%m-%d) - Fix CEI Violation in Market Creation
+**Vulnerability:** A minor Checks-Effects-Interactions (CEI) violation existed in `HelixMarket._submitStatementInternal`, where the external calls `token.transferFrom` and `token.burn` were executed before all state changes and event emissions had completed, notably embedded inside conditional branches.
+**Learning:** While the external call used an internal, trusted token contract (`AlphaHelixToken`), strictly enforcing CEI is crucial as a defense-in-depth measure to mitigate reentrancy risks if token implementations are ever changed or updated to include arbitrary hooks.
+**Prevention:** Always aggregate necessary values (like calculating a `burnAmount`) within complex conditional logic and defer all external interactions to the absolute end of the function after all state mutations and event logging have securely completed.
