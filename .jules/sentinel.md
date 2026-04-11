@@ -27,3 +27,8 @@
 **Vulnerability:** CI pipelines failed due to using deprecated GitHub Actions (e.g., `actions/upload-artifact@v3` instead of `v4`) and because the gas report artifact was not being explicitly generated despite `REPORT_GAS=true`. This causes pipelines to break, potentially blocking critical security updates or deployments.
 **Learning:** Hard failures in CI must be addressed as priority to maintain a secure and functional development lifecycle. `REPORT_GAS=true npm test` does not automatically create a `gas-report.txt` file by default; the output must be explicitly piped using `tee` (e.g., `REPORT_GAS=true npm test | tee gas-report.txt`) for the runner to access it in subsequent steps. Additionally, `actions/github-script` should be updated to `v7` to avoid Node.js deprecation warnings/failures.
 **Prevention:** Always ensure CI workflows are kept up-to-date with the latest major action versions (v4 for standard actions, v7 for scripts). When relying on CLI output to generate reports, explicitly pipe and save the output.
+
+## 2024-05-26 - [GitHub Actions Permission Failure]
+**Vulnerability:** The gas report job failed with `HttpError: Resource not accessible by integration` (status 403) when trying to comment on the PR.
+**Learning:** GitHub Actions jobs that need to comment on PRs (like `actions/github-script` making API calls) must have explicit `permissions` granted to them, such as `pull-requests: write` and `issues: write`, especially if the repository defaults to restricted token permissions.
+**Prevention:** Always verify and add the necessary `permissions` block to workflows or specific jobs that interact with GitHub APIs.
