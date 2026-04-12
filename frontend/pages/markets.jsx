@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -74,18 +74,30 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
-  // BOLT: Replaced manual Promise.all loop with useReadContracts.
-  // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(0);
+
+  // BOLT: Prevent out-of-bounds rendering errors when chain switches
+  useEffect(() => {
+    if (numericCount > 0 && page * PAGE_SIZE >= numericCount) {
+      setPage(0);
+    }
+  }, [numericCount, page]);
+
+  // BOLT: Implemented offset pagination for multicall batching.
+  // Fetching only PAGE_SIZE elements at a time prevents payload explosion and RPC limits.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      const start = page * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, numericCount);
+      return Array.from({ length: end - start }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(start + i)],
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
@@ -93,6 +105,7 @@ export default function MarketsPage() {
 
   const markets = useMemo(() => {
     if (!marketsResults) return [];
+    const start = page * PAGE_SIZE;
     return marketsResults
       .map((res, i) => {
         if (res.status !== 'success') return null;
@@ -100,7 +113,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: start + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +127,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +154,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {numericCount > PAGE_SIZE && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+          <button
+            className="button outline"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+          >
+            Previous
+          </button>
+          <span className="helper" style={{ alignSelf: 'center' }}>
+            Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}
+          </span>
+          <button
+            className="button outline"
+            disabled={(page + 1) * PAGE_SIZE >= numericCount}
+            onClick={() => setPage(p => p + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
