@@ -79,6 +79,10 @@ jobs:
           path: slither-report.json
 
   gas-report:
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     name: Gas Usage Report
     runs-on: ubuntu-latest
     
