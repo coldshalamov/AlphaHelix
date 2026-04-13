@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,6 +65,8 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const PAGE_SIZE = 10;
+
 export default function MarketsPage() {
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
@@ -74,33 +76,59 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
+  const [page, setPage] = useState(1);
+
+  // Safely reset page if count decreases (e.g., network switch)
+  useEffect(() => {
+    if (numericCount > 0) {
+      const maxPage = Math.ceil(numericCount / PAGE_SIZE);
+      if (page > maxPage) {
+        setPage(maxPage || 1);
+      }
+    }
+  }, [numericCount, page]);
+
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE) || 1;
+
+  // BOLT: Offset pagination to prevent O(N) payload explosion on useReadContracts
+  const paginatedIndices = useMemo(() => {
+    if (!numericCount) return [];
+    const startIndex = (page - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, numericCount);
+    const indices = [];
+    for (let i = startIndex; i < endIndex; i++) {
+      indices.push(i);
+    }
+    return indices;
+  }, [numericCount, page]);
+
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
-      if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      return paginatedIndices.map((i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
         args: [BigInt(i)],
       }));
-    }, [numericCount]),
+    }, [paginatedIndices]),
     query: {
-      enabled: numericCount > 0,
+      enabled: paginatedIndices.length > 0,
     },
   });
 
   const markets = useMemo(() => {
     if (!marketsResults) return [];
     return marketsResults
-      .map((res, i) => {
+      .map((res, index) => {
         if (res.status !== 'success') return null;
         const data = res.result;
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
+        const actualId = paginatedIndices[index];
         return {
-          id: i,
+          id: actualId,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +142,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, paginatedIndices]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +169,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span style={{ alignSelf: 'center' }}>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            className="button outline"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
