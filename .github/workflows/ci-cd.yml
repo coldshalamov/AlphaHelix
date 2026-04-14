@@ -13,6 +13,10 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -47,6 +51,10 @@ jobs:
   security:
     name: Security Analysis
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -62,7 +70,7 @@ jobs:
         run: npm ci
         
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           
@@ -81,6 +89,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -115,6 +127,10 @@ jobs:
   lint:
     name: Code Linting
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -138,6 +154,10 @@ jobs:
   build:
     name: Build Contracts
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     needs: [test, security, lint]
     
     steps:
@@ -167,6 +187,10 @@ jobs:
   deploy-testnet:
     name: Deploy to Testnet
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     needs: [build]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment: testnet
@@ -208,6 +232,10 @@ jobs:
   frontend-test:
     name: Frontend Tests
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -235,6 +263,10 @@ jobs:
   documentation:
     name: Generate Documentation
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
@@ -254,7 +286,7 @@ jobs:
         run: node scripts/generate-docs.js
         
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
@@ -263,6 +295,10 @@ jobs:
   notify:
     name: Notify Status
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     needs: [test, security, lint, build]
     if: always()
     
