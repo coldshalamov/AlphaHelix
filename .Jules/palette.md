@@ -21,6 +21,6 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
-## $(date +%Y-%m-%d) - Support International Keyboards and Prevent Scroll-Jacking on Number Inputs
+## 2024-05-24 - Support International Keyboards and Prevent Scroll-Jacking on Number Inputs
 **Learning:** React `<input type="number">` fields suffer from scroll-jacking (scrolling the page accidentally increments/decrements the value) and can break on international keyboards where a comma is used for the decimal separator.
 **Action:** Replace `type="number"` with `type="text"` while using `inputMode="decimal"` and a `pattern` attribute (e.g., `pattern="^\d*\.?\d*$"`). In the `onChange` handler, proactively replace commas with dots and strip non-numeric/dot characters (e.g., `val.replace(/,/g, '.').replace(/[^\d.]/g, '')`) to ensure valid numeric parsing without frustrating the user.
