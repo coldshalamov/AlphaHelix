@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -66,6 +66,8 @@ const MarketCard = memo(function MarketCard({
 });
 
 export default function MarketsPage() {
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 10;
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -74,18 +76,27 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
+  useEffect(() => {
+    if (page * PAGE_SIZE >= numericCount && numericCount > 0) {
+      setPage(0);
+    }
+  }, [numericCount, page]);
+
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
-  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
+  const { data: marketsResults, isLoading, isFetching, error: queryError } = useReadContracts({
     contracts: useMemo(() => {
       if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+      const start = page * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, numericCount);
+      const length = Math.max(0, end - start);
+      return Array.from({ length }).map((_, i) => ({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
-        args: [BigInt(i)],
+        args: [BigInt(start + i)],
       }));
-    }, [numericCount]),
+    }, [numericCount, page]),
     query: {
       enabled: numericCount > 0,
     },
@@ -93,6 +104,7 @@ export default function MarketsPage() {
 
   const markets = useMemo(() => {
     if (!marketsResults) return [];
+    const start = page * PAGE_SIZE;
     return marketsResults
       .map((res, i) => {
         if (res.status !== 'success') return null;
@@ -100,7 +112,7 @@ export default function MarketsPage() {
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id: start + i,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,9 +126,10 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, page]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE);
 
   return (
     <div className="grid section">
@@ -124,10 +137,10 @@ export default function MarketsPage() {
         <h2 className="text-xl font-bold">Markets</h2>
         <p className="helper">Live statements pulled directly from the HelixMarket contract.</p>
       </div>
-      {isLoading && <div className="status">Loading markets...</div>}
+      {(isLoading || isFetching) ? <div className="status">Loading markets...</div> : null}
       {error && <div className="status">{error}</div>}
       <div className="grid two">
-        {markets.map((m) => (
+        {!(isLoading || isFetching) && markets.map((m) => (
           <MarketCard
             key={m.id}
             id={m.id}
@@ -140,7 +153,28 @@ export default function MarketsPage() {
           />
         ))}
       </div>
-      {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {!isLoading && !isFetching && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+          <button
+            className="button secondary"
+            disabled={page === 0}
+            onClick={() => setPage(p => p - 1)}
+          >
+            Previous
+          </button>
+          <span style={{ alignSelf: 'center' }}>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className="button secondary"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => p + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
