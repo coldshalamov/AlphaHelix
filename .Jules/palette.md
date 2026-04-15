@@ -21,3 +21,7 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2026-04-15 - Support International Keyboards in Financial Inputs
+**Learning:** Using `type="number"` for financial inputs causes scroll-jacking and fails to support international keyboards that use commas for decimals.
+**Action:** Use `<input type="text" inputMode="decimal" pattern="^\d*\.?\d*$">` and manually replace commas with dots in the `onChange` handler before applying strict numeric sanitization.
