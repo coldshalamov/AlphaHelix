@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,7 +65,11 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const PAGE_SIZE = 10;
+
 export default function MarketsPage() {
+  const [page, setPage] = useState(0);
+
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -73,21 +77,41 @@ export default function MarketsPage() {
   });
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
+  const totalPages = Math.ceil(numericCount / PAGE_SIZE);
+
+  // BOLT: Safely reset page if count decreases (e.g. network switch)
+  useEffect(() => {
+    if (numericCount > 0 && page >= totalPages) {
+      setPage(Math.max(0, totalPages - 1));
+    }
+  }, [numericCount, page, totalPages]);
+
+  // BOLT: Generate contracts array for the current page only
+  const pageContracts = useMemo(() => {
+    if (!numericCount) return [];
+
+    // Calculate the start ID (oldest market is highest ID if we were doing reverse, but we'll stick to forwards for now 0...count)
+    // Actually, usually users want newest first, but the previous code mapped 0...numericCount forwards.
+    // Let's preserve forwards order: 0, 1, 2...
+    const start = page * PAGE_SIZE;
+    const end = Math.min(start + PAGE_SIZE, numericCount);
+    const length = Math.max(0, end - start);
+
+    return Array.from({ length }).map((_, i) => ({
+      address: contracts.HelixMarket,
+      abi: marketAbi,
+      functionName: 'markets',
+      args: [BigInt(start + i)],
+    }));
+  }, [numericCount, page]);
 
   // BOLT: Replaced manual Promise.all loop with useReadContracts.
   // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
+  // We now paginate to prevent O(N) payload explosion.
   const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
-    contracts: useMemo(() => {
-      if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
-        address: contracts.HelixMarket,
-        abi: marketAbi,
-        functionName: 'markets',
-        args: [BigInt(i)],
-      }));
-    }, [numericCount]),
+    contracts: pageContracts,
     query: {
-      enabled: numericCount > 0,
+      enabled: pageContracts.length > 0,
     },
   });
 
@@ -99,8 +123,10 @@ export default function MarketsPage() {
         const data = res.result;
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
+        // BOLT: Derive ID directly from args[0] to prevent stale data mapping issues
+        const marketId = Number(pageContracts[i].args[0]);
         return {
-          id: i,
+          id: marketId,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +140,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, pageContracts]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +167,28 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {!isLoading && totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+          <button
+            className="button outline"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+          >
+            Previous
+          </button>
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className="button outline"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
