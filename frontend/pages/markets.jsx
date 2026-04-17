@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
@@ -65,7 +65,10 @@ const MarketCard = memo(function MarketCard({
   );
 });
 
+const PAGE_SIZE = 10;
+
 export default function MarketsPage() {
+  const [page, setPage] = useState(0);
   const { data: marketCount } = useReadContract({
     address: contracts.HelixMarket,
     abi: marketAbi,
@@ -74,33 +77,50 @@ export default function MarketsPage() {
 
   const numericCount = useMemo(() => (marketCount ? Number(marketCount) : 0), [marketCount]);
 
-  // BOLT: Replaced manual Promise.all loop with useReadContracts.
-  // This enables multicall batching (1 RPC call instead of N) and standardizes data fetching.
-  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
-    contracts: useMemo(() => {
-      if (!numericCount) return [];
-      return Array.from({ length: numericCount }).map((_, i) => ({
+  // BOLT: Added useEffect to safely reset the page state if the total count decreases (e.g., due to a network switch), preventing out-of-bounds rendering errors.
+  useEffect(() => {
+    if (numericCount > 0 && page * PAGE_SIZE >= numericCount) {
+      setPage(Math.max(0, Math.ceil(numericCount / PAGE_SIZE) - 1));
+    }
+  }, [numericCount, page]);
+
+  // BOLT: Replaced unbounded Wagmi useReadContracts multicall with offset pagination to prevent O(N) payload explosions and RPC limits.
+  const contractCalls = useMemo(() => {
+    if (!numericCount) return [];
+    const start = page * PAGE_SIZE;
+    const end = Math.min(start + PAGE_SIZE, numericCount);
+
+    const calls = [];
+    for (let i = start; i < end; i++) {
+      calls.push({
         address: contracts.HelixMarket,
         abi: marketAbi,
         functionName: 'markets',
         args: [BigInt(i)],
-      }));
-    }, [numericCount]),
+      });
+    }
+    return calls;
+  }, [numericCount, page]);
+
+  const { data: marketsResults, isLoading, error: queryError } = useReadContracts({
+    contracts: contractCalls,
     query: {
-      enabled: numericCount > 0,
+      enabled: contractCalls.length > 0,
     },
   });
 
   const markets = useMemo(() => {
     if (!marketsResults) return [];
     return marketsResults
-      .map((res, i) => {
+      .map((res, index) => {
         if (res.status !== 'success') return null;
         const data = res.result;
+        // BOLT: Derive the ID directly from the input contracts array to ensure data consistency during page transitions.
+        const id = Number(contractCalls[index].args[0]);
         const [ipfsCid, commitEndTime, revealEndTime, yesPool, noPool, unalignedPool, resolved, outcome, tie, originator] =
           data;
         return {
-          id: i,
+          id,
           ipfsCid,
           commitEndTime: Number(commitEndTime),
           revealEndTime: Number(revealEndTime),
@@ -114,7 +134,7 @@ export default function MarketsPage() {
         };
       })
       .filter((m) => m !== null);
-  }, [marketsResults]);
+  }, [marketsResults, contractCalls]);
 
   const error = queryError ? (queryError?.shortMessage || queryError?.message || 'Unable to load markets') : '';
 
@@ -141,6 +161,26 @@ export default function MarketsPage() {
         ))}
       </div>
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
+
+      {Math.ceil(numericCount / PAGE_SIZE) > 1 && (
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', alignItems: 'center' }}>
+          <button
+            className="button secondary"
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Previous
+          </button>
+          <span className="helper">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
+          <button
+            className="button secondary"
+            onClick={() => setPage(p => Math.min(Math.ceil(numericCount / PAGE_SIZE) - 1, p + 1))}
+            disabled={page >= Math.ceil(numericCount / PAGE_SIZE) - 1}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
