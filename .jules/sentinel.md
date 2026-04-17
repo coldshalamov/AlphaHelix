@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2026-04-17 - [Weak Randomness in Market Seeding]
+**Vulnerability:** The initial seed for market randomness (`s.closeSeed`) relied only on predictable elements (`block.timestamp`, `msg.sender`, `marketId`, `blockhash(block.number - 1)`), making it vulnerable to manipulation by validators.
+**Learning:** In Ethereum PoS, `block.prevrandao` provides a much stronger, harder-to-manipulate source of randomness than `blockhash` and timestamp alone.
+**Prevention:** Always include `block.prevrandao` in `keccak256` payloads when generating initial seeds for pseudo-random number generation.
