@@ -1,8 +1,5 @@
 const { expect } = require("chai");
-const {
-  loadFixture,
-  time,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -32,9 +29,7 @@ describe("HelixMarket Security - Griefing", function () {
 
     // This should revert now that we have the fix.
     await expect(
-      market
-        .connect(userA)
-        .submitStatement("ipfs://grief", biddingDuration, shortRevealDuration),
+        market.connect(userA).submitStatement("ipfs://grief", biddingDuration, shortRevealDuration)
     ).to.be.revertedWith("Reveal duration too short");
   });
 
@@ -44,13 +39,7 @@ describe("HelixMarket Security - Griefing", function () {
     const revealDuration = 3600;
 
     await expect(
-      market
-        .connect(userA)
-        .submitStatement(
-          "ipfs://grief_bidding",
-          shortBiddingDuration,
-          revealDuration,
-        ),
+        market.connect(userA).submitStatement("ipfs://grief_bidding", shortBiddingDuration, revealDuration)
     ).to.be.revertedWith("Bidding duration too short");
   });
 });
