@@ -7,18 +7,21 @@ const spaceMono = Space_Mono({
   weight: ['400', '700'],
   subsets: ['latin'],
   variable: '--font-display',
+  display: 'swap',
 });
 
 const ibmPlexSans = IBM_Plex_Sans({
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-body',
+  display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   weight: ['500'],
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
 });
 
 function MyApp({ Component, pageProps }) {
