@@ -2,7 +2,7 @@
 
 /**
  * Generate NatSpec Documentation
- * 
+ *
  * This script generates comprehensive documentation from contract NatSpec comments
  */
 
