@@ -8,7 +8,7 @@ import "./AlphaHelixToken.sol";
 /// @notice Commit-reveal prediction markets with HLX staking and no admin controls.
 contract HelixMarket is ReentrancyGuard {
     AlphaHelixToken public immutable token;
-    uint256 public constant STATEMENT_FEE = 100 * 10**18; // 100 HLX
+    uint256 public constant STATEMENT_FEE = 100 * 10 ** 18; // 100 HLX
     uint256 public constant ORIGINATOR_FEE_BPS = 100; // 1%
     uint256 public constant UNREVEALED_PENALTY_BPS = 10000; // 100% burned on unrevealed withdrawals
     uint256 public constant MIN_REVEAL_DURATION = 1 hours;
@@ -16,14 +16,14 @@ contract HelixMarket is ReentrancyGuard {
     uint256 public constant MAX_DURATION = 52 weeks;
     uint256 public constant MAX_CID_LENGTH = 128;
     // Random close configuration
-    uint256 public constant MIN_COMMIT_DURATION = 1 hours;  // Minimum before random close can trigger
+    uint256 public constant MIN_COMMIT_DURATION = 1 hours; // Minimum before random close can trigger
     uint256 public constant MAX_COMMIT_DURATION = 52 weeks; // Fallback max duration
-    uint256 public constant PING_REWARD = 1 * 10**18;       // 1 HLX reward for closing a market via ping
+    uint256 public constant PING_REWARD = 1 * 10 ** 18; // 1 HLX reward for closing a market via ping
     uint256 public marketCount;
 
     struct Statement {
         string ipfsCid;
-        uint256 commitEndTime;      // For fixed-time: end of commit phase. For random close: earliest close time.
+        uint256 commitEndTime; // For fixed-time: end of commit phase. For random close: earliest close time.
         uint256 revealEndTime;
         uint256 yesPool;
         uint256 noPool;
@@ -37,13 +37,13 @@ contract HelixMarket is ReentrancyGuard {
         uint256 claimedWinningStake;
         uint256 claimedRewardPaid;
         // Random close fields
-        bytes32 closeSeed;           // Market-specific entropy seed
-        uint256 difficultyTarget;    // Hash must be < this to close
-        bool randomCloseEnabled;     // True = random close, False = fixed time (backwards compat)
-        uint256 commitPhaseClosed;   // Timestamp when commit phase closed (0 = still open for random close)
-        uint256 revealDuration;      // Stored reveal duration for random close markets
-        uint256 hardCommitEndTime;   // For random close: forced close time. For fixed-time: equals commitEndTime.
-        bool pingRewardPaid;         // Ensures ping reward is paid at most once per market.
+        bytes32 closeSeed; // Market-specific entropy seed
+        uint256 difficultyTarget; // Hash must be < this to close
+        bool randomCloseEnabled; // True = random close, False = fixed time (backwards compat)
+        uint256 commitPhaseClosed; // Timestamp when commit phase closed (0 = still open for random close)
+        uint256 revealDuration; // Stored reveal duration for random close markets
+        uint256 hardCommitEndTime; // For random close: forced close time. For fixed-time: equals commitEndTime.
+        bool pingRewardPaid; // Ensures ping reward is paid at most once per market.
     }
 
     mapping(uint256 => Statement) public markets;
@@ -55,20 +55,63 @@ contract HelixMarket is ReentrancyGuard {
     // Tracking payouts requires knowing how much a user bet on the winning side.
     // marketId => user => side => amount
     // side: 0 = NO, 1 = YES, 2 = UNALIGNED
-    mapping(uint256 => mapping(address => mapping(uint8 => uint256))) public bets;
+    mapping(uint256 => mapping(address => mapping(uint8 => uint256)))
+        public bets;
 
     // Store committed amount to move to pools upon reveal
     mapping(uint256 => mapping(address => uint256)) public committedAmount;
 
-    event StatementCreated(uint256 indexed marketId, string ipfsCid, uint256 commitEndTime, uint256 revealEndTime, address originator);
-    event BetCommitted(uint256 indexed marketId, address indexed user, bytes32 commitHash, uint256 amount);
-    event BetRevealed(uint256 indexed marketId, address indexed user, uint8 choice, uint256 amount);
-    event MarketResolved(uint256 indexed marketId, bool outcome, bool tie, uint256 totalPool, uint256 originatorFee);
-    event UnrevealedWithdrawn(uint256 indexed marketId, address indexed user, uint256 amountReturned, uint256 penaltyBurned);
-    event Claimed(uint256 indexed marketId, address indexed user, uint8 side, uint256 stake, uint256 payout, bool tie);
+    event StatementCreated(
+        uint256 indexed marketId,
+        string ipfsCid,
+        uint256 commitEndTime,
+        uint256 revealEndTime,
+        address originator
+    );
+    event BetCommitted(
+        uint256 indexed marketId,
+        address indexed user,
+        bytes32 commitHash,
+        uint256 amount
+    );
+    event BetRevealed(
+        uint256 indexed marketId,
+        address indexed user,
+        uint8 choice,
+        uint256 amount
+    );
+    event MarketResolved(
+        uint256 indexed marketId,
+        bool outcome,
+        bool tie,
+        uint256 totalPool,
+        uint256 originatorFee
+    );
+    event UnrevealedWithdrawn(
+        uint256 indexed marketId,
+        address indexed user,
+        uint256 amountReturned,
+        uint256 penaltyBurned
+    );
+    event Claimed(
+        uint256 indexed marketId,
+        address indexed user,
+        uint8 side,
+        uint256 stake,
+        uint256 payout,
+        bool tie
+    );
     // Random close events
-    event CommitPhaseClosedRandomly(uint256 indexed marketId, bytes32 closeHash, uint256 timestamp);
-    event MarketCreatedWithRandomClose(uint256 indexed marketId, uint256 difficultyTarget, uint256 avgDuration);
+    event CommitPhaseClosedRandomly(
+        uint256 indexed marketId,
+        bytes32 closeHash,
+        uint256 timestamp
+    );
+    event MarketCreatedWithRandomClose(
+        uint256 indexed marketId,
+        uint256 difficultyTarget,
+        uint256 avgDuration
+    );
 
     constructor(address _token) {
         token = AlphaHelixToken(_token);
@@ -81,7 +124,9 @@ contract HelixMarket is ReentrancyGuard {
 
     /// @notice Checks if market should randomly close based on hash difficulty
     /// @dev Runs on every market interaction (commit, reveal, ping)
-    function _checkRandomClose(uint256 marketId) internal returns (bool triggerPingReward) {
+    function _checkRandomClose(
+        uint256 marketId
+    ) internal returns (bool triggerPingReward) {
         Statement storage s = markets[marketId];
         triggerPingReward = false;
 
@@ -89,34 +134,44 @@ contract HelixMarket is ReentrancyGuard {
         // 1. Random close is enabled for this market
         // 2. Commit phase not already closed
         // 3. Minimum duration has passed
-        if (s.randomCloseEnabled &&
+        if (
+            s.randomCloseEnabled &&
             s.commitPhaseClosed == 0 &&
-            block.timestamp >= s.commitEndTime) {
-
+            block.timestamp >= s.commitEndTime
+        ) {
             // Compute hash from multiple entropy sources
             // SECURITY: Removed tx.gasprice to prevent user manipulation (grinding)
-            bytes32 closeHash = keccak256(abi.encodePacked(
-                blockhash(block.number - 1),    // Recent block hash
-                blockhash(block.number - 2),    // 2 blocks ago
-                blockhash(block.number - 3),    // 3 blocks ago
-                msg.sender,                      // Current transaction sender
-                block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
-                s.yesPool,                       // Current YES pool state
-                s.noPool,                        // Current NO pool state
-                s.unalignedPool,                 // Current UNALIGNED pool state
-                s.closeSeed,                     // Market-specific seed
-                block.timestamp                  // Current timestamp
-            ));
+            bytes32 closeHash = keccak256(
+                abi.encodePacked(
+                    blockhash(block.number - 1), // Recent block hash
+                    blockhash(block.number - 2), // 2 blocks ago
+                    blockhash(block.number - 3), // 3 blocks ago
+                    msg.sender, // Current transaction sender
+                    block.prevrandao, // Randomness from beacon chain/L1 (harder to manipulate)
+                    s.yesPool, // Current YES pool state
+                    s.noPool, // Current NO pool state
+                    s.unalignedPool, // Current UNALIGNED pool state
+                    s.closeSeed, // Market-specific seed
+                    block.timestamp // Current timestamp
+                )
+            );
 
             // Check if hash meets difficulty target
-            if (uint256(closeHash) < s.difficultyTarget || block.timestamp >= s.hardCommitEndTime) {
+            if (
+                uint256(closeHash) < s.difficultyTarget ||
+                block.timestamp >= s.hardCommitEndTime
+            ) {
                 // COMMIT PHASE CLOSES NOW
                 s.commitPhaseClosed = block.timestamp;
 
                 // Reveal phase starts immediately and lasts for the stored reveal duration
                 s.revealEndTime = block.timestamp + s.revealDuration;
 
-                emit CommitPhaseClosedRandomly(marketId, closeHash, block.timestamp);
+                emit CommitPhaseClosedRandomly(
+                    marketId,
+                    closeHash,
+                    block.timestamp
+                );
 
                 // Pay ping reward once, funded by the statement fee for random-close markets.
                 if (!s.pingRewardPaid) {
@@ -131,8 +186,18 @@ contract HelixMarket is ReentrancyGuard {
     /// @param ipfsCid Content identifier describing the statement.
     /// @param biddingDuration Duration of the commit phase in seconds.
     /// @param revealDuration Duration of the reveal phase in seconds.
-    function submitStatement(string memory ipfsCid, uint256 biddingDuration, uint256 revealDuration) external nonReentrant {
-        _submitStatementInternal(ipfsCid, biddingDuration, revealDuration, false, 0);
+    function submitStatement(
+        string memory ipfsCid,
+        uint256 biddingDuration,
+        uint256 revealDuration
+    ) external nonReentrant {
+        _submitStatementInternal(
+            ipfsCid,
+            biddingDuration,
+            revealDuration,
+            false,
+            0
+        );
     }
 
     /// @notice Create a new market statement with optional random close.
@@ -148,7 +213,13 @@ contract HelixMarket is ReentrancyGuard {
         bool enableRandomClose,
         uint256 avgCommitDuration
     ) external nonReentrant {
-        _submitStatementInternal(ipfsCid, minCommitDuration, revealDuration, enableRandomClose, avgCommitDuration);
+        _submitStatementInternal(
+            ipfsCid,
+            minCommitDuration,
+            revealDuration,
+            enableRandomClose,
+            avgCommitDuration
+        );
     }
 
     /// @dev Internal function for creating market statements.
@@ -161,14 +232,26 @@ contract HelixMarket is ReentrancyGuard {
     ) internal {
         require(bytes(ipfsCid).length > 0, "CID empty");
         require(bytes(ipfsCid).length <= MAX_CID_LENGTH, "CID too long");
-        require(minCommitDuration >= MIN_BIDDING_DURATION, "Bidding duration too short");
+        require(
+            minCommitDuration >= MIN_BIDDING_DURATION,
+            "Bidding duration too short"
+        );
         require(minCommitDuration <= MAX_DURATION, "Bidding duration too long");
-        require(revealDuration >= MIN_REVEAL_DURATION, "Reveal duration too short");
+        require(
+            revealDuration >= MIN_REVEAL_DURATION,
+            "Reveal duration too short"
+        );
         require(revealDuration <= MAX_DURATION, "Reveal duration too long");
 
         if (enableRandomClose) {
-            require(avgCommitDuration >= minCommitDuration, "Avg duration must be >= min duration");
-            require(avgCommitDuration <= MAX_COMMIT_DURATION, "Avg duration too long");
+            require(
+                avgCommitDuration >= minCommitDuration,
+                "Avg duration must be >= min duration"
+            );
+            require(
+                avgCommitDuration <= MAX_COMMIT_DURATION,
+                "Avg duration too long"
+            );
         }
 
         uint256 marketId = marketCount++;
@@ -179,19 +262,27 @@ contract HelixMarket is ReentrancyGuard {
         s.randomCloseEnabled = enableRandomClose;
         s.revealDuration = revealDuration;
 
-        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
+        require(
+            token.transferFrom(msg.sender, address(this), STATEMENT_FEE),
+            "Fee transfer failed"
+        );
 
         if (enableRandomClose) {
             // Generate market-specific random seed
-            s.closeSeed = keccak256(abi.encodePacked(
-                block.timestamp,
-                msg.sender,
-                marketId,
-                blockhash(block.number - 1)
-            ));
+            s.closeSeed = keccak256(
+                abi.encodePacked(
+                    block.timestamp,
+                    msg.sender,
+                    marketId,
+                    blockhash(block.number - 1),
+                    block.prevrandao
+                )
+            );
 
             // Calculate difficulty target based on avgCommitDuration
-            s.difficultyTarget = _calculateDifficultyTarget(avgCommitDuration - minCommitDuration);
+            s.difficultyTarget = _calculateDifficultyTarget(
+                avgCommitDuration - minCommitDuration
+            );
 
             // Force close by avgCommitDuration (ensures markets cannot hang indefinitely).
             s.hardCommitEndTime = block.timestamp + avgCommitDuration;
@@ -203,7 +294,11 @@ contract HelixMarket is ReentrancyGuard {
             require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
             token.burn(STATEMENT_FEE - PING_REWARD);
 
-            emit MarketCreatedWithRandomClose(marketId, s.difficultyTarget, avgCommitDuration);
+            emit MarketCreatedWithRandomClose(
+                marketId,
+                s.difficultyTarget,
+                avgCommitDuration
+            );
         } else {
             // Fixed-time market (backwards compatible)
             s.revealEndTime = s.commitEndTime + revealDuration;
@@ -213,18 +308,24 @@ contract HelixMarket is ReentrancyGuard {
             token.burn(STATEMENT_FEE);
         }
 
-        emit StatementCreated(marketId, ipfsCid, s.commitEndTime, s.revealEndTime, msg.sender);
+        emit StatementCreated(
+            marketId,
+            ipfsCid,
+            s.commitEndTime,
+            s.revealEndTime,
+            msg.sender
+        );
     }
 
     /// @notice Commit a hashed bet during the commit phase.
     /// @param marketId Identifier of the market.
     /// @param commitHash Hash of (choice, salt, bettor address).
     /// @param amount Amount of HLX to stake.
-    function commitBet(uint256 marketId, bytes32 commitHash, uint256 amount)
-        external
-        nonReentrant
-        validMarket(marketId)
-    {
+    function commitBet(
+        uint256 marketId,
+        bytes32 commitHash,
+        uint256 amount
+    ) external nonReentrant validMarket(marketId) {
         bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
@@ -246,12 +347,18 @@ contract HelixMarket is ReentrancyGuard {
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
 
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        require(
+            token.transferFrom(msg.sender, address(this), amount),
+            "Transfer failed"
+        );
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            require(
+                token.transfer(msg.sender, PING_REWARD),
+                "Reward transfer failed"
+            );
         }
     }
 
@@ -259,11 +366,11 @@ contract HelixMarket is ReentrancyGuard {
     /// @param marketId Identifier of the market.
     /// @param choice 0 = NO, 1 = YES, 2 = UNALIGNED.
     /// @param salt Salt used to create the commit hash.
-    function revealBet(uint256 marketId, uint8 choice, uint256 salt)
-        external
-        nonReentrant
-        validMarket(marketId)
-    {
+    function revealBet(
+        uint256 marketId,
+        uint8 choice,
+        uint256 salt
+    ) external nonReentrant validMarket(marketId) {
         bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
@@ -272,7 +379,10 @@ contract HelixMarket is ReentrancyGuard {
         if (s.randomCloseEnabled) {
             require(s.commitPhaseClosed > 0, "Commit phase still open");
         } else {
-            require(block.timestamp >= s.commitEndTime, "Commit phase not over");
+            require(
+                block.timestamp >= s.commitEndTime,
+                "Commit phase not over"
+            );
         }
 
         require(block.timestamp < s.revealEndTime, "Reveal phase over");
@@ -280,7 +390,10 @@ contract HelixMarket is ReentrancyGuard {
         bytes32 storedHash = commits[marketId][msg.sender];
         require(storedHash != bytes32(0), "No bet committed");
 
-        require(keccak256(abi.encodePacked(choice, salt, msg.sender)) == storedHash, "Invalid hash/reveal");
+        require(
+            keccak256(abi.encodePacked(choice, salt, msg.sender)) == storedHash,
+            "Invalid hash/reveal"
+        );
 
         uint256 amount = committedAmount[marketId][msg.sender];
         require(amount > 0, "Already revealed or no amount");
@@ -288,13 +401,16 @@ contract HelixMarket is ReentrancyGuard {
         committedAmount[marketId][msg.sender] = 0;
 
         require(choice <= 2, "Invalid choice");
-        if (choice == 1) { // YES
+        if (choice == 1) {
+            // YES
             s.yesPool += amount;
             bets[marketId][msg.sender][1] += amount;
-        } else if (choice == 0) { // NO
+        } else if (choice == 0) {
+            // NO
             s.noPool += amount;
             bets[marketId][msg.sender][0] += amount;
-        } else { // UNALIGNED (assuming 2)
+        } else {
+            // UNALIGNED (assuming 2)
             s.unalignedPool += amount;
             bets[marketId][msg.sender][2] += amount;
         }
@@ -302,13 +418,18 @@ contract HelixMarket is ReentrancyGuard {
         emit BetRevealed(marketId, msg.sender, choice, amount);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            require(
+                token.transfer(msg.sender, PING_REWARD),
+                "Reward transfer failed"
+            );
         }
     }
 
     /// @notice Resolve a market after the reveal period ends.
     /// @dev Applies tie logic (full refunds, no originator fee) when yes/no pools match.
-    function resolve(uint256 marketId) external nonReentrant validMarket(marketId) {
+    function resolve(
+        uint256 marketId
+    ) external nonReentrant validMarket(marketId) {
         Statement storage s = markets[marketId];
         require(s.revealEndTime != 0, "Reveal not started");
         require(block.timestamp > s.revealEndTime, "Reveal phase not over");
@@ -329,11 +450,17 @@ contract HelixMarket is ReentrancyGuard {
 
     /// @notice Claim winnings (or refunds in a tie) after resolution.
     /// @param marketId Identifier of the market.
-    function claim(uint256 marketId) external nonReentrant validMarket(marketId) {
+    function claim(
+        uint256 marketId
+    ) external nonReentrant validMarket(marketId) {
         Statement storage s = markets[marketId];
         require(s.resolved, "Not resolved");
 
-        (uint256 userBet, uint256 winningPool, uint256 rewardPool) = _payoutInputs(s, marketId);
+        (
+            uint256 userBet,
+            uint256 winningPool,
+            uint256 rewardPool
+        ) = _payoutInputs(s, marketId);
         require(userBet > 0, "No winning bet");
 
         _clearUserBets(marketId, s.tie, s.outcome);
@@ -344,8 +471,12 @@ contract HelixMarket is ReentrancyGuard {
         if (s.tie) {
             payout = userBet;
         } else {
-            require(rewardPool >= s.claimedRewardPaid, "Claim accounting overflow");
-            bool isLastWinner = (s.claimedWinningStake + userBet == winningPool);
+            require(
+                rewardPool >= s.claimedRewardPaid,
+                "Claim accounting overflow"
+            );
+            bool isLastWinner = (s.claimedWinningStake + userBet ==
+                winningPool);
             if (isLastWinner) {
                 payout = rewardPool - s.claimedRewardPaid;
                 s.claimedRewardPaid = rewardPool;
@@ -363,7 +494,9 @@ contract HelixMarket is ReentrancyGuard {
 
     /// @notice Withdraw committed HLX that was never revealed once the reveal window has closed.
     /// @dev Applies a 100% burn penalty to discourage forgetting to reveal.
-    function withdrawUnrevealed(uint256 marketId) external nonReentrant validMarket(marketId) {
+    function withdrawUnrevealed(
+        uint256 marketId
+    ) external nonReentrant validMarket(marketId) {
         Statement storage s = markets[marketId];
         require(block.timestamp > s.revealEndTime, "Reveal phase not over");
 
@@ -388,7 +521,10 @@ contract HelixMarket is ReentrancyGuard {
         return (totalPool * ORIGINATOR_FEE_BPS) / 10000;
     }
 
-    function _determineOutcome(uint256 yesPool, uint256 noPool) internal pure returns (bool tie, bool outcome) {
+    function _determineOutcome(
+        uint256 yesPool,
+        uint256 noPool
+    ) internal pure returns (bool tie, bool outcome) {
         if (yesPool > noPool) {
             return (false, true);
         } else if (noPool > yesPool) {
@@ -397,7 +533,10 @@ contract HelixMarket is ReentrancyGuard {
         return (true, false);
     }
 
-    function _payoutInputs(Statement storage s, uint256 marketId)
+    function _payoutInputs(
+        Statement storage s,
+        uint256 marketId
+    )
         internal
         view
         returns (uint256 userBet, uint256 winningPool, uint256 rewardPool)
@@ -407,7 +546,10 @@ contract HelixMarket is ReentrancyGuard {
         rewardPool = totalPool - fee;
 
         if (s.tie) {
-            userBet = bets[marketId][msg.sender][0] + bets[marketId][msg.sender][1] + bets[marketId][msg.sender][2];
+            userBet =
+                bets[marketId][msg.sender][0] +
+                bets[marketId][msg.sender][1] +
+                bets[marketId][msg.sender][2];
             winningPool = totalPool;
         } else if (s.outcome) {
             userBet = bets[marketId][msg.sender][1];
@@ -433,7 +575,9 @@ contract HelixMarket is ReentrancyGuard {
     /// @notice Calculate difficulty target based on desired average duration
     /// @param avgDuration Expected average time until close (in seconds, after minDuration)
     /// @return Difficulty target (hash must be < this value to close)
-    function _calculateDifficultyTarget(uint256 avgDuration) internal pure returns (uint256) {
+    function _calculateDifficultyTarget(
+        uint256 avgDuration
+    ) internal pure returns (uint256) {
         // Assume ~1 interaction per 60 seconds (conservative estimate)
         // On active markets, this could be much higher (more frequent closes)
         // On inactive markets, this could be lower (longer closes)
@@ -454,11 +598,16 @@ contract HelixMarket is ReentrancyGuard {
     /// @notice Manually trigger a random close check
     /// @dev Useful for low-activity markets where no one is committing
     /// @param marketId Market to ping
-    function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) {
+    function pingMarket(
+        uint256 marketId
+    ) external nonReentrant validMarket(marketId) {
         bool triggerPingReward = _checkRandomClose(marketId);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            require(
+                token.transfer(msg.sender, PING_REWARD),
+                "Reward transfer failed"
+            );
             // PingReward event emitting isn't necessary because pingMarket relies on triggerPingReward
         }
     }
@@ -469,35 +618,47 @@ contract HelixMarket is ReentrancyGuard {
     /// @return willClose True if this hash would close the market
     /// @return isRandomCloseEnabled True if market has random close enabled
     /// @return isCommitPhaseOpen True if commit phase is still open
-    function previewCloseCheck(uint256 marketId) external view returns (
-        bytes32 closeHash,
-        bool willClose,
-        bool isRandomCloseEnabled,
-        bool isCommitPhaseOpen
-    ) {
+    function previewCloseCheck(
+        uint256 marketId
+    )
+        external
+        view
+        returns (
+            bytes32 closeHash,
+            bool willClose,
+            bool isRandomCloseEnabled,
+            bool isCommitPhaseOpen
+        )
+    {
         require(marketId < marketCount, "Invalid market");
         Statement storage s = markets[marketId];
 
         isRandomCloseEnabled = s.randomCloseEnabled;
-        isCommitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
+        isCommitPhaseOpen =
+            s.randomCloseEnabled
+                ? (s.commitPhaseClosed == 0)
+                : (block.timestamp < s.commitEndTime);
 
-        closeHash = keccak256(abi.encodePacked(
-            blockhash(block.number - 1),
-            blockhash(block.number - 2),
-            blockhash(block.number - 3),
-            msg.sender,
-            block.prevrandao,
-            s.yesPool,
-            s.noPool,
-            s.unalignedPool,
-            s.closeSeed,
-            block.timestamp
-        ));
+        closeHash = keccak256(
+            abi.encodePacked(
+                blockhash(block.number - 1),
+                blockhash(block.number - 2),
+                blockhash(block.number - 3),
+                msg.sender,
+                block.prevrandao,
+                s.yesPool,
+                s.noPool,
+                s.unalignedPool,
+                s.closeSeed,
+                block.timestamp
+            )
+        );
 
         willClose = (s.randomCloseEnabled &&
-                     s.commitPhaseClosed == 0 &&
-                     block.timestamp >= s.commitEndTime &&
-                     (uint256(closeHash) < s.difficultyTarget || block.timestamp >= s.hardCommitEndTime));
+            s.commitPhaseClosed == 0 &&
+            block.timestamp >= s.commitEndTime &&
+            (uint256(closeHash) < s.difficultyTarget ||
+                block.timestamp >= s.hardCommitEndTime));
     }
 
     /// @notice Get random close status for a market
@@ -506,14 +667,25 @@ contract HelixMarket is ReentrancyGuard {
     /// @return commitPhaseClosed Timestamp when commit phase closed (0 if still open)
     /// @return difficultyTarget Hash difficulty target
     /// @return closeSeed Market-specific entropy seed
-    function getRandomCloseStatus(uint256 marketId) external view returns (
-        bool randomCloseEnabled,
-        uint256 commitPhaseClosed,
-        uint256 difficultyTarget,
-        bytes32 closeSeed
-    ) {
+    function getRandomCloseStatus(
+        uint256 marketId
+    )
+        external
+        view
+        returns (
+            bool randomCloseEnabled,
+            uint256 commitPhaseClosed,
+            uint256 difficultyTarget,
+            bytes32 closeSeed
+        )
+    {
         require(marketId < marketCount, "Invalid market");
         Statement storage s = markets[marketId];
-        return (s.randomCloseEnabled, s.commitPhaseClosed, s.difficultyTarget, s.closeSeed);
+        return (
+            s.randomCloseEnabled,
+            s.commitPhaseClosed,
+            s.difficultyTarget,
+            s.closeSeed
+        );
     }
 }

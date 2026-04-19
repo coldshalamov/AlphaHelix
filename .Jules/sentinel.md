@@ -12,3 +12,8 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+
+## 2026-04-19 - [Predictable Randomness in closeSeed]
+**Vulnerability:** The market-specific `closeSeed` was generated using only predictable elements like `block.timestamp`, `msg.sender`, and `blockhash(block.number - 1)`, making it potentially vulnerable to manipulation.
+**Learning:** In Ethereum Proof-of-Stake (post-Merge), `block.prevrandao` must be included for stronger pseudo-randomness.
+**Prevention:** Always include `block.prevrandao` when generating pseudo-random seeds on-chain to prevent manipulation.
