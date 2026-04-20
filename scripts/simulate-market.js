@@ -12,21 +12,31 @@ const hre = require("hardhat");
 async function main() {
   console.log("🎲 Starting market simulation...\n");
 
-  const [deployer, originator, userA, userB, userC] = await hre.ethers.getSigners();
+  const [deployer, originator, userA, userB, userC] =
+    await hre.ethers.getSigners();
 
   // Get deployed contracts
   const configPath = "./frontend/src/config/contracts.json";
   let config;
   try {
-    config = JSON.parse(require('fs').readFileSync(configPath, 'utf8'));
+    config = JSON.parse(require("fs").readFileSync(configPath, "utf8"));
   } catch (e) {
     console.error("❌ No deployed contracts found. Run deployment first.");
     process.exit(1);
   }
 
-  const market = await hre.ethers.getContractAt("HelixMarket", config.HelixMarket);
-  const token = await hre.ethers.getContractAt("AlphaHelixToken", config.AlphaHelixToken);
-  const reserve = await hre.ethers.getContractAt("HelixReserve", config.HelixReserve);
+  const market = await hre.ethers.getContractAt(
+    "HelixMarket",
+    config.HelixMarket,
+  );
+  const token = await hre.ethers.getContractAt(
+    "AlphaHelixToken",
+    config.AlphaHelixToken,
+  );
+  const reserve = await hre.ethers.getContractAt(
+    "HelixReserve",
+    config.HelixReserve,
+  );
 
   console.log("📄 Using contracts:");
   console.log("  HelixMarket:", config.HelixMarket);
@@ -65,18 +75,20 @@ async function main() {
   const biddingDuration = 3600; // 1 hour
   const revealDuration = 3600; // 1 hour
 
-  const tx = await market.connect(originator).submitStatement(
-    ipfsCid,
-    biddingDuration,
-    revealDuration
-  );
+  const tx = await market
+    .connect(originator)
+    .submitStatement(ipfsCid, biddingDuration, revealDuration);
   const receipt = await tx.wait();
 
   const marketId = 0; // First market
   console.log(`  Market ID: ${marketId}`);
   console.log(`  IPFS CID: ${ipfsCid}`);
-  console.log(`  Commit Duration: ${biddingDuration}s (${biddingDuration / 3600}h)`);
-  console.log(`  Reveal Duration: ${revealDuration}s (${revealDuration / 3600}h)`);
+  console.log(
+    `  Commit Duration: ${biddingDuration}s (${biddingDuration / 3600}h)`,
+  );
+  console.log(
+    `  Reveal Duration: ${revealDuration}s (${revealDuration / 3600}h)`,
+  );
 
   // Commit bets
   console.log("\n🎯 Committing bets...");
@@ -92,24 +104,34 @@ async function main() {
   const buildCommit = (choice, salt, user) => {
     return hre.ethers.solidityPackedKeccak256(
       ["uint8", "uint256", "address"],
-      [choice, salt, user]
+      [choice, salt, user],
     );
   };
 
   // YES bet from userA
   const commitHashA = buildCommit(1, salt1, userA.address);
-  await (await market.connect(userA).commitBet(marketId, commitHashA, yesAmount)).wait();
+  await (
+    await market.connect(userA).commitBet(marketId, commitHashA, yesAmount)
+  ).wait();
   console.log(`  UserA: YES - ${hre.ethers.formatEther(yesAmount)} HLX`);
 
   // NO bet from userB
   const commitHashB = buildCommit(0, salt2, userB.address);
-  await (await market.connect(userB).commitBet(marketId, commitHashB, noAmount)).wait();
+  await (
+    await market.connect(userB).commitBet(marketId, commitHashB, noAmount)
+  ).wait();
   console.log(`  UserB: NO - ${hre.ethers.formatEther(noAmount)} HLX`);
 
   // UNALIGNED bet from userC
   const commitHashC = buildCommit(2, salt3, userC.address);
-  await (await market.connect(userC).commitBet(marketId, commitHashC, unalignedAmount)).wait();
-  console.log(`  UserC: UNALIGNED - ${hre.ethers.formatEther(unalignedAmount)} HLX`);
+  await (
+    await market
+      .connect(userC)
+      .commitBet(marketId, commitHashC, unalignedAmount)
+  ).wait();
+  console.log(
+    `  UserC: UNALIGNED - ${hre.ethers.formatEther(unalignedAmount)} HLX`,
+  );
 
   console.log("\n⏰ Market lifecycle:");
   console.log("  Status: Commit phase active");

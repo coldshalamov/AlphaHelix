@@ -8,7 +8,8 @@ async function deployContracts() {
   console.log("Deployer:", deployer.address);
 
   console.log("\n-> Deploying AlphaHelixToken");
-  const AlphaHelixToken = await hre.ethers.getContractFactory("AlphaHelixToken");
+  const AlphaHelixToken =
+    await hre.ethers.getContractFactory("AlphaHelixToken");
   const token = await AlphaHelixToken.deploy();
   await token.waitForDeployment();
   const tokenAddress = await token.getAddress();
@@ -34,7 +35,9 @@ async function deployContracts() {
   await tx.wait();
   console.log("MINTER_ROLE granted");
 
-  console.log("\n-> Writing contract addresses to frontend/src/config/contracts.json");
+  console.log(
+    "\n-> Writing contract addresses to frontend/src/config/contracts.json",
+  );
   const configDir = path.join(__dirname, "../frontend/src/config");
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
@@ -48,7 +51,7 @@ async function deployContracts() {
 
   fs.writeFileSync(
     path.join(configDir, "contracts.json"),
-    JSON.stringify(addresses, null, 2)
+    JSON.stringify(addresses, null, 2),
   );
   console.log("Contract addresses saved");
 
