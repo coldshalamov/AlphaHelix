@@ -2,11 +2,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import bannerHelix from '../assets/banner_helix.jpg';
+import Spinner from './Spinner';
 
 export default function Layout({ children, className = '' }) {
   const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending } = useConnect();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected';
@@ -17,6 +19,11 @@ export default function Layout({ children, className = '' }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleConnect = () => {
+    const connector = connectors[0];
+    if (connector) connect({ connector });
   };
 
   const isActive = (path) => router.pathname === path;
@@ -77,9 +84,21 @@ export default function Layout({ children, className = '' }) {
               <span>{copied ? '✓ Copied!' : shortAddress}</span>
             </button>
           ) : (
-            <div className="badge">
-              <span>Connect Wallet</span>
-            </div>
+            <button
+              className="badge"
+              onClick={handleConnect}
+              type="button"
+              aria-label={isPending ? 'Connecting wallet' : 'Connect wallet'}
+              disabled={isPending}
+              style={{
+                border: 'none',
+                cursor: isPending ? 'wait' : 'pointer',
+                opacity: isPending ? 0.7 : 1,
+              }}
+            >
+              {isPending && <Spinner />}
+              <span>{isPending ? 'Connecting...' : 'Connect Wallet'}</span>
+            </button>
           )}
         </div>
       </header>
