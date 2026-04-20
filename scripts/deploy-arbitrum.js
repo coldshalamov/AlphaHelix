@@ -1,7 +1,9 @@
 const { deployContracts } = require("./deploy");
 
 async function main() {
-  console.log("Deploying to Arbitrum Sepolia network (ensure env vars are set)");
+  console.log(
+    "Deploying to Arbitrum Sepolia network (ensure env vars are set)",
+  );
   await deployContracts();
 }
 
