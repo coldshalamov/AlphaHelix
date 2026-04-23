@@ -21,3 +21,7 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2026-04-23 - [Scroll-jacking and International Keyboards]
+**Learning:** Using `<input type="number">` can cause unwanted scroll-jacking, and users with international keyboards might struggle if inputs don't accept commas as decimal separators.
+**Action:** Use `<input type="text" inputMode="decimal">` with the HTML `pattern` attribute to prevent scroll-jacking. Manually strip non-numeric characters in the `onChange` handler, and importantly, replace commas with dots (e.g., `val = val.replace(/,/g, '.').replace(/[^\d.]/g, '')`) to support international keyboards.
