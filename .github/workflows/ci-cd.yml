@@ -81,6 +81,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -96,7 +100,7 @@ jobs:
         run: npm ci
         
       - name: Generate gas report
-        run: REPORT_GAS=true npm test | tee gas-report.txt
+        run: REPORT_GAS=true npm test
         
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
