@@ -16,8 +16,13 @@ const BuyCard = memo(function BuyCard({
   handleBuy,
   inputRef
 }) {
+  const onSubmit = useCallback((e) => {
+    e.preventDefault();
+    handleBuy();
+  }, [handleBuy]);
+
   return (
-    <div className="card" style={{ borderColor: '#dbeafe' }}>
+    <form className="card" style={{ borderColor: '#dbeafe' }} onSubmit={onSubmit}>
       <h3 className="font-semibold">Buy HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
         <label htmlFor="buy-amount" className="helper">
@@ -71,9 +76,9 @@ const BuyCard = memo(function BuyCard({
         </span>
       </div>
       <button
+        type="submit"
         className="button primary"
         style={{ marginTop: '0.75rem' }}
-        onClick={handleBuy}
         disabled={Boolean(activeAction)}
       >
         {activeAction === 'buy' ? (
@@ -85,7 +90,7 @@ const BuyCard = memo(function BuyCard({
           'Buy HLX'
         )}
       </button>
-    </div>
+    </form>
   );
 });
 
@@ -99,8 +104,13 @@ const SellCard = memo(function SellCard({
   handleSell,
   inputRef
 }) {
+  const onSubmit = useCallback((e) => {
+    e.preventDefault();
+    handleSell();
+  }, [handleSell]);
+
   return (
-    <div className="card" style={{ borderColor: '#ffe4e6' }}>
+    <form className="card" style={{ borderColor: '#ffe4e6' }} onSubmit={onSubmit}>
       <h3 className="font-semibold">Sell HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
         <label htmlFor="sell-amount" className="helper">
@@ -154,9 +164,9 @@ const SellCard = memo(function SellCard({
         </span>
       </div>
       <button
+        type="submit"
         className="button danger"
         style={{ marginTop: '0.75rem' }}
-        onClick={handleSell}
         disabled={Boolean(activeAction)}
       >
         {activeAction === 'sell' ? (
@@ -169,7 +179,7 @@ const SellCard = memo(function SellCard({
         )}
       </button>
       <p className="helper">Allowances reset each time for simplicity.</p>
-    </div>
+    </form>
   );
 });
 

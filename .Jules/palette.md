@@ -21,3 +21,7 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2026-04-24 - Native Form Accessibility
+**Learning:** React functional components wrapping inputs inside simple `<div>` elements with `onClick` handlers on buttons break native keyboard accessibility. Users cannot submit the input by pressing the "Enter" key, which creates friction.
+**Action:** Always wrap interactive input fields and their submission buttons in a semantic `<form onSubmit={...}>` element and use `<button type="submit">` rather than a generic `onClick` handler.
