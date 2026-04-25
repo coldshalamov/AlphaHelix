@@ -21,6 +21,11 @@ module.exports = {
       accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
     },
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS ? true : false,
+    outputFile: 'gas-report.txt',
+    noColors: true,
+  },
   etherscan: {
     apiKey: {
       arbitrumSepolia: ARBISCAN_API_KEY || "",
