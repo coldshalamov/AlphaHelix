@@ -21,3 +21,6 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+## 2026-04-27 - [Form Submission Accessibility]
+**Learning:** Users expect to be able to submit forms by pressing the 'Enter' key after filling an input field. Wrapping inputs and submit buttons in a `<div>` breaks this native accessibility feature.
+**Action:** Always wrap financial or transaction input widgets in semantic `<form onSubmit={...}>` elements and use `<button type="submit">` instead of `<div>` wrappers and `onClick` handlers on buttons to ensure native keyboard accessibility.
