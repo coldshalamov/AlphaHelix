@@ -239,6 +239,9 @@ function BettingWidget({
       // Create salt + commitment hash
       const randomBuffer = new Uint8Array(32);
       window.crypto.getRandomValues(randomBuffer);
+      // BOLT: Optimize buffer to hex conversion.
+      // Replaced manual array mapping with `viem`'s `bytesToHex` utility to avoid creating intermediate arrays and strings,
+      // reducing unnecessary memory overhead and garbage collection pauses during cryptographic salt generation.
       const salt = BigInt(bytesToHex(randomBuffer));
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
       // BOLT: Convert marketId (BigInt) to string to avoid JSON.stringify crash in persistBet
