@@ -81,6 +81,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -111,6 +115,7 @@ jobs:
               repo: context.repo.repo,
               body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
             });
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
     name: Code Linting
