@@ -37,11 +37,10 @@ const BuyCard = memo(function BuyCard({
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern={"^\\d*\\.?\\d*$"}
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -120,11 +119,10 @@ const SellCard = memo(function SellCard({
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern={"^\\d*\\.?\\d*$"}
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -242,7 +240,11 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    // Replace commas with dots and strip non-numeric/dot characters for international keyboards
+    let val = e.target.value.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
@@ -251,7 +253,11 @@ function Bank() {
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    // Replace commas with dots and strip non-numeric/dot characters for international keyboards
+    let val = e.target.value.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50
