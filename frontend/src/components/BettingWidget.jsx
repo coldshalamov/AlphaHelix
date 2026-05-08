@@ -140,7 +140,12 @@ function BettingWidget({
   }, []);
 
   const handleAmountChange = useCallback((e) => {
-    const val = e.target.value;
+    let val = e.target.value.replace(/[^0-9.,]/g, '').replace(/,/g, '.');
+    const parts = val.split('.');
+    if (parts.length > 2) {
+      val = parts[0] + '.' + parts.slice(1).join('');
+    }
+    if (e.target.value !== val) e.target.value = val;
     // Strict sanitization: allow empty string or valid decimal fragments
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       // SENTINEL: Increased limit to 50 to accommodate full 18-decimal precision from formatEther
@@ -474,11 +479,10 @@ function BettingWidget({
             <input
               ref={amountInputRef}
               id="bet-amount"
-              type="number"
+              type="text"
+              pattern={"^\\d*\\.?\\d*$"}
               inputMode="decimal"
               autoComplete="off"
-              min="0"
-              step="0.01"
               maxLength="50"
               className="input"
               style={{

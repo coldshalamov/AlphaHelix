@@ -21,3 +21,7 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2026-05-08 - Prevent scroll-jacking on financial inputs
+**Learning:** Financial input fields using `type="number"` suffer from scroll-jacking, where scrolling over the input inadvertently changes the value.
+**Action:** Use `<input type="text" inputMode="decimal">` with the HTML `pattern` attribute (e.g., `pattern={"^\\d*\\.?\\d*$"}`). Manually strip non-numeric characters in the `onChange` handler, replace commas with dots, and prevent multiple decimal points. Crucially, to prevent a React state desync bug where stripped characters remain visible if the sanitized value matches the current state, force a DOM update in the handler (e.g., `if (e.target.value !== val) e.target.value = val;`). When converting `type="number"` inputs, remove attributes like `min` and `step`.
