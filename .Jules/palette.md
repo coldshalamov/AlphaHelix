@@ -21,3 +21,11 @@
 ## 2026-03-29 - [Contextual Focus for Helper Buttons]
 **Learning:** Users can lose their place when clicking helper buttons (like 'Max' balance fillers) that modify input values if focus isn't managed.
 **Action:** Helper buttons that modify input values must explicitly shift focus to the modified input field using `useRef` and `.focus()` (wrapped in a `setTimeout`) to maintain context and provide immediate feedback for assistive technologies.
+
+## 2026-05-09 - Prevent React State Desync on Custom Input Sanitization
+**Learning:** When aggressively sanitizing text inputs in React (e.g., removing commas, multiple decimals, non-numeric chars), updating state alone () can desync from the DOM if the sanitized value matches the previous React state while the native DOM input has changed (e.g. typing "10.5," when state is "10.5"). This leaves invalid characters visibly lingering in the input.
+**Action:** When manually stripping characters from inputs, force a sync by updating the DOM element directly (`if (e.target.value !== val) e.target.value = val`) before setting state. Also, to prevent the cursor from jumping to the end of the input when characters are removed, capture `selectionStart`/`selectionEnd` and restore them offset by the length difference.
+
+## $(date +%Y-%m-%d) - Prevent React State Desync on Custom Input Sanitization
+**Learning:** When aggressively sanitizing text inputs in React (e.g., removing commas, multiple decimals, non-numeric chars), updating state alone (e.g., setAmount) can desync from the DOM if the sanitized value matches the previous React state while the native DOM input has changed (e.g. typing "10.5," when state is "10.5"). This leaves invalid characters visibly lingering in the input.
+**Action:** When manually stripping characters from inputs, force a sync by updating the DOM element directly (if e.target.value !== val) before setting state. Also, to prevent the cursor from jumping to the end of the input when characters are removed, capture selectionStart/selectionEnd and restore them offset by the length difference.
