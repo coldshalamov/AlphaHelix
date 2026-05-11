@@ -225,7 +225,6 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -239,6 +238,8 @@ contract HelixMarket is ReentrancyGuard {
         require(amount > 0, "Amount must be > 0");
         require(!hasCommitted[marketId][msg.sender], "Already committed");
         require(commitHash != bytes32(0), "Invalid hash");
+
+        bool triggerPingReward = _checkRandomClose(marketId);
 
         commits[marketId][msg.sender] = commitHash;
         hasCommitted[marketId][msg.sender] = true;
@@ -264,7 +265,6 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -278,6 +278,8 @@ contract HelixMarket is ReentrancyGuard {
         require(block.timestamp < s.revealEndTime, "Reveal phase over");
 
         bytes32 storedHash = commits[marketId][msg.sender];
+
+        bool triggerPingReward = _checkRandomClose(marketId);
         require(storedHash != bytes32(0), "No bet committed");
 
         require(keccak256(abi.encodePacked(choice, salt, msg.sender)) == storedHash, "Invalid hash/reveal");
