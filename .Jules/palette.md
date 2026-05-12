@@ -25,3 +25,7 @@
 ## 2026-05-12 - [Form Submission Accessibility]
 **Learning:** Financial or transaction input widgets without `<form>` wrappers force users to reach for their mouse to submit, breaking keyboard flow.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-driven widgets to enable native "Enter" key submission.
+
+## 2026-05-12 - [Form Submission Collisions]
+**Learning:** When refactoring components to use \`<form>\` wrappers for accessibility, auxiliary \`<button>\` elements (like "Max" buttons) will default to \`type="submit"\` if not explicitly defined, causing unintentional form submissions.
+**Action:** When adding \`<form>\` wrappers, explicitly define \`type="button"\` on all auxiliary or secondary buttons inside the form to prevent accidental submissions.
