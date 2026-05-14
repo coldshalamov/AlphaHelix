@@ -505,14 +505,18 @@ describe("HelixMarket", function () {
       // Verify market is closed
       statement = await market.markets(marketId);
       if (statement.commitPhaseClosed > 0) {
-        // Now try to commit - should fail
+        // Now try to commit - should NOT revert but return early (silent reject)
         await expect(
           market.connect(userC).commitBet(
             marketId,
             buildCommit(0, 222, userC),
             ethers.parseEther("5")
           )
-        ).to.be.revertedWith("Commit phase closed");
+        ).to.not.be.reverted;
+
+        // Verify bet was not recorded
+        const hasCommitted = await market.hasCommitted(marketId, userC.address);
+        expect(hasCommitted).to.be.false;
       }
     });
 
