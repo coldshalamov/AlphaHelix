@@ -225,7 +225,6 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
@@ -250,6 +249,7 @@ contract HelixMarket is ReentrancyGuard {
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
 
+        bool triggerPingReward = _checkRandomClose(marketId);
         if (triggerPingReward) {
             require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
         }
