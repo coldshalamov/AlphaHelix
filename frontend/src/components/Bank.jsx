@@ -37,11 +37,10 @@ const BuyCard = memo(function BuyCard({
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
+          pattern="^\d*\.?\d*$"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -120,11 +119,10 @@ const SellCard = memo(function SellCard({
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
           autoComplete="off"
-          min="0"
-          step="0.01"
+          pattern="^\d*\.?\d*$"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -242,20 +240,41 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    const val = e.target.value;
-    // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setBuyAmount(val);
+    let val = e.target.value.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    // Safe sanitize: extract digits before the first dot, and all digits after, ignoring subsequent dots
+    const parts = val.split('.');
+    if (parts.length > 1) {
+      val = parts[0] + '.' + parts.slice(1).join('').replace(/\./g, '');
+    }
+    if (val.length <= 50) {
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      const diff = e.target.value.length - val.length;
+      setBuyAmount(val);
+      e.target.value = val;
+      if (start !== null) {
+        const newPos = Math.max(0, start - diff);
+        e.target.setSelectionRange(newPos, newPos);
+      }
     }
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    const val = e.target.value;
-    // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setSellAmount(val);
+    let val = e.target.value.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 1) {
+      val = parts[0] + '.' + parts.slice(1).join('').replace(/\./g, '');
+    }
+    if (val.length <= 50) {
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      const diff = e.target.value.length - val.length;
+      setSellAmount(val);
+      e.target.value = val;
+      if (start !== null) {
+        const newPos = Math.max(0, start - diff);
+        e.target.setSelectionRange(newPos, newPos);
+      }
     }
   }, []);
 
