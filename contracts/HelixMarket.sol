@@ -179,8 +179,6 @@ contract HelixMarket is ReentrancyGuard {
         s.randomCloseEnabled = enableRandomClose;
         s.revealDuration = revealDuration;
 
-        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
-
         if (enableRandomClose) {
             // Generate market-specific random seed
             s.closeSeed = keccak256(abi.encodePacked(
@@ -199,10 +197,6 @@ contract HelixMarket is ReentrancyGuard {
             // revealEndTime will be set when commit phase closes
             s.revealEndTime = 0; // Placeholder, set when commit phase closes
 
-            // Burn statement fee minus the reserved ping reward.
-            require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
-            token.burn(STATEMENT_FEE - PING_REWARD);
-
             emit MarketCreatedWithRandomClose(marketId, s.difficultyTarget, avgCommitDuration);
         } else {
             // Fixed-time market (backwards compatible)
@@ -210,10 +204,19 @@ contract HelixMarket is ReentrancyGuard {
             s.difficultyTarget = 0; // Not used
             s.commitPhaseClosed = 0; // Not used for fixed-time markets
             s.hardCommitEndTime = s.commitEndTime;
-            token.burn(STATEMENT_FEE);
         }
 
         emit StatementCreated(marketId, ipfsCid, s.commitEndTime, s.revealEndTime, msg.sender);
+
+        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
+
+        if (enableRandomClose) {
+            // Burn statement fee minus the reserved ping reward.
+            require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
+            token.burn(STATEMENT_FEE - PING_REWARD);
+        } else {
+            token.burn(STATEMENT_FEE);
+        }
     }
 
     /// @notice Commit a hashed bet during the commit phase.
@@ -225,11 +228,10 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
-        // Check commit phase is still open
+        // Check commit phase is still open BEFORE checking random close
         if (s.randomCloseEnabled) {
             require(s.commitPhaseClosed == 0, "Commit phase closed");
         } else {
@@ -240,15 +242,18 @@ contract HelixMarket is ReentrancyGuard {
         require(!hasCommitted[marketId][msg.sender], "Already committed");
         require(commitHash != bytes32(0), "Invalid hash");
 
+        // Now safe to check random close (which might close the market)
+        bool triggerPingReward = _checkRandomClose(marketId);
+
         commits[marketId][msg.sender] = commitHash;
         hasCommitted[marketId][msg.sender] = true;
 
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
 
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
-
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
+
+        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         if (triggerPingReward) {
             require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
