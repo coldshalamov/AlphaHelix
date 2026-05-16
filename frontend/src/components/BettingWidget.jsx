@@ -23,6 +23,13 @@ const CHOICES = [
 
 const renderCountdown = (t) => <div className="helper">{t} remaining</div>;
 
+// BOLT: Extracted static array to prevent unnecessary allocations during re-renders
+const AMOUNT_ERRORS = [
+  'Enter an amount of HLX to stake.',
+  'Invalid HLX amount.',
+  'Enter an amount greater than zero.',
+];
+
 // BOLT: Extracted and memoized to prevent re-renders when typing amount
 const Choices = memo(function Choices({ choice, isLocked, onChange }) {
   return (
@@ -88,11 +95,7 @@ function BettingWidget({
 
   const isAmountError = useMemo(() => {
     if (!status) return false;
-    return [
-      'Enter an amount of HLX to stake.',
-      'Invalid HLX amount.',
-      'Enter an amount greater than zero.',
-    ].includes(status);
+    return AMOUNT_ERRORS.includes(status);
   }, [status]);
 
   // Track what the current txHash actually represents
