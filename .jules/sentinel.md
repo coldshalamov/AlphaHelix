@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2024-05-20 - Enforce Checks-Effects-Interactions Pattern
+**Vulnerability:** Events were emitted after external token transfers in `commitBet`, `resolve`, `claim`, and `withdrawUnrevealed`. This violates the CEI pattern and can lead to out-of-order event logs during reentrancies, complicating off-chain indexing.
+**Learning:** Always emit events (Effects) before making any external calls (Interactions), even if the function is protected by `nonReentrant`.
+**Prevention:** Make it a habit to write event emissions immediately after state changes and before any external interactions.
