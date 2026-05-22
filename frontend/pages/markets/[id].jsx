@@ -92,9 +92,10 @@ export default function MarketDetailPage() {
     query: {
        enabled: marketId !== undefined,
        // BOLT: Smart polling. If market is resolved, stop polling (return false) to save RPC calls and re-renders.
+       // In TanStack Query v5, the callback receives the query object.
        // Otherwise, poll every 5s for live updates.
-       refetchInterval: (data) => {
-         const market = data?.[0]?.result;
+       refetchInterval: (query) => {
+         const market = query.state.data?.[0]?.result;
          const resolved = market?.[6];
          return resolved ? false : 5000;
        }
