@@ -45,13 +45,13 @@ contract HelixReserve is ReentrancyGuard, Ownable2Step {
         require(address(this).balance >= ethAmount, "Insufficient ETH in reserve");
         require(token.allowance(msg.sender, address(this)) >= hlxAmount, "Insufficient allowance");
 
+        emit Sold(msg.sender, hlxAmount, ethAmount);
+
         require(token.transferFrom(msg.sender, address(this), hlxAmount), "Transfer failed");
         token.burn(hlxAmount);
 
         (bool success, ) = msg.sender.call{value: ethAmount}("");
         require(success, "ETH transfer failed");
-
-        emit Sold(msg.sender, hlxAmount, ethAmount);
     }
 
     receive() external payable nonReentrant {
