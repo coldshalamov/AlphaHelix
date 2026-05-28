@@ -35,6 +35,8 @@ export default function Layout({ children, className = '' }) {
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                // BOLT: Explicit sizes prevent downloading excessively large images on wide screens since max-width is 1200px
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
