@@ -25,3 +25,7 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+
+## 2026-05-29 - [Financial Input Scroll-jacking]
+**Learning:** Using `type="number"` for financial inputs introduces native scroll-jacking (scrolling over the input changes the value), leading to accidental balance changes.
+**Action:** Use `type="text"` with `inputMode="decimal"` and `pattern={"^\\d*\\.?\\d*$"}` to prevent scroll-jacking, while manually sanitizing input and preserving cursor position via `selectionStart` and `selectionEnd`.
