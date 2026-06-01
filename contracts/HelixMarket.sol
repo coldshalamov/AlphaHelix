@@ -246,9 +246,9 @@ contract HelixMarket is ReentrancyGuard {
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
 
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
-
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
+
+        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         if (triggerPingReward) {
             require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
@@ -320,11 +320,11 @@ contract HelixMarket is ReentrancyGuard {
         uint256 totalPool = s.yesPool + s.noPool + s.unalignedPool;
         uint256 fee = s.tie ? 0 : _calculateFee(totalPool);
 
+        emit MarketResolved(marketId, s.outcome, s.tie, totalPool, fee);
+
         if (fee > 0) {
             require(token.transfer(s.originator, fee), "Fee transfer failed");
         }
-
-        emit MarketResolved(marketId, s.outcome, s.tie, totalPool, fee);
     }
 
     /// @notice Claim winnings (or refunds in a tie) after resolution.
@@ -357,8 +357,8 @@ contract HelixMarket is ReentrancyGuard {
             }
         }
 
-        require(token.transfer(msg.sender, payout), "Transfer failed");
         emit Claimed(marketId, msg.sender, side, userBet, payout, s.tie);
+        require(token.transfer(msg.sender, payout), "Transfer failed");
     }
 
     /// @notice Withdraw committed HLX that was never revealed once the reveal window has closed.
@@ -376,12 +376,13 @@ contract HelixMarket is ReentrancyGuard {
         uint256 penalty = (amount * UNREVEALED_PENALTY_BPS) / 10000;
         uint256 refund = amount - penalty;
 
+        emit UnrevealedWithdrawn(marketId, msg.sender, refund, penalty);
+
         if (penalty > 0) {
             token.burn(penalty);
         }
 
         require(token.transfer(msg.sender, refund), "Refund transfer failed");
-        emit UnrevealedWithdrawn(marketId, msg.sender, refund, penalty);
     }
 
     function _calculateFee(uint256 totalPool) internal pure returns (uint256) {
