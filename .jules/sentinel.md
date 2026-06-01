@@ -17,7 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
-## 2024-06-01 - Fix CEI Violation in Event Emissions
-**Vulnerability:** Events were emitted after external token transfers in `commitBet`, `resolve`, `claim`, and `withdrawUnrevealed` within `HelixMarket.sol`.
-**Learning:** Even when protected by `nonReentrant` modifiers, placing event emissions after external calls violates the Checks-Effects-Interactions (CEI) pattern. This can cause out-of-order event logs in complex transaction chains, which disrupts off-chain indexing and monitoring.
-**Prevention:** Always emit events (Effects) before making external contract calls (Interactions).
+## 2024-06-01 - Fix Denial of Service in Reward Distribution
+**Vulnerability:** A `require(token.transfer(...))` statement was used for an auxiliary reward (ping reward) at the end of core functions (`commitBet`, `revealBet`). Because EVM transactions are atomic, if the token transfer reverted (e.g., due to insufficient contract balance or a token hook), it caused the entire transaction to revert, bricking core logic.
+**Learning:** Moving external calls to the end of a function (CEI) does not prevent Denial-of-Service if the call's failure still reverts the transaction. Atomicity means the entire state change is rolled back.
+**Prevention:** For non-critical auxiliary interactions like reward distributions, use a `try/catch` block or low-level calls (and ignore failures) to ensure that the core business logic remains resilient and executes regardless of the auxiliary call's success.
