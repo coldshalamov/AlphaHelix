@@ -1,0 +1,3 @@
+## 2024-06-07 - Enhanced Pagination Accessibility
+**Learning:** Standalone text on pagination buttons (like "Previous" or "Next") often lacks sufficient context for screen reader users when navigated out of context. Also, pagination buttons lacking explicit `type="button"` attributes can trigger unintended form submissions if the pagination controls are ever nested inside a `<form>` context in React.
+**Action:** Always add context-rich `aria-label` attributes (e.g., "Previous page", "Next page") to pagination controls. Always explicitly define `type="button"` on non-submit interactive elements to ensure robust component reusability.
