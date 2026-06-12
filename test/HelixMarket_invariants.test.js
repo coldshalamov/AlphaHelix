@@ -274,7 +274,8 @@ describe("HelixMarket Invariant Tests", function () {
       const MINTER_ROLE = await token.MINTER_ROLE();
 
       for (let i = 0; i < 20; i++) {
-        const randomAmount = ethers.parseEther(String(0.001 + Math.random() * 999.999));
+        // Fix: Limit precision to 18 decimals to avoid "too many decimals" error in parseEther
+        const randomAmount = ethers.parseEther((0.001 + Math.random() * 999.999).toFixed(18));
         const marketId = i;
 
         // Refresh tokens and approval
