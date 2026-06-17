@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2024-05-24 - DoS via Atomicity in Auxiliary Operations
+**Vulnerability:** Core logic functions (`commitBet`, `revealBet`, `pingMarket`) used reverting `require()` statements for non-critical auxiliary operations (optional ping reward transfers).
+**Learning:** Using `require()` for auxiliary external calls at the end of core logic creates a Denial of Service (DoS) risk. If the reward transfer fails (e.g. the contract runs out of tokens to fund the reward), it reverts the entire transaction, bricking the core functionality (committing/revealing bets).
+**Prevention:** Use a `try/catch` block for non-critical auxiliary external calls to ensure failures in those operations do not block primary business operations.
