@@ -122,4 +122,3 @@ describe("HelixMarket Edge Cases", function () {
     expect(userAfter - userBefore).to.equal(expectedPayout);
   });
 });
-

@@ -53,4 +53,3 @@ main().catch((error) => {
   console.error("[verify] Failed", error);
   process.exitCode = 1;
 });
-
