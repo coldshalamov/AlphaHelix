@@ -12,3 +12,7 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+## 2026-03-20 - Address Grinding in Random Close Entropy
+**Vulnerability:** `msg.sender` was used as an entropy source for pseudo-randomness in `HelixMarket.sol` (specifically in `checkRandomClose` and `previewCloseCheck`), allowing Address Grinding vulnerabilities.
+**Learning:** Including `msg.sender` allows attackers to deploy malicious contract factories, precompute their contract addresses using `CREATE2`, and only execute transactions from favorable addresses to predictably satisfy the hashing condition (e.g., forcing early market closure).
+**Prevention:** Only use deterministic, non-user-controlled state and block properties (like `block.prevrandao`, block hashes, and total pool sizes) for on-chain randomness. Completely exclude user-controllable variables like `msg.sender` or `tx.gasprice` from entropy generation.
