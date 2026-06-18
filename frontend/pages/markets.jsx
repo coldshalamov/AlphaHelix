@@ -29,30 +29,30 @@ const MarketCard = memo(function MarketCard({
       <h3 className="font-semibold" style={{ marginTop: '0.25rem' }}>
         {ipfsCid || 'No CID provided'}
       </h3>
-      <div className="table-like" style={{ marginTop: '0.5rem' }}>
+      <dl className="table-like" style={{ marginTop: '0.5rem' }}>
         <div>
-          <div className="label">Commit ends</div>
-          <div className="value">{commitDate}</div>
+          <dt className="label">Commit ends</dt>
+          <dd className="value" style={{ margin: 0 }}>{commitDate}</dd>
         </div>
         <div>
-          <div className="label">Reveal ends</div>
-          <div className="value">{revealDate}</div>
+          <dt className="label">Reveal ends</dt>
+          <dd className="value" style={{ margin: 0 }}>{revealDate}</dd>
         </div>
-      </div>
-      <div className="table-like" style={{ marginTop: '0.5rem' }}>
+      </dl>
+      <dl className="table-like" style={{ marginTop: '0.5rem' }}>
         <div>
-          <div className="label">YES Pool</div>
-          <div className="value">{formatEther(yesPool)} HLX</div>
-        </div>
-        <div>
-          <div className="label">NO Pool</div>
-          <div className="value">{formatEther(noPool)} HLX</div>
+          <dt className="label">YES Pool</dt>
+          <dd className="value" style={{ margin: 0 }}>{formatEther(yesPool)} HLX</dd>
         </div>
         <div>
-          <div className="label">UNALIGNED Pool</div>
-          <div className="value">{formatEther(unalignedPool)} HLX</div>
+          <dt className="label">NO Pool</dt>
+          <dd className="value" style={{ margin: 0 }}>{formatEther(noPool)} HLX</dd>
         </div>
-      </div>
+        <div>
+          <dt className="label">UNALIGNED Pool</dt>
+          <dd className="value" style={{ margin: 0 }}>{formatEther(unalignedPool)} HLX</dd>
+        </div>
+      </dl>
       <Link
         className="button primary"
         style={{ marginTop: '0.75rem', display: 'inline-block' }}
