@@ -20,8 +20,9 @@ const MarketCard = memo(function MarketCard({
   noPool,
   unalignedPool,
 }) {
-  const commitDate = dateTimeFormatter.format(new Date(commitEndTime * 1000));
-  const revealDate = dateTimeFormatter.format(new Date(revealEndTime * 1000));
+  // BOLT: Passed timestamp directly to avoid Date object allocation
+  const commitDate = dateTimeFormatter.format(commitEndTime * 1000);
+  const revealDate = dateTimeFormatter.format(revealEndTime * 1000);
 
   return (
     <div className="card">
