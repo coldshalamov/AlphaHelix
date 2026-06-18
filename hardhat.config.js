@@ -36,4 +36,9 @@ module.exports = {
       },
     ],
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    outputFile: "gas-report.txt",
+    noColors: true,
+  },
 };
