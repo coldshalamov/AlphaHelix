@@ -14,6 +14,14 @@ module.exports = {
       viaIR: true,
     },
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    outputFile: "gas-report.txt",
+    noColors: true,
+    currency: "USD",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    token: "ETH",
+  },
   networks: {
     hardhat: {},
     arbitrumSepolia: {
