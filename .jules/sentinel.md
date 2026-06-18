@@ -17,3 +17,8 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## 2025-05-23 - Revert Loop Vulnerability in Conditional Branch Calls
+**Vulnerability:** External calls like `token.burn()` were executed immediately within conditional branches of `_submitStatementInternal`. If the burn failed, it would revert the entire transaction mid-execution, before standard token transfers could complete.
+**Learning:** Executing external token interactions mid-function, particularly inside conditionals, violates the Checks-Effects-Interactions (CEI) pattern and introduces unnecessary points of failure that can cause unexpected state reversions.
+**Prevention:** Adhere strictly to the CEI pattern. Calculate the amounts required for external interactions locally within conditionals (e.g., `burnAmount = ...`) and defer the actual external calls (e.g., `token.burn(burnAmount)`) to the very end of the function, after all internal state changes have completed.
