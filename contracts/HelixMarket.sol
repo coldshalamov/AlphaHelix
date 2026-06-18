@@ -187,7 +187,8 @@ contract HelixMarket is ReentrancyGuard {
                 block.timestamp,
                 msg.sender,
                 marketId,
-                blockhash(block.number - 1)
+                blockhash(block.number - 1),
+                block.prevrandao
             ));
 
             // Calculate difficulty target based on avgCommitDuration
