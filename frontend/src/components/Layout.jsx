@@ -35,6 +35,10 @@ export default function Layout({ children, className = '' }) {
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                // BOLT: Explicitly define `sizes` prop to prevent browsers from downloading
+                // full-viewport images on screens wider than the CSS max-width (1200px),
+                // saving bandwidth and reducing load time for large displays.
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
