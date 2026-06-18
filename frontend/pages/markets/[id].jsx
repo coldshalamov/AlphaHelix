@@ -11,6 +11,8 @@ import Countdown from '@/components/Countdown';
 
 const BettingWidget = dynamic(() => import('@/components/BettingWidget'), { ssr: false });
 
+const EXPECTED_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337);
+
 const renderTimeLeft = (t) => <div className="helper">Time left: {t}</div>;
 
 export default function MarketDetailPage() {
@@ -18,7 +20,6 @@ export default function MarketDetailPage() {
   const chainId = useChainId();
   const router = useRouter();
   const { id } = router.query;
-  const expectedChainId = useMemo(() => Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337), []);
 
   const marketId = useMemo(() => {
     if (id === undefined) return undefined;
@@ -187,7 +188,7 @@ export default function MarketDetailPage() {
       setStatus('Connect a wallet to claim.');
       return;
     }
-    if (chainId && chainId !== expectedChainId) {
+    if (chainId && chainId !== EXPECTED_CHAIN_ID) {
       setStatus('Wrong network selected. Switch to the configured Helix chain.');
       return;
     }
@@ -293,7 +294,7 @@ export default function MarketDetailPage() {
               style={{ marginTop: '0.5rem' }}
               onClick={handleClaim}
               disabled={
-                !resolved || claimable === 0n || isClaimPending || isClaimConfirming || (chainId && chainId !== expectedChainId)
+                !resolved || claimable === 0n || isClaimPending || isClaimConfirming || (chainId && chainId !== EXPECTED_CHAIN_ID)
               }
             >
               {isClaimPending || isClaimConfirming ? (
@@ -305,7 +306,7 @@ export default function MarketDetailPage() {
                 'Claim winnings / refund'
               )}
             </button>
-            {chainId && chainId !== expectedChainId && (
+            {chainId && chainId !== EXPECTED_CHAIN_ID && (
               <div className="helper">Wrong network detected. Switch chains to claim.</div>
             )}
             {status && <div className="status">{status}</div>}
@@ -321,7 +322,7 @@ export default function MarketDetailPage() {
         resolved={resolved}
         outcome={outcome}
         tie={tie}
-        expectedChainId={expectedChainId}
+        expectedChainId={EXPECTED_CHAIN_ID}
         allowance={allowance}
         committedAmount={committedBalance}
         hlxBalance={hlxBalance}
