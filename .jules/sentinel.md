@@ -17,3 +17,8 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## 2026-04-15 - [Weak On-Chain Randomness]
+**Vulnerability:** `HelixMarket.sol` used `blockhash`, `block.timestamp`, and `msg.sender` as the sole entropy sources for the market-specific `closeSeed` during `_submitStatementInternal`. This is vulnerable to predictability and potential manipulation by validators.
+**Learning:** In Ethereum PoS, `block.prevrandao` provides a much stronger, less manipulable source of pseudo-randomness derived from the beacon chain. It should be combined with other sources for operations requiring robust randomness.
+**Prevention:** Always include `block.prevrandao` in `keccak256` payloads when generating on-chain random seeds where oracle services (like Chainlink VRF) are not utilized.
