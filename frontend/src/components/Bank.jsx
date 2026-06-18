@@ -34,11 +34,13 @@ const BuyCard = memo(function BuyCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* Validation logic: inputMode="decimal" and pattern prevent scroll-jacking while preserving HTML5 validation constraints */}
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern="^\d*\.?\d*$"
           autoComplete="off"
           min="0"
           step="0.01"
@@ -117,11 +119,13 @@ const SellCard = memo(function SellCard({
         </button>
       </div>
       <div style={{ position: 'relative' }}>
+        {/* Validation logic: inputMode="decimal" and pattern prevent scroll-jacking while preserving HTML5 validation constraints */}
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern="^\d*\.?\d*$"
           autoComplete="off"
           min="0"
           step="0.01"
