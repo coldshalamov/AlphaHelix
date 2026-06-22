@@ -33,7 +33,7 @@ describe("HelixMarket Randomness Security", function () {
       3600,
       3600,
       true,
-      7200
+      7200,
     );
     marketId = 0;
   });
@@ -44,10 +44,14 @@ describe("HelixMarket Randomness Security", function () {
     await ethers.provider.send("evm_mine");
 
     // Check previewCloseCheck with gasPrice = 1 gwei
-    const res1 = await market.previewCloseCheck.staticCall(marketId, { gasPrice: 1000000000n });
+    const res1 = await market.previewCloseCheck.staticCall(marketId, {
+      gasPrice: 1000000000n,
+    });
 
     // Check previewCloseCheck with gasPrice = 2 gwei
-    const res2 = await market.previewCloseCheck.staticCall(marketId, { gasPrice: 2000000000n });
+    const res2 = await market.previewCloseCheck.staticCall(marketId, {
+      gasPrice: 2000000000n,
+    });
 
     console.log("Hash 1 (1 gwei):", res1[0]);
     console.log("Hash 2 (2 gwei):", res2[0]);
