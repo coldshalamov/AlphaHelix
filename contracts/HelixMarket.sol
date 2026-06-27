@@ -251,7 +251,7 @@ contract HelixMarket is ReentrancyGuard {
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            try token.transfer(msg.sender, PING_REWARD) returns (bool) {} catch {}
         }
     }
 
@@ -302,7 +302,7 @@ contract HelixMarket is ReentrancyGuard {
         emit BetRevealed(marketId, msg.sender, choice, amount);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            try token.transfer(msg.sender, PING_REWARD) returns (bool) {} catch {}
         }
     }
 
@@ -321,7 +321,7 @@ contract HelixMarket is ReentrancyGuard {
         uint256 fee = s.tie ? 0 : _calculateFee(totalPool);
 
         if (fee > 0) {
-            require(token.transfer(s.originator, fee), "Fee transfer failed");
+            try token.transfer(s.originator, fee) returns (bool) {} catch {}
         }
 
         emit MarketResolved(marketId, s.outcome, s.tie, totalPool, fee);
@@ -458,7 +458,7 @@ contract HelixMarket is ReentrancyGuard {
         bool triggerPingReward = _checkRandomClose(marketId);
 
         if (triggerPingReward) {
-            require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
+            try token.transfer(msg.sender, PING_REWARD) returns (bool) {} catch {}
             // PingReward event emitting isn't necessary because pingMarket relies on triggerPingReward
         }
     }
