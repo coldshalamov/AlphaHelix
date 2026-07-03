@@ -1,0 +1,3 @@
+## 2024-07-03 - Native Form Submission & Refactoring Risk
+**Learning:** Found an accessibility issue pattern where `BettingWidget.jsx` used `<div>` wrappers and `onClick` handlers for primary inputs, breaking native 'Enter' key submission. This was inconsistent with `Bank.jsx` which correctly used `<form>` tags.
+**Action:** Always wrap primary interactive inputs in a semantic `<form>` with a `type="submit"` button to ensure 'Enter' key functionality. When refactoring `<div>` wrappers to `<form>` tags, explicitly check that nested auxiliary buttons (like 'Max') have `type="button"` to avoid premature form submission.
