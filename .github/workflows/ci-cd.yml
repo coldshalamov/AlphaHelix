@@ -9,6 +9,11 @@ on:
 env:
   NODE_VERSION: "20"
 
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
 jobs:
   test:
     name: Test Suite
