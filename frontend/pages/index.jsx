@@ -5,6 +5,13 @@ export default function Home() {
 
   return (
     <div className="home-page">
+      {/*
+        ⚡ BOLT OPTIMIZATION:
+        Removed useState/useEffect that dynamically applied animation classes.
+        Applying them statically allows the browser to animate immediately
+        upon CSS load, improving First Contentful Paint (FCP) and preventing
+        an unnecessary full-page re-render during hydration.
+      */}
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-background">
