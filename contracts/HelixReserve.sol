@@ -48,7 +48,7 @@ contract HelixReserve is ReentrancyGuard, Ownable2Step {
         require(token.transferFrom(msg.sender, address(this), hlxAmount), "Transfer failed");
         token.burn(hlxAmount);
 
-        (bool success, ) = msg.sender.call{value: ethAmount}("");
+        (bool success, ) = payable(msg.sender).call{value: ethAmount}("");
         require(success, "ETH transfer failed");
 
         emit Sold(msg.sender, hlxAmount, ethAmount);
