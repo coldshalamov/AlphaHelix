@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2025-05-22 - [Zero-Value Timestamp State Bypass]
+**Vulnerability:** The withdrawUnrevealed function relied on a timestamp check (block.timestamp > s.revealEndTime) without checking if the timestamp was initialized. For Random Close markets, revealEndTime was initialized to 0, which trivially passed the timestamp check (block.timestamp > 0 is true).
+**Learning:** Default uninitialized values (like 0 in Solidity) can inadvertently bypass time-based constraints or state transition checks if not explicitly checked for initialization.
+**Prevention:** Always verify that state variables used in critical timing checks (like end times) have been properly initialized (!= 0) before using them in comparisons.
