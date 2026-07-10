@@ -1,0 +1,3 @@
+## 2024-05-24 - Form Submissions in React
+**Learning:** React components containing inputs that users are expected to submit often miss keyboard accessibility when implemented via generic `<div>` wrappers and `onClick` handlers. Wrapping inputs in a `<form>` and converting the submit button to `type="submit"` correctly delegates submission logic, allowing for native "Enter" key press behavior.
+**Action:** Always verify if complex input areas can be semantically converted to `<form>` tags. Ensure all non-submit buttons inside forms are explicitly marked with `type="button"` to avoid accidental submissions.
