@@ -1,0 +1,28 @@
+--- frontend/src/components/BettingWidget.jsx
++++ frontend/src/components/BettingWidget.jsx
+@@ -439,7 +439,7 @@
+   }
+
+   return (
+-    <div className="card">
++    <form className="card" onSubmit={(e) => { e.preventDefault(); handleCommit(); }}>
+       <h3 className="font-semibold">Commit phase</h3>
+       <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
+       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
+@@ -508,7 +508,7 @@
+           </div>
+         </div>
+
+-        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
++        <button type="submit" className="button primary" disabled={isLocked}>
+           {isLocked ? (
+             <>
+               <Spinner />
+@@ -525,7 +525,7 @@
+           {status}
+         </div>
+       )}
+-    </div>
++    </form>
+   );
+ }

@@ -440,7 +440,7 @@ function BettingWidget({
   }
 
   return (
-    <form className="card" onSubmit={(e) => { e.preventDefault(); handleCommit(); }}>
+    <div className="card">
       <h3 className="font-semibold">Commit phase</h3>
       <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
@@ -508,7 +508,7 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
           {isLocked ? (
             <>
               <Spinner />
@@ -527,7 +527,7 @@ function BettingWidget({
           {status}
         </div>
       )}
-    </form>
+    </div>
   );
 }
 
