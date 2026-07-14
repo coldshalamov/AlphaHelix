@@ -4,3 +4,12 @@
 ## 2024-07-05 - TanStack Query v5 refetchInterval Callback
 **Learning:** In @tanstack/react-query v5, the `refetchInterval` callback receives the `query` object as its first argument, not the raw `data`.
 **Action:** Always access the data via `query.state.data` in the `refetchInterval` callback to prevent errors and infinite network polling.
+## 2024-07-06 - Next.js Static Animation Hydration
+**Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes after component mount (e.g., `isVisible ? 'animate-fade' : ''`) is an anti-pattern that harms First Contentful Paint (FCP) and causes unnecessary full-page re-renders. Next.js can server-render these classes, allowing the browser to animate them immediately upon CSS load without waiting for JS hydration.
+**Action:** Always apply static CSS animation classes directly to elements in the JSX.
+## 2024-07-06 - Node.js 20 Deprecation in GitHub Actions
+**Learning:** GitHub Actions is deprecating Node.js 20, causing warnings and eventual failures for actions that rely on it (like `actions/checkout@v3`, `actions/setup-node@v3`, `actions/upload-artifact@v3`, and `actions/github-script@v6`).
+**Action:** Update core GitHub Actions to their latest versions (e.g., `@v4` for checkout/setup-node/upload-artifact, and `@v7` for github-script) to ensure compatibility with Node.js 24 and prevent CI failures.
+## 2024-07-06 - GitHub Actions Permissions for `actions/github-script`
+**Learning:** When a GitHub Actions workflow using `actions/github-script` or the `GITHUB_TOKEN` fails with `HttpError: Resource not accessible by integration` while attempting to comment on a pull request or issue, it indicates the token lacks necessary write permissions.
+**Action:** Resolve this by adding a `permissions` block to the specific job, explicitly granting `pull-requests: write` and `issues: write` (along with `contents: read` if the job also checks out code).
