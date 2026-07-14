@@ -7,3 +7,6 @@
 ## 2024-07-06 - Next.js Static Animation Hydration
 **Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes after component mount (e.g., `isVisible ? 'animate-fade' : ''`) is an anti-pattern that harms First Contentful Paint (FCP) and causes unnecessary full-page re-renders. Next.js can server-render these classes, allowing the browser to animate them immediately upon CSS load without waiting for JS hydration.
 **Action:** Always apply static CSS animation classes directly to elements in the JSX.
+## 2024-07-06 - Node.js 20 Deprecation in GitHub Actions
+**Learning:** GitHub Actions is deprecating Node.js 20, causing warnings and eventual failures for actions that rely on it (like `actions/checkout@v3`, `actions/setup-node@v3`, `actions/upload-artifact@v3`, and `actions/github-script@v6`).
+**Action:** Update core GitHub Actions to their latest versions (e.g., `@v4` for checkout/setup-node/upload-artifact, and `@v7` for github-script) to ensure compatibility with Node.js 24 and prevent CI failures.
