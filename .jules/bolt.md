@@ -4,3 +4,6 @@
 ## 2024-07-05 - TanStack Query v5 refetchInterval Callback
 **Learning:** In @tanstack/react-query v5, the `refetchInterval` callback receives the `query` object as its first argument, not the raw `data`.
 **Action:** Always access the data via `query.state.data` in the `refetchInterval` callback to prevent errors and infinite network polling.
+## 2024-07-14 - CI Failures and Github Action Version Upgrades
+**Learning:** Old GitHub actions version causes CI to fail.
+**Action:** When a GitHub Actions workflow using `actions/github-script`, `actions/upload-artifact`, `actions/setup-node`, or `actions/checkout` fails because of deprecation or being outdated, upgrade it to the new recommended versions (`@v4` for checkout/setup-node/upload-artifact, `@v7` for github-script). Also, ensure the Hardhat gas reporter plugin is installed (`pnpm install hardhat-gas-reporter`) and configured properly in `hardhat.config.js` to output `gas-report.txt` when a CI expects it as an artifact.
