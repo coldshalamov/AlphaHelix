@@ -81,6 +81,10 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     
     steps:
       - name: Checkout code
@@ -263,7 +267,7 @@ jobs:
   notify:
     name: Notify Status
     runs-on: ubuntu-latest
-    needs: [test, security, lint, build]
+    needs: [test, security, lint, build, gas-report]
     if: always()
     
     steps:
@@ -272,6 +276,7 @@ jobs:
           if [ "${{ needs.test.result }}" == "failure" ] || \
              [ "${{ needs.security.result }}" == "failure" ] || \
              [ "${{ needs.lint.result }}" == "failure" ] || \
+             [ "${{ needs.gas-report.result }}" == "failure" ] || \
              [ "${{ needs.build.result }}" == "failure" ]; then
             echo "❌ Pipeline failed"
             exit 1

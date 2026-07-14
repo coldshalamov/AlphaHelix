@@ -10,3 +10,6 @@
 ## 2024-07-06 - Node.js 20 Deprecation in GitHub Actions
 **Learning:** GitHub Actions is deprecating Node.js 20, causing warnings and eventual failures for actions that rely on it (like `actions/checkout@v3`, `actions/setup-node@v3`, `actions/upload-artifact@v3`, and `actions/github-script@v6`).
 **Action:** Update core GitHub Actions to their latest versions (e.g., `@v4` for checkout/setup-node/upload-artifact, and `@v7` for github-script) to ensure compatibility with Node.js 24 and prevent CI failures.
+## 2024-07-06 - GitHub Actions Permissions for `actions/github-script`
+**Learning:** When a GitHub Actions workflow using `actions/github-script` or the `GITHUB_TOKEN` fails with `HttpError: Resource not accessible by integration` while attempting to comment on a pull request or issue, it indicates the token lacks necessary write permissions.
+**Action:** Resolve this by adding a `permissions` block to the specific job, explicitly granting `pull-requests: write` and `issues: write` (along with `contents: read` if the job also checks out code).
