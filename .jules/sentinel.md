@@ -17,3 +17,13 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## $(date +%Y-%m-%d) - [Logic DoS via State-Changing Modifiers/Internal Calls]
+**Vulnerability:** A function triggers a state change (e.g., closing a market phase via \`_checkRandomClose\`) *before* executing precondition checks (\`require(s.commitPhaseClosed == 0)\`). If the state change violates the precondition, the transaction reverts, preventing legitimate state progression (Logic DoS).
+**Learning:** State-changing side-effects that can alter the validity of a function's own preconditions must be called *after* those preconditions are validated.
+**Prevention:** Always validate all function preconditions (\`require\` statements) before executing internal functions or modifiers that update state.
+
+## 2026-05-11 - [Logic DoS via State-Changing Modifiers/Internal Calls]
+**Vulnerability:** A function triggers a state change (e.g., closing a market phase via `_checkRandomClose`) *before* executing precondition checks (`require(s.commitPhaseClosed == 0)`). If the state change violates the precondition, the transaction reverts, preventing legitimate state progression (Logic DoS).
+**Learning:** State-changing side-effects that can alter the validity of a function's own preconditions must be called *after* those preconditions are validated.
+**Prevention:** Always validate all function preconditions (`require` statements) before executing internal functions or modifiers that update state.

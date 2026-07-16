@@ -71,3 +71,49 @@ describe("HelixMarket Security: Overwrite Commitment", function () {
     console.log("Protection verified: User could not overwrite commitment.");
   });
 });
+
+describe("HelixMarket Security: Logic DoS on Random Close", function () {
+  it("PROTECTION: Prevents commitBet from reverting when it triggers random close", async function () {
+    const [owner, userA] = await ethers.getSigners();
+    const AlphaHelixToken = await ethers.getContractFactory("AlphaHelixToken");
+    const token = await AlphaHelixToken.deploy();
+
+    const HelixMarket = await ethers.getContractFactory("HelixMarket");
+    const market = await HelixMarket.deploy(token.target);
+
+    const amount = ethers.parseEther("1000");
+    const MINTER_ROLE = await token.MINTER_ROLE();
+    await token.grantRole(MINTER_ROLE, owner.address);
+    await token.mint(owner.address, amount);
+    await token.approve(market.target, amount);
+
+    await token.mint(userA.address, amount);
+    await token.connect(userA).approve(market.target, amount);
+
+    await market.submitStatementWithRandomClose("ipfs://dos", 3600, 3600, true, 7200);
+    const marketId = 0;
+
+    await ethers.provider.send("evm_increaseTime", [3601]);
+    await ethers.provider.send("evm_mine");
+
+    let willClose = false;
+    let attempts = 0;
+    while (!willClose && attempts < 1000) {
+      const res = await market.connect(userA).previewCloseCheck(marketId);
+      willClose = res.willClose;
+      if (!willClose) {
+        await ethers.provider.send("evm_mine");
+        attempts++;
+      }
+    }
+
+    expect(willClose).to.be.true;
+
+    // We expect the tx to NOT revert if the issue is fixed.
+    const salt = 123;
+    const commitHashValue = ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [1, salt, userA.address]);
+
+    await expect(market.connect(userA).commitBet(marketId, commitHashValue, ethers.parseEther("10")))
+      .to.not.be.reverted;
+  });
+});
