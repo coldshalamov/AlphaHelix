@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+
+
+
+
 
   return (
     <div className="home-page">
@@ -25,15 +25,15 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="hero-content">
-            <h1 className={`hero-title ${isVisible ? 'animate-fade-in-up' : ''}`}>
+            <h1 className={'hero-title animate-fade-in-up'}>
               Truth Through
               <span className="text-cyan"> Consensus</span>
             </h1>
-            <p className={`hero-description ${isVisible ? 'animate-fade-in-up stagger-2' : ''}`}>
+            <p className={'hero-description animate-fade-in-up stagger-2'}>
               AlphaHelix is a decentralized prediction market where facts are verified through
               financial consensus. Stake HLX on truth claims using cryptographic commit-reveal flows.
             </p>
-            <div className={`hero-actions ${isVisible ? 'animate-fade-in-up stagger-3' : ''}`}>
+            <div className={'hero-actions animate-fade-in-up stagger-3'}>
               <Link href="/markets" className="button primary">
                 Explore Markets
               </Link>
@@ -44,15 +44,15 @@ export default function Home() {
 
             {/* Floating Stats */}
             <div className="hero-stats">
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-4' : ''}`}>
+              <div className={'stat-card animate-scale-in stagger-4'}>
                 <div className="stat-value font-mono text-cyan">56</div>
                 <div className="stat-label">Tests Passing</div>
               </div>
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-5' : ''}`}>
+              <div className={'stat-card animate-scale-in stagger-5'}>
                 <div className="stat-value font-mono text-amber">100%</div>
                 <div className="stat-label">Security Score</div>
               </div>
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-6' : ''}`}>
+              <div className={'stat-card animate-scale-in stagger-6'}>
                 <div className="stat-value font-mono text-cyan">∞</div>
                 <div className="stat-label">Truth Nodes</div>
               </div>
@@ -207,7 +207,7 @@ export default function Home() {
         .hero-title {
           font-size: clamp(2.5rem, 5vw, 4.5rem);
           margin-bottom: var(--space-6);
-          opacity: 0;
+
         }
 
         .hero-description {
@@ -217,7 +217,7 @@ export default function Home() {
           max-width: 600px;
           margin-left: auto;
           margin-right: auto;
-          opacity: 0;
+
         }
 
         .hero-actions {
@@ -225,7 +225,7 @@ export default function Home() {
           gap: var(--space-4);
           justify-content: center;
           flex-wrap: wrap;
-          opacity: 0;
+
         }
 
         .hero-stats {
@@ -245,7 +245,7 @@ export default function Home() {
           border-radius: var(--radius-xl);
           padding: var(--space-6);
           text-align: center;
-          opacity: 0;
+
         }
 
         .stat-value {
