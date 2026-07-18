@@ -4,6 +4,10 @@
 ## 2024-07-05 - TanStack Query v5 refetchInterval Callback
 **Learning:** In @tanstack/react-query v5, the `refetchInterval` callback receives the `query` object as its first argument, not the raw `data`.
 **Action:** Always access the data via `query.state.data` in the `refetchInterval` callback to prevent errors and infinite network polling.
+## 2025-02-17 - CI and Configuration Learnings
+**Learning:** CI failures occurred due to deprecated GitHub Actions (v3/v6) and a missing gas reporter configuration (`gas-report.txt` was not generated because `hardhat-gas-reporter` was not included and configured in `hardhat.config.js`).
+**Action:** Update all GitHub Actions to newer versions (`actions/checkout@v4`, `actions/setup-node@v4`, `actions/upload-artifact@v4`, `actions/github-script@v7`). Additionally, ensure that `hardhat-gas-reporter` is required and explicitly configured to output to a file if CI expects it.
+
 ## 2025-02-17 - Static Animation Hydration
 **Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes harms First Contentful Paint (FCP) and causes unnecessary full-page re-renders. Additionally, initial `opacity: 0` rules handled by JS will break and permanently hide elements if JS fails to hydrate.
 **Action:** Next.js can server-render CSS classes. Always apply static CSS animation classes directly in JSX and remove initial hidden states for better FCP and resilience.
