@@ -66,6 +66,7 @@ function BettingWidget({
   allowance,
   committedAmount,
   hlxBalance, // BOLT: Received from parent via batched request
+  hasCommitted,
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -410,8 +411,8 @@ function BettingWidget({
   }
 
   // BOLT: Prevent double-commit which would overwrite local secret
-  const hasCommitted = committedAmount && committedAmount > 0n;
-  if (hasCommitted) {
+  const isAlreadyCommitted = (committedAmount && committedAmount > 0n) || hasCommitted;
+  if (isAlreadyCommitted) {
     return (
       <div className="card" style={{ borderColor: '#dbeafe' }}>
         <h3 className="font-semibold">Commit phase</h3>
