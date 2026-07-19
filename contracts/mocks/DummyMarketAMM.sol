@@ -15,6 +15,9 @@ contract DummyMarketAMM {
     function mint(uint256 amount) external {
         lastCaller = msg.sender;
         mintedTotal += amount;
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        require(
+            token.transferFrom(msg.sender, address(this), amount),
+            "Transfer failed"
+        );
     }
 }
