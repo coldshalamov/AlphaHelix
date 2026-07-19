@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("@nomicfoundation/hardhat-toolbox");
 require("solidity-coverage");
+require("hardhat-gas-reporter");
 
 const { ARBITRUM_SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ARBISCAN_API_KEY } = process.env;
 
@@ -13,6 +14,12 @@ module.exports = {
       optimizer: { enabled: true, runs: 200 },
       viaIR: true,
     },
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: "USD",
+    outputFile: "gas-report.txt",
+    noColors: true,
   },
   networks: {
     hardhat: {},

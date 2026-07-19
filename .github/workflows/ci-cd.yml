@@ -108,6 +108,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            if (!fs.existsSync('gas-report.txt')) { console.log('gas-report.txt not found'); return; }
             const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
