@@ -4,3 +4,6 @@
 ## 2024-07-05 - TanStack Query v5 refetchInterval Callback
 **Learning:** In @tanstack/react-query v5, the `refetchInterval` callback receives the `query` object as its first argument, not the raw `data`.
 **Action:** Always access the data via `query.state.data` in the `refetchInterval` callback to prevent errors and infinite network polling.
+## 2024-07-19 - Static Animation Hydration Pitfall
+**Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes harms First Contentful Paint (FCP) and causes unnecessary full-page re-renders. Next.js can server-render these classes, allowing the browser to animate them immediately upon CSS load without waiting for JS hydration. Leaving base initial hidden states like `opacity: 0` will permanently hide the elements if JS logic is removed.
+**Action:** Apply static CSS animation classes directly to elements in the JSX and explicitly remove initial hidden state utility classes or base CSS rules.
