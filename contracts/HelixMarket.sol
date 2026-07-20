@@ -365,6 +365,7 @@ contract HelixMarket is ReentrancyGuard {
     /// @dev Applies a 100% burn penalty to discourage forgetting to reveal.
     function withdrawUnrevealed(uint256 marketId) external nonReentrant validMarket(marketId) {
         Statement storage s = markets[marketId];
+        require(s.revealEndTime != 0, "Reveal not started");
         require(block.timestamp > s.revealEndTime, "Reveal phase not over");
 
         uint256 amount = committedAmount[marketId][msg.sender];
