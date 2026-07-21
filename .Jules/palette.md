@@ -25,3 +25,6 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+## 2024-11-20 - [Pagination Accessibility]
+**Learning:** React state-driven pagination lacks native announcements. Screen reader users may click "Next" and hear nothing, unsure if the action succeeded.
+**Action:** Add `aria-live="polite"` to the page indicator element (e.g., `Page X of Y`) so the new page number is automatically announced on state change.
