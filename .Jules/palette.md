@@ -25,3 +25,6 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+## 2024-05-30 - Enable native form submission for betting widget
+**Learning:** Wrapping interactive input-heavy widgets in a semantic `<form onSubmit={...}>` rather than a simple `<div>` provides native keyboard accessibility. It enables users to submit their actions simply by pressing 'Enter' within the input, instead of being forced to tab to or click a submission button.
+**Action:** When implementing primary input submission patterns, prioritize wrapping them in semantic `<form>` tags and changing the submission button to `<button type="submit">`.
