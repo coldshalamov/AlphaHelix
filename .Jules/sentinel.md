@@ -12,3 +12,8 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+
+## 2025-05-22 - Random Close DOS in commitBet
+**Vulnerability:** In `HelixMarket.sol`, calling `_checkRandomClose` within `commitBet` before verifying `s.commitPhaseClosed == 0` causes a revert loop. If `_checkRandomClose` triggers a market close, it sets `s.commitPhaseClosed`. The subsequent `require(s.commitPhaseClosed == 0)` then fails, reverting the transaction. This prevents `commitBet` from closing a market and creates a Denial of Service (DoS) for users.
+**Learning:** When a state-modifying internal function is called, subsequent `require` checks must account for the mutated state, or the internal function call must occur after the preconditions are checked.
+**Prevention:** Always perform precondition checks on state before executing internal routines that can mutate that same state, avoiding self-inflicted revert loops.
