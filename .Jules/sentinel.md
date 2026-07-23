@@ -12,3 +12,7 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+## 2024-07-23 - State Mutation in Pre-execution Modifiers/Checks
+**Vulnerability:** In `commitBet` and `revealBet`, calling `_checkRandomClose` (which mutates state variables like `s.commitPhaseClosed` when randomness hits) before evaluating precondition `require` checks led to a DoS vulnerability. A user's valid commit transaction could randomly close the market and then immediately revert because the `require(s.commitPhaseClosed == 0)` check failed.
+**Learning:** Functions that both check the current phase (time/state) and can conditionally update it must execute the invariant checks *before* the state mutation.
+**Prevention:** Always place precondition checks (e.g., is the market open?) before any internal routine that might alter that specific precondition state (e.g., closing the market).
