@@ -1,14 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
+  // BOLT: Removed `useState` and `useEffect` for animations to prevent an unnecessary full-page re-render and improve FCP. Animations now hydrate statically.
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -25,15 +18,15 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="hero-content">
-            <h1 className={`hero-title ${isVisible ? 'animate-fade-in-up' : ''}`}>
+            <h1 className="hero-title animate-fade-in-up">
               Truth Through
               <span className="text-cyan"> Consensus</span>
             </h1>
-            <p className={`hero-description ${isVisible ? 'animate-fade-in-up stagger-2' : ''}`}>
+            <p className="hero-description animate-fade-in-up stagger-2">
               AlphaHelix is a decentralized prediction market where facts are verified through
               financial consensus. Stake HLX on truth claims using cryptographic commit-reveal flows.
             </p>
-            <div className={`hero-actions ${isVisible ? 'animate-fade-in-up stagger-3' : ''}`}>
+            <div className="hero-actions animate-fade-in-up stagger-3">
               <Link href="/markets" className="button primary">
                 Explore Markets
               </Link>
@@ -41,18 +34,17 @@ export default function Home() {
                 Get HLX Tokens
               </Link>
             </div>
-
             {/* Floating Stats */}
             <div className="hero-stats">
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-4' : ''}`}>
+              <div className="stat-card animate-scale-in stagger-4">
                 <div className="stat-value font-mono text-cyan">56</div>
                 <div className="stat-label">Tests Passing</div>
               </div>
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-5' : ''}`}>
+              <div className="stat-card animate-scale-in stagger-5">
                 <div className="stat-value font-mono text-amber">100%</div>
                 <div className="stat-label">Security Score</div>
               </div>
-              <div className={`stat-card ${isVisible ? 'animate-scale-in stagger-6' : ''}`}>
+              <div className="stat-card animate-scale-in stagger-6">
                 <div className="stat-value font-mono text-cyan">∞</div>
                 <div className="stat-label">Truth Nodes</div>
               </div>
@@ -60,7 +52,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* How It Works */}
       <section className="section">
         <div className="container">
@@ -68,7 +59,6 @@ export default function Home() {
           <p className="section-description text-center">
             A three-phase mechanism ensures truth emerges from independent consensus
           </p>
-
           <div className="grid three" style={{ marginTop: 'var(--space-12)' }}>
             <div className="feature-card">
               <div className="feature-icon cyan">
@@ -84,7 +74,6 @@ export default function Home() {
                 preventing herd behavior and front-running attacks.
               </p>
             </div>
-
             <div className="feature-card">
               <div className="feature-icon amber">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -99,7 +88,6 @@ export default function Home() {
                 commitments are burned to ensure honest participation.
               </p>
             </div>
-
             <div className="feature-card">
               <div className="feature-icon cyan">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -116,7 +104,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Why AlphaHelix */}
       <section className="section bg-elevated">
         <div className="container">
@@ -167,12 +154,10 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <style jsx>{`
         .home-page {
           min-height: 100vh;
         }
-
         .hero {
           position: relative;
           min-height: 80vh;
@@ -180,14 +165,12 @@ export default function Home() {
           align-items: center;
           overflow: hidden;
         }
-
         .hero-background {
           position: absolute;
           inset: 0;
           opacity: 0.4;
           z-index: 0;
         }
-
         .hero-background::after {
           content: '';
           position: absolute;
@@ -195,7 +178,6 @@ export default function Home() {
           background: linear-gradient(180deg, rgba(15, 15, 15, 0.3) 0%, var(--charcoal-bg) 100%);
           z-index: 1;
         }
-
         .hero-content {
           position: relative;
           z-index: 1;
@@ -203,13 +185,10 @@ export default function Home() {
           margin: 0 auto;
           text-align: center;
         }
-
         .hero-title {
           font-size: clamp(2.5rem, 5vw, 4.5rem);
           margin-bottom: var(--space-6);
-          opacity: 0;
         }
-
         .hero-description {
           font-size: var(--text-xl);
           color: var(--color-text-secondary);
@@ -217,17 +196,13 @@ export default function Home() {
           max-width: 600px;
           margin-left: auto;
           margin-right: auto;
-          opacity: 0;
         }
-
         .hero-actions {
           display: flex;
           gap: var(--space-4);
           justify-content: center;
           flex-wrap: wrap;
-          opacity: 0;
         }
-
         .hero-stats {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -237,7 +212,6 @@ export default function Home() {
           margin-left: auto;
           margin-right: auto;
         }
-
         .stat-card {
           background: rgba(26, 26, 26, 0.8);
           backdrop-filter: blur(10px);
@@ -245,34 +219,28 @@ export default function Home() {
           border-radius: var(--radius-xl);
           padding: var(--space-6);
           text-align: center;
-          opacity: 0;
         }
-
         .stat-value {
           font-size: var(--text-4xl);
           font-weight: var(--font-bold);
           margin-bottom: var(--space-2);
         }
-
         .stat-label {
           font-size: var(--text-sm);
           color: var(--color-text-tertiary);
           text-transform: uppercase;
           letter-spacing: var(--tracking-wider);
         }
-
         .section-title {
           font-size: var(--text-4xl);
           margin-bottom: var(--space-4);
         }
-
         .section-description {
           font-size: var(--text-lg);
           color: var(--color-text-secondary);
           max-width: 600px;
           margin: 0 auto;
         }
-
         .feature-card {
           background: var(--color-bg-secondary);
           border: 1px solid var(--color-border);
@@ -281,12 +249,10 @@ export default function Home() {
           text-align: center;
           transition: transform var(--transition-base), border-color var(--transition-base);
         }
-
         .feature-card:hover {
           transform: translateY(-4px);
           border-color: var(--cyan-truth);
         }
-
         .feature-icon {
           width: 80px;
           height: 80px;
@@ -298,66 +264,54 @@ export default function Home() {
           background: rgba(0, 217, 255, 0.1);
           border: 2px solid var(--cyan-truth);
         }
-
         .feature-icon.cyan {
           color: var(--cyan-truth);
         }
-
         .feature-icon.amber {
           color: var(--amber-uncertainty);
           background: rgba(255, 184, 0, 0.1);
           border-color: var(--amber-uncertainty);
         }
-
         .feature-title {
           font-size: var(--text-2xl);
           margin-bottom: var(--space-3);
         }
-
         .feature-description {
           color: var(--color-text-secondary);
           line-height: var(--leading-relaxed);
         }
-
         .bg-elevated {
           background: var(--color-bg-elevated);
         }
-
         .split-content {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: var(--space-12);
           align-items: center;
         }
-
         @media (max-width: 768px) {
           .split-content {
             grid-template-columns: 1fr;
           }
         }
-
         .feature-list {
           list-style: none;
           margin: var(--space-6) 0;
         }
-
         .feature-list li {
           display: flex;
           gap: var(--space-3);
           margin-bottom: var(--space-4);
           align-items: flex-start;
         }
-
         .feature-bullet {
           font-size: var(--text-xl);
           flex-shrink: 0;
         }
-
         .split-visual {
           position: relative;
           height: 400px;
         }
-
         .network-preview {
           position: relative;
           width: 100%;
@@ -367,7 +321,6 @@ export default function Home() {
           border-radius: var(--radius-2xl);
           overflow: hidden;
         }
-
         .network-node {
           position: absolute;
           width: 20px;
@@ -376,7 +329,6 @@ export default function Home() {
           border-radius: 50%;
           box-shadow: 0 0 20px var(--cyan-truth);
         }
-
         .network-lines {
           position: absolute;
           inset: 0;
