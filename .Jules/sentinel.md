@@ -12,3 +12,11 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+## 2024-05-24 - DoS Revert Loop in State-Mutating Checks
+**Vulnerability:** In `HelixMarket.sol`, `commitBet` called `_checkRandomClose(marketId)` before verifying if the commit phase was open. If the random close condition was met, `_checkRandomClose` mutated `s.commitPhaseClosed`, causing the subsequent `require(s.commitPhaseClosed == 0)` to revert, rolling back both the bet and the market close (DoS).
+**Learning:** State-mutating internal condition checks can sabotage subsequent validation logic, creating silent DoS vulnerabilities when those checks are expected to pass.
+**Prevention:** Always perform precondition state validation (`require(state == expected)`) *before* invoking any internal routines that might mutate that very state.
+## 2024-05-24 - Phase Bypass due to Uninitialized Timeline Variables
+**Vulnerability:** In `HelixMarket.sol`, `withdrawUnrevealed` relied on `block.timestamp > s.revealEndTime` to ensure the reveal phase was over. However, for random-close markets, `s.revealEndTime` is initialized to `0` and only set when the commit phase closes. This allowed the condition `block.timestamp > 0` to immediately pass, enabling phase bypass vulnerabilities where actions intended for post-reveal could be executed before the reveal phase even started.
+**Learning:** Dynamically set timeline boundaries (like end times) that start uninitialized (as `0`) bypass standard timestamp checks (`block.timestamp > 0` is always true).
+**Prevention:** Always explicitly check that the variable is initialized (e.g., `s.revealEndTime != 0`) before using it in timestamp comparisons to prevent phase bypass vulnerabilities.
