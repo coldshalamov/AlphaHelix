@@ -16,3 +16,7 @@
 **Vulnerability:** A user could call `withdrawUnrevealed` on a random-close market before the reveal phase had even started. This was because `revealEndTime` initializes to 0 for these markets, causing `block.timestamp > s.revealEndTime` to trivially pass if not properly checked.
 **Learning:** In dynamically configured contracts (like commit-reveal where phase boundaries aren't known upfront), initializing timestamp variables to 0 creates a bypass risk when used in basic comparisons.
 **Prevention:** Always verify that dynamic phase timestamps are explicitly initialized (e.g., `require(endTime != 0)`) before using them in comparisons.
+## 2024-07-25 - Fix EOL Node Versions in GitHub Actions
+**Vulnerability:** Node 20 is deprecated on GitHub Actions runners, resulting in warnings and potential future pipeline failures (EOL).
+**Learning:** Core GitHub Actions (checkout, setup-node, upload-artifact) need regular maintenance to avoid depending on outdated Node.js versions which can pose security/stability risks.
+**Prevention:** Regularly upgrade standard GitHub Actions (`@v4` for checkout/setup-node/upload-artifact, `@v7` for github-script) to ensure they run on supported, secure Node versions (like Node 24).
