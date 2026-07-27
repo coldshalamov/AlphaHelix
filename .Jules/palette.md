@@ -25,3 +25,6 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+## 2024-10-26 - [Screen Reader Page Transitions]
+**Learning:** React Router / Next.js pagination often updates text content without a full page reload, leaving screen reader users unaware that the page has changed if focus isn't moved or the update isn't announced.
+**Action:** When implementing simple pagination controls, add `aria-live="polite"` to the page indicator element (e.g., `<span aria-live="polite">Page 1 of 5</span>`) to ensure screen readers automatically announce page transitions without interrupting the user.
