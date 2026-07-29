@@ -12,3 +12,8 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+
+## 2026-05-16 - State Revert DoS in Side-Effect Validation
+**Vulnerability:** In `commitBet`, `_checkRandomClose` was called *before* verifying if the commit phase was open. If the random close successfully triggered, it would close the market, but the subsequent `require(s.commitPhaseClosed == 0)` would immediately fail, reverting the entire transaction. This meant the market could never actually close via a commit action if users kept trying to commit right at the boundary, causing a Denial of Service.
+**Learning:** Logic DoS vulnerabilities occur when a function invokes a state-changing side-effect (like closing a phase) *before* validating the preconditions (like "is the phase open?"). The side-effect alters the state that the precondition is about to check, causing unintended reverts.
+**Prevention:** Always validate all preconditions (requires) for a user action *before* executing internal logic or side-effects that might alter those same conditions.
