@@ -3,11 +3,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  // BOLT: Removed unnecessary JS state (isVisible) that triggered a second render cycle.
+  // Replaced with static CSS animation utilities (animate-fade-in-up) since the animation
+  // should just play unconditionally on initial load.
+  // This improves First Contentful Paint (FCP) and reduces JS execution overhead.
+  const isVisible = true;
 
   return (
     <div className="home-page">
@@ -207,7 +207,6 @@ export default function Home() {
         .hero-title {
           font-size: clamp(2.5rem, 5vw, 4.5rem);
           margin-bottom: var(--space-6);
-          opacity: 0;
         }
 
         .hero-description {
@@ -217,7 +216,6 @@ export default function Home() {
           max-width: 600px;
           margin-left: auto;
           margin-right: auto;
-          opacity: 0;
         }
 
         .hero-actions {
@@ -225,7 +223,6 @@ export default function Home() {
           gap: var(--space-4);
           justify-content: center;
           flex-wrap: wrap;
-          opacity: 0;
         }
 
         .hero-stats {
@@ -245,7 +242,6 @@ export default function Home() {
           border-radius: var(--radius-xl);
           padding: var(--space-6);
           text-align: center;
-          opacity: 0;
         }
 
         .stat-value {
