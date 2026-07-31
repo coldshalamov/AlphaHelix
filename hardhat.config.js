@@ -5,8 +5,15 @@ require("solidity-coverage");
 const { ARBITRUM_SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ARBISCAN_API_KEY } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
+require("hardhat-gas-reporter");
+
 module.exports = {
   defaultNetwork: "hardhat",
+  gasReporter: {
+    enabled: true,
+    outputFile: "gas-report.txt",
+    noColors: true
+  },
   solidity: {
     version: "0.8.20",
     settings: {
