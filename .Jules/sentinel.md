@@ -12,3 +12,7 @@
 **Vulnerability:** `AlphaHelixToken` contract contained a `burn(address from, uint256 amount)` function restricted only by `MINTER_ROLE`, allowing the role holder (likely admin/deployer) to burn arbitrary user tokens without allowance. This contradicts the decentralized nature of the application.
 **Learning:** Custom implementation of standard features (like burning) often introduces security flaws or centralization risks compared to using battle-tested libraries (OpenZeppelin extensions).
 **Prevention:** Utilize established extensions like `ERC20Burnable` which enforce standard security models (users burn their own tokens) instead of rolling custom logic that might be overly permissive.
+## 2024-07-31 - Fix Phase Bypass Vulnerability in Unrevealed Withdrawal
+**Vulnerability:** A missing check for `s.revealEndTime != 0` in `withdrawUnrevealed` allows a potential bypass if `s.revealEndTime` defaults to `0` and `block.timestamp > 0`.
+**Learning:** Variables representing dynamically set phase boundaries initialized to `0` can create phase bypass vulnerabilities when used in timestamp comparisons before initialization.
+**Prevention:** Always explicitly check that phase boundary variables are initialized (e.g., `s.revealEndTime != 0`) before using them in timestamp comparisons.
