@@ -25,3 +25,6 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+## 2024-08-05 - Decorative Spinners
+**Learning:** Visual loading indicators used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...') should use aria-hidden="true" instead of role="status" and aria-label="Loading" to prevent redundant screen reader announcements.
+**Action:** When adding spinners next to descriptive text, provide a prop (like ariaHidden={true}) to the spinner to hide it from assistive technologies.
