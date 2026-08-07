@@ -215,7 +215,8 @@ export default function MarketDetailPage() {
         <div className="table-like" style={{ marginTop: '0.75rem' }}>
           <div>
             <div className="label">Commit end</div>
-            <div className="value">{dateTimeFormatter.format(new Date(Number(commitEndTime) * 1000))}</div>
+            {/* BOLT: Passed timestamp directly to avoid Date object allocation */}
+            <div className="value">{dateTimeFormatter.format(Number(commitEndTime) * 1000)}</div>
             <Countdown
               targetSeconds={Number(commitEndTime)}
               render={renderTimeLeft}
@@ -223,7 +224,7 @@ export default function MarketDetailPage() {
           </div>
           <div>
             <div className="label">Reveal end</div>
-            <div className="value">{dateTimeFormatter.format(new Date(Number(revealEndTime) * 1000))}</div>
+            <div className="value">{dateTimeFormatter.format(Number(revealEndTime) * 1000)}</div>
             <Countdown
               targetSeconds={Number(revealEndTime)}
               render={renderTimeLeft}
