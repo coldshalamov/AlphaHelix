@@ -68,13 +68,13 @@ export default function Layout({ children, className = '' }) {
               className="badge cyan"
               onClick={handleCopy}
               type="button"
-              aria-label="Copy wallet address"
+              aria-label={copied ? 'Wallet address copied' : 'Copy wallet address'}
               style={{
                 border: 'none',
                 cursor: 'pointer',
               }}
             >
-              <span>{copied ? '✓ Copied!' : shortAddress}</span>
+              <span aria-live="polite">{copied ? '✓ Copied!' : shortAddress}</span>
             </button>
           ) : (
             <div className="badge">
