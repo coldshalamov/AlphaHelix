@@ -374,7 +374,8 @@ function Bank() {
               className="badge"
               onClick={handleCopy}
               type="button"
-              aria-label="Copy wallet address"
+              aria-label={copied ? 'Address copied to clipboard' : 'Copy wallet address'}
+              aria-live="polite"
             >
               <span>{copied ? 'Copied!' : shortAddress}</span>
             </button>
