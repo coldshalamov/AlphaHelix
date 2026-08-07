@@ -36,4 +36,10 @@ module.exports = {
       },
     ],
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
+    outputFile: "gas-report.txt",
+    noColors: true,
+  },
 };
