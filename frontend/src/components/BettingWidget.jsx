@@ -471,14 +471,14 @@ function BettingWidget({
             </div>
           </div>
           <div style={{ position: 'relative' }}>
+            {/* PALETTE: Used text input with pattern to prevent scroll-jacking while preserving HTML5 constraints */}
             <input
               ref={amountInputRef}
               id="bet-amount"
-              type="number"
+              type="text"
               inputMode="decimal"
+              pattern="^\d*\.?\d*$"
               autoComplete="off"
-              min="0"
-              step="0.01"
               maxLength="50"
               className="input"
               style={{
