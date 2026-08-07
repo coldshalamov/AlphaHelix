@@ -9,9 +9,10 @@ import {
   useReadContract,
   useSwitchChain,
 } from 'wagmi';
-import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
+import { encodePacked, keccak256, parseEther, formatEther, toHex } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
+import { INPUT_SANITIZATION_REGEX, VALID_DECIMAL_REGEX, MAX_INPUT_LENGTH } from '@/lib/constants';
 import Spinner from './Spinner';
 import Countdown from './Countdown';
 
@@ -142,9 +143,9 @@ function BettingWidget({
   const handleAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+    if (val === '' || INPUT_SANITIZATION_REGEX.test(val)) {
       // SENTINEL: Increased limit to 50 to accommodate full 18-decimal precision from formatEther
-      if (val.length <= 50) setAmount(val);
+      if (val.length <= MAX_INPUT_LENGTH) setAmount(val);
     }
   }, []);
 
@@ -220,7 +221,7 @@ function BettingWidget({
     if (typeof window === 'undefined' || !window.crypto) return setStatus('Secure random generator unavailable.');
 
     // Validate format before parsing to ensure it's a valid decimal number
-    if (!/^\d*\.?\d+$/.test(amount)) {
+    if (!VALID_DECIMAL_REGEX.test(amount)) {
       return setStatus('Invalid HLX amount format.');
     }
 
@@ -239,9 +240,7 @@ function BettingWidget({
       // Create salt + commitment hash
       const randomBuffer = new Uint8Array(32);
       window.crypto.getRandomValues(randomBuffer);
-      const salt = BigInt(
-        '0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''),
-      );
+      const salt = BigInt(toHex(randomBuffer));
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
       // BOLT: Convert marketId (BigInt) to string to avoid JSON.stringify crash in persistBet
       const betData = { marketId: marketId.toString(), salt: salt.toString(), choice: Number(choice), amount, hash };
@@ -479,7 +478,7 @@ function BettingWidget({
               autoComplete="off"
               min="0"
               step="0.01"
-              maxLength="50"
+              maxLength={MAX_INPUT_LENGTH}
               className="input"
               style={{
                 paddingRight: '3.5rem',
