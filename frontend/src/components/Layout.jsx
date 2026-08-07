@@ -35,6 +35,8 @@ export default function Layout({ children, className = '' }) {
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                // BOLT: Optimize image loading by defining sizes to match CSS max-width
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
