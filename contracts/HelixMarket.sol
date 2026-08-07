@@ -71,6 +71,7 @@ contract HelixMarket is ReentrancyGuard {
     event MarketCreatedWithRandomClose(uint256 indexed marketId, uint256 difficultyTarget, uint256 avgDuration);
 
     constructor(address _token) {
+        require(_token != address(0), "Invalid token");
         token = AlphaHelixToken(_token);
     }
 
