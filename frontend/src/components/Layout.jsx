@@ -35,6 +35,9 @@ export default function Layout({ children, className = '' }) {
                 alt="AlphaHelix"
                 className="header-banner-image"
                 priority
+                // BOLT: Explicitly define sizes constrained by the container's max-width (1200px)
+                // to prevent browsers from downloading unnecessarily large images on wide viewports.
+                sizes="(max-width: 1200px) 100vw, 1200px"
               />
             </div>
           </Link>
