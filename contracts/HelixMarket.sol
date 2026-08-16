@@ -186,6 +186,7 @@ contract HelixMarket is ReentrancyGuard {
             s.closeSeed = keccak256(abi.encodePacked(
                 block.timestamp,
                 msg.sender,
+                block.prevrandao,
                 marketId,
                 blockhash(block.number - 1)
             ));
