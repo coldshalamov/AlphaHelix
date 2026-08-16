@@ -1,0 +1,5 @@
+🚨 Severity: HIGH
+💡 Vulnerability: The GitHub Actions CI/CD workflow was failing due to the deprecation of `actions/upload-artifact@v3` (causing a hard failure) and an issue where `gas-report.txt` was expected by `actions/github-script` but not generated or piped successfully.
+🎯 Impact: Security scans, automated testing, and deployments were completely blocked, leaving the repository blind to regressions and security vulnerabilities.
+🔧 Fix: Upgraded `actions/upload-artifact` from `v3` to `v4` and correctly piped the `REPORT_GAS=true npm test` output using `tee gas-report.txt` to ensure the artifact exists for downstream jobs.
+✅ Verification: Ran `pnpm install && pnpm format && pnpm lint && pnpm test` locally to ensure no regressions, and inspected `.github/workflows/ci-cd.yml` directly to confirm the configuration fixes.
