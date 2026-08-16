@@ -1,0 +1,3 @@
+## 2024-06-10 - Context-Rich Pagination Accessibility
+**Learning:** The default pagination pattern using standalone text like "Previous" or "Next" without explicit `type="button"` lacks sufficient context for screen reader users and could trigger accidental form submissions. Wrapping pagination controls in a `<nav aria-label="Pagination">` element provides a better semantic landmark.
+**Action:** Always wrap pagination controls in a `<nav aria-label="...">` landmark, and ensure pagination buttons have explicit `type="button"` attributes and context-rich `aria-label`s (e.g., "Previous page", "Next page").
