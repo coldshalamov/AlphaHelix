@@ -24,9 +24,15 @@ contract HelixReserve is ReentrancyGuard, Ownable2Step {
         token = AlphaHelixToken(tokenAddress);
     }
 
-    function seedMarket(address marketAMM, uint256 hlxAmount) external onlyOwner nonReentrant {
+    function seedMarket(
+        address marketAMM,
+        uint256 hlxAmount
+    ) external onlyOwner nonReentrant {
         require(marketAMM != address(0), "Market AMM cannot be zero");
-        require(token.balanceOf(address(this)) >= hlxAmount, "Insufficient HLX reserve");
+        require(
+            token.balanceOf(address(this)) >= hlxAmount,
+            "Insufficient HLX reserve"
+        );
         require(token.approve(marketAMM, hlxAmount), "Approve failed");
         IMarketAMM(marketAMM).mint(hlxAmount);
 
@@ -42,10 +48,19 @@ contract HelixReserve is ReentrancyGuard, Ownable2Step {
         require(hlxAmount % RATE == 0, "HLX amount must convert to whole wei");
 
         uint256 ethAmount = hlxAmount / RATE;
-        require(address(this).balance >= ethAmount, "Insufficient ETH in reserve");
-        require(token.allowance(msg.sender, address(this)) >= hlxAmount, "Insufficient allowance");
+        require(
+            address(this).balance >= ethAmount,
+            "Insufficient ETH in reserve"
+        );
+        require(
+            token.allowance(msg.sender, address(this)) >= hlxAmount,
+            "Insufficient allowance"
+        );
 
-        require(token.transferFrom(msg.sender, address(this), hlxAmount), "Transfer failed");
+        require(
+            token.transferFrom(msg.sender, address(this), hlxAmount),
+            "Transfer failed"
+        );
         token.burn(hlxAmount);
 
         (bool success, ) = msg.sender.call{value: ethAmount}("");

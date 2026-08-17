@@ -79,6 +79,11 @@ export default function MarketDetailPage() {
            abi: tokenAbi,
            functionName: 'balanceOf',
            args: [address],
+        },
+        {
+          ...contractConfig,
+          functionName: 'hasCommitted',
+          args: [marketId, address],
         }
       );
     }
@@ -113,6 +118,7 @@ export default function MarketDetailPage() {
   const committedBalance = address ? readResults?.[userResultsBaseIndex + 3]?.result : undefined;
   const allowance = address ? readResults?.[userResultsBaseIndex + 4]?.result : undefined;
   const hlxBalance = address ? readResults?.[userResultsBaseIndex + 5]?.result : undefined;
+  const hasCommitted = address ? readResults?.[userResultsBaseIndex + 6]?.result : undefined;
 
   const isLoading = isReading;
   const error = readError;
@@ -325,6 +331,7 @@ export default function MarketDetailPage() {
         allowance={allowance}
         committedAmount={committedBalance}
         hlxBalance={hlxBalance}
+        hasCommitted={hasCommitted}
       />
     </div>
   );
