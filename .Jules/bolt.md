@@ -11,3 +11,6 @@
 ## 2026-04-17 - Wagmi useReadContracts Pagination
 **Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to dynamic contract counters (like `marketCount`) cause O(N) payload explosions and hit RPC limits.
 **Action:** Always implement offset pagination (e.g., `PAGE_SIZE`) for dynamic list rendering.
+## 2024-10-24 - Hex Generation Performance
+**Learning:** Manual byte array to hex string mapping (`Array.from(buffer).map(...).join('')`) causes unnecessary intermediate array allocations, multiple string creations, and added garbage collection overhead.
+**Action:** Use native utilities like `viem`'s `bytesToHex()` to eliminate these overheads when converting byte arrays to hex strings.
