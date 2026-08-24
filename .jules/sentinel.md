@@ -17,3 +17,8 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+
+## 2025-05-23 - [Randomness Manipulation via msg.sender]
+**Vulnerability:** `HelixMarket.sol` used `msg.sender` as an entropy source in `_checkRandomClose`. This allows a malicious actor to grind the randomness within a single block by deploying multiple proxy contracts to find an address that satisfies the difficulty target, forcing the market to close prematurely.
+**Learning:** Including user-controllable variables (like `msg.sender`) in on-chain randomness calculations intended to be global compromises the integrity of the randomness, transforming a global random event into a user-grindable condition.
+**Prevention:** Ensure that global, objective randomness sources only rely on non-user-controllable inputs such as `block.prevrandao`, `blockhash`, and immutable seeds.
