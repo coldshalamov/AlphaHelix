@@ -78,7 +78,7 @@ const BuyCard = memo(function BuyCard({
       >
         {activeAction === 'buy' ? (
           <>
-            <Spinner />
+            <Spinner ariaHidden />
             Processing...
           </>
         ) : (
@@ -161,7 +161,7 @@ const SellCard = memo(function SellCard({
       >
         {activeAction === 'sell' ? (
           <>
-            <Spinner />
+            <Spinner ariaHidden />
             Processing...
           </>
         ) : (
@@ -404,7 +404,7 @@ function Bank() {
             >
               {isSwitching ? (
                 <>
-                  <Spinner />
+                  <Spinner ariaHidden />
                   Switching...
                 </>
               ) : (

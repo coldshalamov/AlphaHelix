@@ -298,7 +298,7 @@ export default function MarketDetailPage() {
             >
               {isClaimPending || isClaimConfirming ? (
                 <>
-                  <Spinner />
+                  <Spinner ariaHidden />
                   Claiming...
                 </>
               ) : (
