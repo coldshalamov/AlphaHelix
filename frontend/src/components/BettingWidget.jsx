@@ -346,7 +346,7 @@ function BettingWidget({
         >
           {isSwitching ? (
             <>
-              <Spinner />
+              <Spinner ariaHidden={true} />
               Switching...
             </>
           ) : (
@@ -373,7 +373,7 @@ function BettingWidget({
             <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
               {isLocked ? (
                 <>
-                  <Spinner />
+                  <Spinner ariaHidden={true} />
                   Revealing...
                 </>
               ) : (
@@ -511,7 +511,7 @@ function BettingWidget({
         <button className="button primary" onClick={handleCommit} disabled={isLocked}>
           {isLocked ? (
             <>
-              <Spinner />
+              <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
           ) : (
