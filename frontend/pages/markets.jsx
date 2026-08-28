@@ -163,23 +163,27 @@ export default function MarketsPage() {
       {!isLoading && markets.length === 0 && !error && <p className="helper">No markets found.</p>}
 
       {Math.ceil(numericCount / PAGE_SIZE) > 1 && (
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', alignItems: 'center' }}>
+        <nav aria-label="Pagination" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', alignItems: 'center' }}>
           <button
+            type="button"
+            aria-label="Previous page"
             className="button secondary"
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
           >
             Previous
           </button>
-          <span className="helper">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
+          <span className="helper" aria-live="polite">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
           <button
+            type="button"
+            aria-label="Next page"
             className="button secondary"
             onClick={() => setPage(p => Math.min(Math.ceil(numericCount / PAGE_SIZE) - 1, p + 1))}
             disabled={page >= Math.ceil(numericCount / PAGE_SIZE) - 1}
           >
             Next
           </button>
-        </div>
+        </nav>
       )}
     </div>
   );
