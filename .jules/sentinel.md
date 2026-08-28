@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2026-07-07 - Denial of Service via Atomicity in Reward Transfers
+**Vulnerability:** Reverting `require()` statements were used for non-critical reward transfers (`PING_REWARD`) at the end of core logic functions (`commitBet`, `revealBet`, `pingMarket`), which could cause a DoS by reverting the entire transaction if the token transfer fails.
+**Learning:** External calls for auxiliary operations like reward distributions should never block primary business logic. If the transfer fails, it bricks the core functionality.
+**Prevention:** Use `try/catch` blocks (with explicit `returns (bool)` definitions for ERC20) for optional/auxiliary external calls to safely handle failures without blocking main operations.
