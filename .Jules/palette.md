@@ -25,3 +25,6 @@
 ## 2024-05-25 - [Form Submission Accessibility]
 **Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
 **Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
+## 2024-05-21 - Accessible Pagination Buttons
+**Learning:** Pagination buttons without `aria-label`s or explicit `type="button"` can be confusing for screen reader users (who only hear "Previous" or "Next" without context) and can cause accidental form submissions if later wrapped in a form.
+**Action:** Always add explicit `aria-label`s (like "Previous page") and `type="button"` to navigation controls.
