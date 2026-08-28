@@ -1,0 +1,3 @@
+## 2026-05-17 - Financial input sanitization with cursor preservation
+**Learning:** Financial input fields should use `<input type="text" inputMode="decimal">` to prevent scroll-jacking, with robust `onChange` sanitization. When forcing a DOM update (`e.target.value = val`) to prevent React state desync, cursor jumping occurs.
+**Action:** Replace commas with dots, remove non-numeric characters except dots, and safely merge multiple decimals. Capture `selectionStart`/`selectionEnd` before the DOM update, calculate the length difference, and restore the cursor position using `e.target.setSelectionRange`.
