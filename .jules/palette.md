@@ -1,0 +1,3 @@
+## 2024-06-23 - Semantic Form Replacements
+**Learning:** Avoid using `<div>` wrappers and `onClick` handlers for input forms, as this prevents native form submission via the 'Enter' key. Always wrap input-heavy widgets in a semantic `<form onSubmit={...}>` and use a primary `<button type="submit">`.
+**Action:** When converting `<div>` wrappers into semantic `<form>` tags to improve accessibility, always ensure that any nested auxiliary buttons (e.g., 'Max' buttons, toggle switches) explicitly declare `type="button"`. Otherwise, they will default to `type="submit"` and inadvertently trigger form submissions.
