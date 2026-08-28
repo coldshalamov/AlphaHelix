@@ -1,5 +1,7 @@
 const { expect } = require("chai");
-const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {
+  loadFixture,
+} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -28,7 +30,9 @@ describe("HelixMarket Security: Input Validation", function () {
   it("should revert if CID is empty", async function () {
     const { market, userA } = await loadFixture(deployHelixMarketFixture);
     await expect(
-        market.connect(userA).submitStatement("", biddingDuration, revealDuration)
+      market
+        .connect(userA)
+        .submitStatement("", biddingDuration, revealDuration),
     ).to.be.revertedWith("CID empty");
   });
 
@@ -37,7 +41,9 @@ describe("HelixMarket Security: Input Validation", function () {
     const MAX_CID_LENGTH = 128;
     const longCid = "a".repeat(MAX_CID_LENGTH + 1);
     await expect(
-        market.connect(userA).submitStatement(longCid, biddingDuration, revealDuration)
+      market
+        .connect(userA)
+        .submitStatement(longCid, biddingDuration, revealDuration),
     ).to.be.revertedWith("CID too long");
   });
 
@@ -46,31 +52,44 @@ describe("HelixMarket Security: Input Validation", function () {
     const MAX_CID_LENGTH = 128;
     const validCid = "a".repeat(MAX_CID_LENGTH);
     await expect(
-        market.connect(userA).submitStatement(validCid, biddingDuration, revealDuration)
+      market
+        .connect(userA)
+        .submitStatement(validCid, biddingDuration, revealDuration),
     ).to.not.be.reverted;
   });
 
   it("should revert on invalid marketId across entrypoints", async function () {
     const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-    const commit = ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [1, 123, userA.address]);
-    await expect(market.connect(userA).commitBet(0, commit, 1n)).to.be.revertedWith("Invalid market");
+    const commit = ethers.solidityPackedKeccak256(
+      ["uint8", "uint256", "address"],
+      [1, 123, userA.address],
+    );
+    await expect(
+      market.connect(userA).commitBet(0, commit, 1n),
+    ).to.be.revertedWith("Invalid market");
     await expect(market.resolve(0)).to.be.revertedWith("Invalid market");
-    await expect(market.previewCloseCheck(0)).to.be.revertedWith("Invalid market");
-    await expect(market.getRandomCloseStatus(0)).to.be.revertedWith("Invalid market");
+    await expect(market.previewCloseCheck(0)).to.be.revertedWith(
+      "Invalid market",
+    );
+    await expect(market.getRandomCloseStatus(0)).to.be.revertedWith(
+      "Invalid market",
+    );
     await expect(market.pingMarket(0)).to.be.revertedWith("Invalid market");
   });
 
   it("should not allow resolving random-close markets before reveal starts", async function () {
     const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-    await market.connect(userA).submitStatementWithRandomClose(
-      "ipfs://random-close",
-      3600,
-      3600,
-      true,
-      7200
-    );
+    await market
+      .connect(userA)
+      .submitStatementWithRandomClose(
+        "ipfs://random-close",
+        3600,
+        3600,
+        true,
+        7200,
+      );
 
     await expect(market.resolve(0)).to.be.revertedWith("Reveal not started");
   });
