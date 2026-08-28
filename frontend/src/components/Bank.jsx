@@ -37,11 +37,10 @@ const BuyCard = memo(function BuyCard({
         <input
           ref={inputRef}
           id="buy-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern={"^\\d*\\.?\\d*$"}
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="0.1"
@@ -120,11 +119,10 @@ const SellCard = memo(function SellCard({
         <input
           ref={inputRef}
           id="sell-amount"
-          type="number"
+          type="text"
           inputMode="decimal"
+          pattern={"^\\d*\\.?\\d*$"}
           autoComplete="off"
-          min="0"
-          step="0.01"
           maxLength="50"
           className="input"
           placeholder="100"
@@ -242,20 +240,46 @@ function Bank() {
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
   const handleBuyAmountChange = useCallback((e) => {
-    const val = e.target.value;
-    // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setBuyAmount(val);
+    let val = e.target.value;
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+    const oldLength = val.length;
+
+    val = val.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 1) {
+      val = parts[0] + '.' + parts.slice(1).join('').replace(/\./g, '');
+    }
+
+    if (val.length <= 50) {
+      e.target.value = val;
+      const diff = val.length - oldLength;
+      if (start !== null && end !== null) {
+        e.target.setSelectionRange(start + diff, end + diff);
+      }
+      setBuyAmount(val);
     }
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
-    const val = e.target.value;
-    // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setSellAmount(val);
+    let val = e.target.value;
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+    const oldLength = val.length;
+
+    val = val.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 1) {
+      val = parts[0] + '.' + parts.slice(1).join('').replace(/\./g, '');
+    }
+
+    if (val.length <= 50) {
+      e.target.value = val;
+      const diff = val.length - oldLength;
+      if (start !== null && end !== null) {
+        e.target.setSelectionRange(start + diff, end + diff);
+      }
+      setSellAmount(val);
     }
   }, []);
 
