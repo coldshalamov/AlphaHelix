@@ -445,7 +445,7 @@ function BettingWidget({
       <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
-      <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
+      <form className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }} onSubmit={(e) => { e.preventDefault(); handleCommit(); }}>
         <Choices choice={choice} isLocked={isLocked} onChange={handleChoiceChange} />
 
         <div>
@@ -508,7 +508,7 @@ function BettingWidget({
           </div>
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked}>
           {isLocked ? (
             <>
               <Spinner />
@@ -518,7 +518,7 @@ function BettingWidget({
             'Commit bet'
           )}
         </button>
-      </div>
+      </form>
 
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
 
