@@ -165,15 +165,19 @@ export default function MarketsPage() {
       {Math.ceil(numericCount / PAGE_SIZE) > 1 && (
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', alignItems: 'center' }}>
           <button
+            type="button"
             className="button secondary"
+            aria-label="Previous page"
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
           >
             Previous
           </button>
-          <span className="helper">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
+          <span className="helper" aria-live="polite">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
           <button
+            type="button"
             className="button secondary"
+            aria-label="Next page"
             onClick={() => setPage(p => Math.min(Math.ceil(numericCount / PAGE_SIZE) - 1, p + 1))}
             disabled={page >= Math.ceil(numericCount / PAGE_SIZE) - 1}
           >
