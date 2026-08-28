@@ -11,3 +11,10 @@
 ## 2026-04-17 - Wagmi useReadContracts Pagination
 **Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to dynamic contract counters (like `marketCount`) cause O(N) payload explosions and hit RPC limits.
 **Action:** Always implement offset pagination (e.g., `PAGE_SIZE`) for dynamic list rendering.
+## 2024-07-22 - JS-Hydrated Animations Anti-Pattern
+**Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes after component mount (e.g., `isVisible ? 'animate-fade' : ''`) is a common anti-pattern in Next.js that harms First Contentful Paint (FCP) and causes unnecessary full-page re-renders.
+**Action:** Always apply static CSS animation classes directly to elements in the JSX to allow the browser to animate them immediately upon CSS load without waiting for JS hydration. When refactoring, ensure any hardcoded hidden states (like `opacity: 0`) are removed so elements don't remain invisible if JS/CSS fails.
+
+## 2024-07-22 - Countdown CPU De-optimization
+**Learning:** Replacing a 1Hz `setInterval` with a raw `requestAnimationFrame` loop for a low-frequency UI update (like a 1-second countdown) causes severe CPU de-optimization by executing the logic 60-120 times per second needlessly.
+**Action:** When using `requestAnimationFrame` for infrequent updates, always implement timestamp throttling to limit execution frequency.
