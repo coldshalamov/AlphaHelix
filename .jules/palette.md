@@ -1,0 +1,3 @@
+## 2024-05-25 - Fix financial input sanitization & accessibility
+**Learning:** Using `type="number"` for financial inputs causes accessibility issues like scroll-jacking, inconsistent cross-browser behavior, and difficulty preventing invalid characters (like multiple dots or letters).
+**Action:** Always use `type="text"` with `inputMode="decimal"` and a `pattern` for numeric inputs. Sanitize manually in `onChange` (replace commas, strip non-numeric, merge decimals). Crucially, to prevent React state desync, force a DOM update (`e.target.value = val`) and preserve the user's cursor position using `selectionStart`/`selectionEnd` and `setSelectionRange`. Remove `min` and `step` attributes when converting away from `type="number"`.
