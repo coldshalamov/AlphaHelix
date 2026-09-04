@@ -9,7 +9,7 @@ import {
   useReadContract,
   useSwitchChain,
 } from 'wagmi';
-import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
+import { encodePacked, keccak256, parseEther, formatEther, bytesToHex } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
@@ -239,8 +239,9 @@ function BettingWidget({
       // Create salt + commitment hash
       const randomBuffer = new Uint8Array(32);
       window.crypto.getRandomValues(randomBuffer);
+      // BOLT: Optimized hex conversion avoids intermediate string allocations for 32-byte salt
       const salt = BigInt(
-        '0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''),
+        bytesToHex(randomBuffer),
       );
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
       // BOLT: Convert marketId (BigInt) to string to avoid JSON.stringify crash in persistBet
