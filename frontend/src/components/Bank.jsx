@@ -3,6 +3,7 @@ import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTr
 import { formatEther, parseEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
+import { INPUT_SANITIZATION_REGEX, VALID_DECIMAL_REGEX, MAX_INPUT_LENGTH } from '@/lib/constants';
 import Spinner from './Spinner';
 
 // BOLT: Extracted and memoized BuyCard to prevent re-renders when typing in Sell input
@@ -42,7 +43,7 @@ const BuyCard = memo(function BuyCard({
           autoComplete="off"
           min="0"
           step="0.01"
-          maxLength="50"
+          maxLength={MAX_INPUT_LENGTH}
           className="input"
           placeholder="0.1"
           value={buyAmount}
@@ -125,7 +126,7 @@ const SellCard = memo(function SellCard({
           autoComplete="off"
           min="0"
           step="0.01"
-          maxLength="50"
+          maxLength={MAX_INPUT_LENGTH}
           className="input"
           placeholder="100"
           value={sellAmount}
@@ -244,18 +245,18 @@ function Bank() {
   const handleBuyAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setBuyAmount(val);
+    if (val === '' || INPUT_SANITIZATION_REGEX.test(val)) {
+      // SENTINEL: Enforced limit using shared constant
+      if (val.length <= MAX_INPUT_LENGTH) setBuyAmount(val);
     }
   }, []);
 
   const handleSellAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-      // SENTINEL: Increased limit to 50
-      if (val.length <= 50) setSellAmount(val);
+    if (val === '' || INPUT_SANITIZATION_REGEX.test(val)) {
+      // SENTINEL: Enforced limit using shared constant
+      if (val.length <= MAX_INPUT_LENGTH) setSellAmount(val);
     }
   }, []);
 
@@ -287,7 +288,7 @@ function Bank() {
       return;
     }
     // Validate format before parsing to avoid exceptions
-    if (!/^\d*\.?\d+$/.test(buyAmount)) {
+    if (!VALID_DECIMAL_REGEX.test(buyAmount)) {
       setStatus('Invalid amount format.');
       setActiveAction(null);
       return;
@@ -324,7 +325,7 @@ function Bank() {
       return;
     }
     // Validate format before parsing
-    if (!/^\d*\.?\d+$/.test(sellAmount)) {
+    if (!VALID_DECIMAL_REGEX.test(sellAmount)) {
       setStatus('Invalid amount format.');
       setActiveAction(null);
       return;
