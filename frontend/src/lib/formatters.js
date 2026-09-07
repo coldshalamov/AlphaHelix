@@ -6,3 +6,9 @@ export const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   minute: 'numeric',
   second: 'numeric',
 });
+
+// BOLT: Optimized date formatter to avoid new Date() object allocation
+export function formatTimestamp(seconds) {
+  if (!seconds) return 'Pending';
+  return dateTimeFormatter.format(Number(seconds) * 1000);
+}
