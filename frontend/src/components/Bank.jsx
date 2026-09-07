@@ -5,6 +5,10 @@ import contracts from '@/config/contracts.json';
 import { reserveAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
 
+// BOLT: Extracted regex to prevent recompilation on every render
+const DECIMAL_INPUT_REGEX = /^\d*\.?\d*$/;
+const DECIMAL_VALID_REGEX = /^\d*\.?\d+$/;
+
 // BOLT: Extracted and memoized BuyCard to prevent re-renders when typing in Sell input
 const BuyCard = memo(function BuyCard({
   buyAmount,
@@ -244,7 +248,7 @@ function Bank() {
   const handleBuyAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+    if (val === '' || DECIMAL_INPUT_REGEX.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setBuyAmount(val);
     }
@@ -253,7 +257,7 @@ function Bank() {
   const handleSellAmountChange = useCallback((e) => {
     const val = e.target.value;
     // Strict sanitization: allow empty string or valid decimal fragments
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+    if (val === '' || DECIMAL_INPUT_REGEX.test(val)) {
       // SENTINEL: Increased limit to 50
       if (val.length <= 50) setSellAmount(val);
     }
@@ -287,7 +291,7 @@ function Bank() {
       return;
     }
     // Validate format before parsing to avoid exceptions
-    if (!/^\d*\.?\d+$/.test(buyAmount)) {
+    if (!DECIMAL_VALID_REGEX.test(buyAmount)) {
       setStatus('Invalid amount format.');
       setActiveAction(null);
       return;
@@ -324,7 +328,7 @@ function Bank() {
       return;
     }
     // Validate format before parsing
-    if (!/^\d*\.?\d+$/.test(sellAmount)) {
+    if (!DECIMAL_VALID_REGEX.test(sellAmount)) {
       setStatus('Invalid amount format.');
       setActiveAction(null);
       return;
