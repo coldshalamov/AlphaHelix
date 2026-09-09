@@ -55,4 +55,22 @@ describe("HelixMarket Randomness Security", function () {
     // If fix is working, hashes should be identical (gasPrice ignored)
     expect(res1[0]).to.equal(res2[0]);
   });
+
+  it("should generate SAME hashes for different message senders (Fix Verified)", async function () {
+    // Advance time to allow random close check
+    await ethers.provider.send("evm_increaseTime", [3600]);
+    await ethers.provider.send("evm_mine");
+
+    // Check previewCloseCheck with deployer
+    const res1 = await market.previewCloseCheck.staticCall(marketId);
+
+    // Check previewCloseCheck with user1
+    const res2 = await market.connect(user1).previewCloseCheck.staticCall(marketId);
+
+    console.log("Hash 1 (deployer):", res1[0]);
+    console.log("Hash 2 (user1):", res2[0]);
+
+    // If fix is working, hashes should be identical (msg.sender ignored)
+    expect(res1[0]).to.equal(res2[0]);
+  });
 });
