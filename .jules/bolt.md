@@ -4,3 +4,6 @@
 ## 2024-07-05 - TanStack Query v5 refetchInterval Callback
 **Learning:** In @tanstack/react-query v5, the `refetchInterval` callback receives the `query` object as its first argument, not the raw `data`.
 **Action:** Always access the data via `query.state.data` in the `refetchInterval` callback to prevent errors and infinite network polling.
+## 2024-05-24 - Hex Generation Performance
+**Learning:** Manual byte-array to hex string conversion (e.g., `Array.from(buffer).map(...).join('')`) is an anti-pattern causing excessive intermediate allocations and GC pressure.
+**Action:** Always use native utilities like `bytesToHex` from `viem` for optimal memory/CPU performance on the frontend. Note that `bytesToHex` natively returns a `0x`-prefixed string.
