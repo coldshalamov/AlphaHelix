@@ -17,7 +17,7 @@ const BuyCard = memo(function BuyCard({
   inputRef
 }) {
   return (
-    <form className="card" style={{ borderColor: '#dbeafe' }} onSubmit={(e) => { e.preventDefault(); handleBuy(); }}>
+    <form className="card" style={{ borderColor: '#dbeafe' }} onSubmit={(e) => { e.preventDefault(); if (!activeAction) handleBuy(); }}>
       <h3 className="font-semibold">Buy HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
         <label htmlFor="buy-amount" className="helper">
@@ -100,7 +100,7 @@ const SellCard = memo(function SellCard({
   inputRef
 }) {
   return (
-    <form className="card" style={{ borderColor: '#ffe4e6' }} onSubmit={(e) => { e.preventDefault(); handleSell(); }}>
+    <form className="card" style={{ borderColor: '#ffe4e6' }} onSubmit={(e) => { e.preventDefault(); if (!activeAction) handleSell(); }}>
       <h3 className="font-semibold">Sell HLX</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
         <label htmlFor="sell-amount" className="helper">
