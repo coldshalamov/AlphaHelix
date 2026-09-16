@@ -1,0 +1,3 @@
+## 2024-10-25 - Form Native Keyboard Submission Pattern
+**Learning:** Users expect to submit via the "Enter" key on input fields, but wrapping everything in a `<form>` can cause unintended premature submissions if utility buttons lack `type="button"`. Also, disabled submit buttons can be bypassed via keyboard submission.
+**Action:** When converting to semantic `<form onSubmit={...}>`, explicitly add `type="button"` to non-submit buttons, change the main submit to `type="submit"`, and enforce disabled states inside the `onSubmit` handler (e.g., `if (!isLocked) handleCommit()`) to prevent unauthorized keyboard submissions.
