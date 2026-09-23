@@ -11,3 +11,6 @@
 ## 2026-04-17 - Wagmi useReadContracts Pagination
 **Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to dynamic contract counters (like `marketCount`) cause O(N) payload explosions and hit RPC limits.
 **Action:** Always implement offset pagination (e.g., `PAGE_SIZE`) for dynamic list rendering.
+## 2024-07-29 - Static Animation Hydration Pitfall
+**Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes (e.g. `isVisible ? 'animate-fade' : ''`) is a Next.js anti-pattern that harms FCP and causes unnecessary full-page re-renders. Also, removing this JS without removing corresponding base CSS rules (like `opacity: 0`) causes permanently invisible UI elements.
+**Action:** Always apply static CSS animation classes directly in JSX so browsers animate them upon CSS load without waiting for JS hydration. Ensure base static hidden properties are also removed when making this change.
