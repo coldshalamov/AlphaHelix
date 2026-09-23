@@ -16,3 +16,7 @@
 **Vulnerability:** withdrawUnrevealed relied on block.timestamp > s.revealEndTime while s.revealEndTime could still be 0 (uninitialized in random-close markets). This bypassed the intended timeline checks.
 **Learning:** Variables representing dynamically set phase boundaries initialize to 0. Timestamp comparisons against 0 always pass in EVM, creating critical phase bypass vulnerabilities if uninitialized state isn't explicitly handled.
 **Prevention:** Always explicitly check that dynamically set timestamp variables are initialized (e.g., require(s.revealEndTime != 0)) before using them in access control or timeline comparisons.
+## 2024-08-25 - Prevent Grinding Attack via msg.sender
+**Vulnerability:** The entropy pool for generating a global randomness value (`closeHash`) in `HelixMarket.sol` included a user-controllable variable (`msg.sender`).
+**Learning:** Never include user-controllable variables like `msg.sender` or `tx.origin` in entropy pools when calculating on-chain global randomness. It allows attackers to grind the randomness via proxy contracts or `CREATE2` to force desired outcomes.
+**Prevention:** Remove user-controllable variables from `keccak256` entropy inputs and rely only on system-provided or verifiable entropy sources (like `block.prevrandao`).

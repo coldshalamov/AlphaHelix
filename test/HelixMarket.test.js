@@ -1,5 +1,8 @@
 const { expect } = require("chai");
-const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {
+  loadFixture,
+  time,
+} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 // This is needed to make chai matchers work with ethers v6
@@ -35,7 +38,10 @@ describe("HelixMarket", function () {
   const burnAddress = "0x000000000000000000000000000000000000dEaD";
 
   function buildCommit(choice, salt, user) {
-    return ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [choice, salt, user.address]);
+    return ethers.solidityPackedKeccak256(
+      ["uint8", "uint256", "address"],
+      [choice, salt, user.address],
+    );
   }
 
   function toWei(value) {
@@ -44,18 +50,28 @@ describe("HelixMarket", function () {
 
   describe("Lifecycle and economics", function () {
     it("YES wins, sweeps unaligned, and originator receives 1% fee", async function () {
-      const { market, token, owner, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, owner, userA, userB, userC } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
-      await market.connect(userA).submitStatement("ipfs://cid", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://cid", biddingDuration, revealDuration);
       const marketId = 0;
 
       const yesAmount = ethers.parseEther("200");
       const noAmount = ethers.parseEther("100");
       const unalignedAmount = ethers.parseEther("50");
 
-      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), yesAmount);
-      await market.connect(userC).commitBet(marketId, buildCommit(0, 222, userC), noAmount);
-      await market.connect(owner).commitBet(marketId, buildCommit(2, 333, owner), unalignedAmount);
+      await market
+        .connect(userB)
+        .commitBet(marketId, buildCommit(1, 111, userB), yesAmount);
+      await market
+        .connect(userC)
+        .commitBet(marketId, buildCommit(0, 222, userC), noAmount);
+      await market
+        .connect(owner)
+        .commitBet(marketId, buildCommit(2, 333, owner), unalignedAmount);
 
       await time.increase(biddingDuration + 1);
 
@@ -69,7 +85,9 @@ describe("HelixMarket", function () {
       await market.resolve(marketId);
       const originatorBalanceAfter = await token.balanceOf(userA.address);
 
-      expect(originatorBalanceAfter - originatorBalanceBefore).to.equal(ethers.parseEther("3.5"));
+      expect(originatorBalanceAfter - originatorBalanceBefore).to.equal(
+        ethers.parseEther("3.5"),
+      );
 
       const balanceBefore = await token.balanceOf(userB.address);
       await market.connect(userB).claim(marketId);
@@ -80,18 +98,28 @@ describe("HelixMarket", function () {
     });
 
     it("Tie refunds all bettors without originator fee", async function () {
-      const { market, token, owner, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, owner, userA, userB, userC } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
-      await market.connect(userA).submitStatement("ipfs://tie", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://tie", biddingDuration, revealDuration);
       const marketId = 0;
 
       const yesAmount = ethers.parseEther("150");
       const noAmount = ethers.parseEther("150");
       const unalignedAmount = ethers.parseEther("40");
 
-      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), yesAmount);
-      await market.connect(userC).commitBet(marketId, buildCommit(0, 222, userC), noAmount);
-      await market.connect(owner).commitBet(marketId, buildCommit(2, 333, owner), unalignedAmount);
+      await market
+        .connect(userB)
+        .commitBet(marketId, buildCommit(1, 111, userB), yesAmount);
+      await market
+        .connect(userC)
+        .commitBet(marketId, buildCommit(0, 222, userC), noAmount);
+      await market
+        .connect(owner)
+        .commitBet(marketId, buildCommit(2, 333, owner), unalignedAmount);
 
       await time.increase(biddingDuration + 1);
 
@@ -121,13 +149,19 @@ describe("HelixMarket", function () {
 
   describe("Unrevealed commitments", function () {
     it("punishes unrevealed stake with total forfeiture", async function () {
-      const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
-      await market.connect(userA).submitStatement("ipfs://unrevealed", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://unrevealed", biddingDuration, revealDuration);
       const marketId = 0;
       const amount = ethers.parseEther("100");
 
-      await market.connect(userB).commitBet(marketId, buildCommit(1, 123, userB), amount);
+      await market
+        .connect(userB)
+        .commitBet(marketId, buildCommit(1, 123, userB), amount);
 
       await time.increase(biddingDuration + revealDuration + 2);
 
@@ -142,7 +176,9 @@ describe("HelixMarket", function () {
       expect(userBalanceAfter - userBalanceBefore).to.equal(0);
       expect(supplyBefore - supplyAfter).to.equal(amount);
 
-      await expect(market.connect(userB).withdrawUnrevealed(marketId)).to.be.revertedWith("No unrevealed stake");
+      await expect(
+        market.connect(userB).withdrawUnrevealed(marketId),
+      ).to.be.revertedWith("No unrevealed stake");
     });
   });
 
@@ -150,33 +186,47 @@ describe("HelixMarket", function () {
     it("reverts resolve before reveal end", async function () {
       const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-      await market.connect(userA).submitStatement("ipfs://cid", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://cid", biddingDuration, revealDuration);
 
-      await expect(market.resolve(0)).to.be.revertedWith("Reveal phase not over");
+      await expect(market.resolve(0)).to.be.revertedWith(
+        "Reveal phase not over",
+      );
     });
 
     it("reverts reveal before commit end", async function () {
       const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-      await market.connect(userA).submitStatement("ipfs://cid", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://cid", biddingDuration, revealDuration);
       const hashA = buildCommit(1, 111, userA);
       const amountA = ethers.parseEther("50");
 
       await market.connect(userA).commitBet(0, hashA, amountA);
 
-      await expect(market.connect(userA).revealBet(0, 1, 111)).to.be.revertedWith("Commit phase not over");
+      await expect(
+        market.connect(userA).revealBet(0, 1, 111),
+      ).to.be.revertedWith("Commit phase not over");
     });
 
     it("reverts unrevealed withdrawal before reveal end", async function () {
-      const { market, userA, userB } = await loadFixture(deployHelixMarketFixture);
+      const { market, userA, userB } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
-      await market.connect(userA).submitStatement("ipfs://cid", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://cid", biddingDuration, revealDuration);
       const hashA = buildCommit(1, 111, userB);
       const amountA = ethers.parseEther("10");
 
       await market.connect(userB).commitBet(0, hashA, amountA);
 
-      await expect(market.connect(userB).withdrawUnrevealed(0)).to.be.revertedWith("Reveal phase not over");
+      await expect(
+        market.connect(userB).withdrawUnrevealed(0),
+      ).to.be.revertedWith("Reveal phase not over");
     });
   });
 
@@ -219,10 +269,18 @@ describe("HelixMarket", function () {
 
     for (const scenario of scenarios) {
       it(`maintains pool accounting when ${scenario.name}`, async function () {
-        const { market, token, owner, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+        const { market, token, owner, userA, userB, userC } = await loadFixture(
+          deployHelixMarketFixture,
+        );
         const actors = { owner, userA, userB, userC };
         const originator = userA;
-        await market.connect(originator).submitStatement(`ipfs://${scenario.name}`, biddingDuration, revealDuration);
+        await market
+          .connect(originator)
+          .submitStatement(
+            `ipfs://${scenario.name}`,
+            biddingDuration,
+            revealDuration,
+          );
 
         const stakes = [];
         let yesPool = 0n;
@@ -235,7 +293,9 @@ describe("HelixMarket", function () {
             const amount = toWei(entry.amount);
             const salt = BigInt(1000 + stakes.length);
 
-            await market.connect(actor).commitBet(0, buildCommit(choice, salt, actor), amount);
+            await market
+              .connect(actor)
+              .commitBet(0, buildCommit(choice, salt, actor), amount);
             stakes.push({ actor, choice, amount, salt });
 
             if (choice === 1) yesPool += amount;
@@ -250,14 +310,20 @@ describe("HelixMarket", function () {
 
         await time.increase(biddingDuration + 1);
         for (const stake of stakes) {
-          await market.connect(stake.actor).revealBet(0, stake.choice, stake.salt);
+          await market
+            .connect(stake.actor)
+            .revealBet(0, stake.choice, stake.salt);
         }
         await time.increase(revealDuration + 1);
 
-        const originatorBalanceBefore = await token.balanceOf(originator.address);
+        const originatorBalanceBefore = await token.balanceOf(
+          originator.address,
+        );
         await market.resolve(0);
         const statement = await market.markets(0);
-        const originatorBalanceAfter = await token.balanceOf(originator.address);
+        const originatorBalanceAfter = await token.balanceOf(
+          originator.address,
+        );
         const originatorFee = originatorBalanceAfter - originatorBalanceBefore;
 
         const winners = stakes.filter((stake) => {
@@ -284,8 +350,11 @@ describe("HelixMarket", function () {
             const rewardPool = totalPool - originatorFee;
             const winningPool = statement.outcome ? yesPool : noPool;
 
-            const isLastWinner = claimedWinningStake + stake.amount === winningPool;
-            const expected = isLastWinner ? rewardPool - claimedRewardPaid : (stake.amount * rewardPool) / winningPool;
+            const isLastWinner =
+              claimedWinningStake + stake.amount === winningPool;
+            const expected = isLastWinner
+              ? rewardPool - claimedRewardPaid
+              : (stake.amount * rewardPool) / winningPool;
             claimedWinningStake += stake.amount;
             claimedRewardPaid += expected;
 
@@ -300,14 +369,22 @@ describe("HelixMarket", function () {
     }
 
     it("prevents losing side from withdrawing more than zero", async function () {
-      const { market, token, owner, userA, userB } = await loadFixture(deployHelixMarketFixture);
-      await market.connect(owner).submitStatement("ipfs://loss-check", biddingDuration, revealDuration);
+      const { market, token, owner, userA, userB } = await loadFixture(
+        deployHelixMarketFixture,
+      );
+      await market
+        .connect(owner)
+        .submitStatement("ipfs://loss-check", biddingDuration, revealDuration);
 
       const yesAmount = ethers.parseEther("10");
       const noAmount = ethers.parseEther("1");
 
-      await market.connect(userA).commitBet(0, buildCommit(1, 99, userA), yesAmount);
-      await market.connect(userB).commitBet(0, buildCommit(0, 100, userB), noAmount);
+      await market
+        .connect(userA)
+        .commitBet(0, buildCommit(1, 99, userA), yesAmount);
+      await market
+        .connect(userB)
+        .commitBet(0, buildCommit(0, 100, userB), noAmount);
 
       await time.increase(biddingDuration + 1);
       await market.connect(userA).revealBet(0, 1, 99);
@@ -316,10 +393,14 @@ describe("HelixMarket", function () {
       await time.increase(revealDuration + 1);
       await market.resolve(0);
 
-      await expect(market.connect(userB).claim(0)).to.be.revertedWith("No winning bet");
+      await expect(market.connect(userB).claim(0)).to.be.revertedWith(
+        "No winning bet",
+      );
 
       const before = await token.balanceOf(userB.address);
-      await expect(market.connect(userB).withdrawUnrevealed(0)).to.be.revertedWith("No unrevealed stake");
+      await expect(
+        market.connect(userB).withdrawUnrevealed(0),
+      ).to.be.revertedWith("No unrevealed stake");
       const after = await token.balanceOf(userB.address);
       expect(after).to.equal(before);
     });
@@ -327,7 +408,9 @@ describe("HelixMarket", function () {
 
   describe("Random close markets", function () {
     it("Creates random close market with correct parameters", async function () {
-      const { market, token, userA } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       const minDuration = 3600; // 1 hour minimum
       const avgDuration = 7200; // 2 hours average
@@ -338,7 +421,7 @@ describe("HelixMarket", function () {
         minDuration,
         revealDuration,
         true, // enable random close
-        avgDuration
+        avgDuration,
       );
 
       const marketId = 0;
@@ -351,10 +434,14 @@ describe("HelixMarket", function () {
     });
 
     it("Fixed-time markets still work (backwards compatibility)", async function () {
-      const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       // Use the original submitStatement function
-      await market.connect(userA).submitStatement("ipfs://fixed-time", biddingDuration, revealDuration);
+      await market
+        .connect(userA)
+        .submitStatement("ipfs://fixed-time", biddingDuration, revealDuration);
 
       const marketId = 0;
       const status = await market.getRandomCloseStatus(marketId);
@@ -365,11 +452,17 @@ describe("HelixMarket", function () {
       expect(status.commitPhaseClosed).to.equal(0);
 
       // Commit should work during window
-      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), ethers.parseEther("100"));
+      await market
+        .connect(userB)
+        .commitBet(
+          marketId,
+          buildCommit(1, 111, userB),
+          ethers.parseEther("100"),
+        );
 
       // Can't reveal before commit end
       await expect(
-        market.connect(userB).revealBet(marketId, 1, 111)
+        market.connect(userB).revealBet(marketId, 1, 111),
       ).to.be.revertedWith("Commit phase not over");
 
       // Time travel past commit window
@@ -383,7 +476,9 @@ describe("HelixMarket", function () {
     });
 
     it("Fixed-time markets also work with submitStatementWithRandomClose", async function () {
-      const { market, token, userA, userB } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       // Use submitStatementWithRandomClose with enableRandomClose = false
       await market.connect(userA).submitStatementWithRandomClose(
@@ -391,7 +486,7 @@ describe("HelixMarket", function () {
         biddingDuration,
         revealDuration,
         false, // disable random close
-        0 // avgDuration not used
+        0, // avgDuration not used
       );
 
       const marketId = 0;
@@ -400,7 +495,13 @@ describe("HelixMarket", function () {
       expect(status.randomCloseEnabled).to.be.false;
 
       // Test normal flow
-      await market.connect(userB).commitBet(marketId, buildCommit(1, 111, userB), ethers.parseEther("50"));
+      await market
+        .connect(userB)
+        .commitBet(
+          marketId,
+          buildCommit(1, 111, userB),
+          ethers.parseEther("50"),
+        );
       await time.increase(biddingDuration + 1);
       await market.connect(userB).revealBet(marketId, 1, 111);
 
@@ -409,19 +510,23 @@ describe("HelixMarket", function () {
     });
 
     it("Random close market can close during commit", async function () {
-      const { market, token, userA, userB, userC } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB, userC } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       const minDuration = 3600; // 1 hour minimum (required by MIN_BIDDING_DURATION)
       const avgDuration = 3660; // Just 1 minute more = very high probability
       const revealDuration = 3600;
 
-      await market.connect(userA).submitStatementWithRandomClose(
-        "ipfs://random-close-test",
-        minDuration,
-        revealDuration,
-        true,
-        avgDuration
-      );
+      await market
+        .connect(userA)
+        .submitStatementWithRandomClose(
+          "ipfs://random-close-test",
+          minDuration,
+          revealDuration,
+          true,
+          avgDuration,
+        );
 
       const marketId = 0;
 
@@ -437,12 +542,14 @@ describe("HelixMarket", function () {
         try {
           // Alternate between users
           const user = attempts % 2 === 0 ? userB : userC;
-          if (!await market.hasCommitted(marketId, user.address)) {
-            await market.connect(user).commitBet(
-              marketId,
-              buildCommit(1, 1000 + attempts, user),
-              ethers.parseEther("1")
-            );
+          if (!(await market.hasCommitted(marketId, user.address))) {
+            await market
+              .connect(user)
+              .commitBet(
+                marketId,
+                buildCommit(1, 1000 + attempts, user),
+                ethers.parseEther("1"),
+              );
           }
         } catch (e) {
           // Commit phase may have closed
@@ -461,33 +568,41 @@ describe("HelixMarket", function () {
 
       statement = await market.markets(marketId);
       // Market should eventually close (or we hit max attempts)
-      console.log(`Market tested with ${attempts} attempts, closed: ${statement.commitPhaseClosed > 0}`);
+      console.log(
+        `Market tested with ${attempts} attempts, closed: ${statement.commitPhaseClosed > 0}`,
+      );
     });
 
     it("Cannot commit after random close", async function () {
-      const { market, token, userA, userB, userC, owner } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB, userC, owner } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       // Create market with very high close probability (difficulty target = max)
       const minDuration = 3600; // 1 hour minimum
       const avgDuration = 3601; // Just 1 second more than min = extremely high probability
       const revealDuration = 3600;
 
-      await market.connect(userA).submitStatementWithRandomClose(
-        "ipfs://high-probability",
-        minDuration,
-        revealDuration,
-        true,
-        avgDuration
-      );
+      await market
+        .connect(userA)
+        .submitStatementWithRandomClose(
+          "ipfs://high-probability",
+          minDuration,
+          revealDuration,
+          true,
+          avgDuration,
+        );
 
       const marketId = 0;
 
       // Commit before close
-      await market.connect(userB).commitBet(
-        marketId,
-        buildCommit(1, 111, userB),
-        ethers.parseEther("10")
-      );
+      await market
+        .connect(userB)
+        .commitBet(
+          marketId,
+          buildCommit(1, 111, userB),
+          ethers.parseEther("10"),
+        );
 
       // Time travel to minimum duration
       await time.increase(minDuration + 1);
@@ -507,38 +622,46 @@ describe("HelixMarket", function () {
       if (statement.commitPhaseClosed > 0) {
         // Now try to commit - should fail
         await expect(
-          market.connect(userC).commitBet(
-            marketId,
-            buildCommit(0, 222, userC),
-            ethers.parseEther("5")
-          )
+          market
+            .connect(userC)
+            .commitBet(
+              marketId,
+              buildCommit(0, 222, userC),
+              ethers.parseEther("5"),
+            ),
         ).to.be.revertedWith("Commit phase closed");
       }
     });
 
     it("Can reveal after random close", async function () {
-      const { market, token, userA, userB, owner } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userB, owner } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       const minDuration = 3600; // 1 hour minimum
       const avgDuration = 3601; // Very high probability
       const revealDuration = 3600;
 
-      await market.connect(userA).submitStatementWithRandomClose(
-        "ipfs://reveal-test",
-        minDuration,
-        revealDuration,
-        true,
-        avgDuration
-      );
+      await market
+        .connect(userA)
+        .submitStatementWithRandomClose(
+          "ipfs://reveal-test",
+          minDuration,
+          revealDuration,
+          true,
+          avgDuration,
+        );
 
       const marketId = 0;
 
       // Commit before close
-      await market.connect(userB).commitBet(
-        marketId,
-        buildCommit(1, 111, userB),
-        ethers.parseEther("10")
-      );
+      await market
+        .connect(userB)
+        .commitBet(
+          marketId,
+          buildCommit(1, 111, userB),
+          ethers.parseEther("10"),
+        );
 
       // Time travel to minimum duration
       await time.increase(minDuration + 1);
@@ -567,13 +690,15 @@ describe("HelixMarket", function () {
     it("previewCloseCheck returns correct values", async function () {
       const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-      await market.connect(userA).submitStatementWithRandomClose(
-        "ipfs://preview-test",
-        3600,
-        3600,
-        true,
-        7200
-      );
+      await market
+        .connect(userA)
+        .submitStatementWithRandomClose(
+          "ipfs://preview-test",
+          3600,
+          3600,
+          true,
+          7200,
+        );
 
       const preview = await market.previewCloseCheck(0);
 
@@ -589,13 +714,15 @@ describe("HelixMarket", function () {
       await market.connect(userA).submitStatement("ipfs://fixed", 3600, 3600);
 
       // Create random close market
-      await market.connect(userA).submitStatementWithRandomClose(
-        "ipfs://random",
-        3600,
-        3600,
-        true,
-        7200
-      );
+      await market
+        .connect(userA)
+        .submitStatementWithRandomClose(
+          "ipfs://random",
+          3600,
+          3600,
+          true,
+          7200,
+        );
 
       const fixedStatus = await market.getRandomCloseStatus(0);
       expect(fixedStatus.randomCloseEnabled).to.be.false;
@@ -614,21 +741,23 @@ describe("HelixMarket", function () {
           7200, // minDuration = 2 hours
           3600,
           true,
-          3600  // avgDuration = 1 hour (less than min)
-        )
+          3600, // avgDuration = 1 hour (less than min)
+        ),
       ).to.be.revertedWith("Avg duration must be >= min duration");
     });
 
     it("Ping reward works for closing market", async function () {
-      const { market, token, userA, userC } = await loadFixture(deployHelixMarketFixture);
+      const { market, token, userA, userC } = await loadFixture(
+        deployHelixMarketFixture,
+      );
 
       // Create market with HIGH close probability
       await market.connect(userA).submitStatementWithRandomClose(
         "ipfs://ping-test",
-        3600,  // 1 hour minimum
-        3600,  // 1 hour reveal
-        true,  // random close
-        3601   // Very high probability (just 1 second more)
+        3600, // 1 hour minimum
+        3600, // 1 hour reveal
+        true, // random close
+        3601, // Very high probability (just 1 second more)
       );
 
       await time.increase(3601);
@@ -656,7 +785,9 @@ describe("HelixMarket", function () {
       }
 
       // Log result
-      console.log(`Ping test: ${closed ? "Got reward" : "No reward"} after ${attempts} attempts`);
+      console.log(
+        `Ping test: ${closed ? "Got reward" : "No reward"} after ${attempts} attempts`,
+      );
     });
   });
 });

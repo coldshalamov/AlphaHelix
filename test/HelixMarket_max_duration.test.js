@@ -1,5 +1,8 @@
 const { expect } = require("chai");
-const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {
+  loadFixture,
+  time,
+} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -30,7 +33,13 @@ describe("HelixMarket Security - Max Duration", function () {
     const revealDuration = 3600;
 
     await expect(
-        market.connect(userA).submitStatement("ipfs://long_bidding", longBiddingDuration, revealDuration)
+      market
+        .connect(userA)
+        .submitStatement(
+          "ipfs://long_bidding",
+          longBiddingDuration,
+          revealDuration,
+        ),
     ).to.be.revertedWith("Bidding duration too long");
   });
 
@@ -41,7 +50,13 @@ describe("HelixMarket Security - Max Duration", function () {
     const longRevealDuration = maxDuration + 1n;
 
     await expect(
-        market.connect(userA).submitStatement("ipfs://long_reveal", biddingDuration, longRevealDuration)
+      market
+        .connect(userA)
+        .submitStatement(
+          "ipfs://long_reveal",
+          biddingDuration,
+          longRevealDuration,
+        ),
     ).to.be.revertedWith("Reveal duration too long");
   });
 });

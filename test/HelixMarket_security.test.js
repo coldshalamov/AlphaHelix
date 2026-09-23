@@ -1,5 +1,8 @@
 const { expect } = require("chai");
-const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {
+  loadFixture,
+  time,
+} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 require("@nomicfoundation/hardhat-chai-matchers");
@@ -31,13 +34,18 @@ describe("HelixMarket Security: Overwrite Commitment", function () {
   const revealDuration = 3600;
 
   function buildCommit(choice, salt, user) {
-    return ethers.solidityPackedKeccak256(["uint8", "uint256", "address"], [choice, salt, user.address]);
+    return ethers.solidityPackedKeccak256(
+      ["uint8", "uint256", "address"],
+      [choice, salt, user.address],
+    );
   }
 
   it("PROTECTION: Prevents overwriting commitment", async function () {
     const { market, userA } = await loadFixture(deployHelixMarketFixture);
 
-    await market.connect(userA).submitStatement("ipfs://overwrite", biddingDuration, revealDuration);
+    await market
+      .connect(userA)
+      .submitStatement("ipfs://overwrite", biddingDuration, revealDuration);
     const marketId = 0;
 
     // 1. Commit 100 HLX on YES
@@ -52,8 +60,9 @@ describe("HelixMarket Security: Overwrite Commitment", function () {
     const commit2 = buildCommit(0, salt2, userA); // Choice 0 = NO
 
     // Expect revert
-    await expect(market.connect(userA).commitBet(marketId, commit2, amount2))
-        .to.be.revertedWith("Already committed");
+    await expect(
+      market.connect(userA).commitBet(marketId, commit2, amount2),
+    ).to.be.revertedWith("Already committed");
 
     // 3. Move to reveal phase
     await time.increase(biddingDuration + 1);

@@ -9,7 +9,8 @@ async function main() {
   // --- 1. Deploy Contracts ---
 
   // Deploy AlphaHelixToken
-  const AlphaHelixToken = await hre.ethers.getContractFactory("AlphaHelixToken");
+  const AlphaHelixToken =
+    await hre.ethers.getContractFactory("AlphaHelixToken");
   const token = await AlphaHelixToken.deploy();
   await token.waitForDeployment();
   const tokenAddress = await token.getAddress();
@@ -50,7 +51,7 @@ async function main() {
   };
   fs.writeFileSync(
     path.join(configDir, "contracts.json"),
-    JSON.stringify(addresses, null, 2)
+    JSON.stringify(addresses, null, 2),
   );
   console.log("Addresses written to frontend/src/config/contracts.json");
 
@@ -64,7 +65,9 @@ async function main() {
     console.log(`Minted 10,000 HLX to ${user.address}`);
 
     // Approve Market to spend tokens
-    await (await token.connect(user).approve(marketAddress, approveAmount)).wait();
+    await (
+      await token.connect(user).approve(marketAddress, approveAmount)
+    ).wait();
     console.log(`Approved HelixMarket for ${user.address}`);
   }
 
@@ -75,12 +78,14 @@ async function main() {
   async function commitBet(user, marketId, choice, salt, amountStr) {
     const amount = hre.ethers.parseEther(amountStr);
     const packed = hre.ethers.solidityPacked(
-        ["uint8", "uint256", "address"],
-        [choice, salt, user.address]
+      ["uint8", "uint256", "address"],
+      [choice, salt, user.address],
     );
     const hash = hre.ethers.keccak256(packed);
     await (await market.connect(user).commitBet(marketId, hash, amount)).wait();
-    console.log(`User ${user.address} committed bet on Market ${marketId} (Choice: ${choice}, Amount: ${amountStr})`);
+    console.log(
+      `User ${user.address} committed bet on Market ${marketId} (Choice: ${choice}, Amount: ${amountStr})`,
+    );
   }
 
   // Market 1: "Will ETH flip BTC in 2025?" (Phase: Open)
@@ -92,20 +97,24 @@ async function main() {
   // We use 50 weeks instead.
   const fiftyWeeks = 50 * 7 * 24 * 60 * 60;
 
-  await (await market.connect(deployer).submitStatement(
-    "ipfs://QmMarket1_ETH_BTC_Flip_2025",
-    fiftyWeeks,
-    fiftyWeeks
-  )).wait();
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket1_ETH_BTC_Flip_2025",
+        fiftyWeeks,
+        fiftyWeeks,
+      )
+  ).wait();
   console.log("Market 1 created: 'Will ETH flip BTC in 2025?' (Open)");
 
   // Market 2: "Is the sky blue?" (Phase: Commit)
   // Also long duration, but we will place bets.
-  await (await market.connect(deployer).submitStatement(
-    "ipfs://QmMarket2_Sky_Blue",
-    fiftyWeeks,
-    fiftyWeeks
-  )).wait();
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement("ipfs://QmMarket2_Sky_Blue", fiftyWeeks, fiftyWeeks)
+  ).wait();
   console.log("Market 2 created: 'Is the sky blue?' (Commit)");
 
   // Bets for Market 2
@@ -116,16 +125,19 @@ async function main() {
   // Deployer bets UNALIGNED (2)
   await commitBet(deployer, 1, 2, 11111, "100");
 
-
   // Market 3: "Did we land on the moon?" (Phase: Reveal)
   // Short commit duration so we can travel past it.
   const shortDuration = 60 * 60 + 60; // 1 hour + 60s. (Min duration is 1 hour = 3600s)
   const longReveal = fiftyWeeks;
-  await (await market.connect(deployer).submitStatement(
-    "ipfs://QmMarket3_Moon_Landing",
-    shortDuration,
-    longReveal
-  )).wait();
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket3_Moon_Landing",
+        shortDuration,
+        longReveal,
+      )
+  ).wait();
   console.log("Market 3 created: 'Did we land on the moon?' (Reveal target)");
 
   // Bets for Market 3 (Must happen BEFORE time travel)
@@ -151,13 +163,18 @@ async function main() {
   const m2 = await market.markets(1);
   const m3 = await market.markets(2);
 
-  const now = (await hre.ethers.provider.getBlock('latest')).timestamp;
+  const now = (await hre.ethers.provider.getBlock("latest")).timestamp;
 
   console.log(`Current Time: ${now}`);
-  console.log(`Market 1 Commit End: ${m1.commitEndTime} (Open? ${now < m1.commitEndTime})`);
-  console.log(`Market 2 Commit End: ${m2.commitEndTime} (Open? ${now < m2.commitEndTime})`);
-  console.log(`Market 3 Commit End: ${m3.commitEndTime} (Reveal? ${now >= m3.commitEndTime && now < m3.revealEndTime})`);
-
+  console.log(
+    `Market 1 Commit End: ${m1.commitEndTime} (Open? ${now < m1.commitEndTime})`,
+  );
+  console.log(
+    `Market 2 Commit End: ${m2.commitEndTime} (Open? ${now < m2.commitEndTime})`,
+  );
+  console.log(
+    `Market 3 Commit End: ${m3.commitEndTime} (Reveal? ${now >= m3.commitEndTime && now < m3.revealEndTime})`,
+  );
 }
 
 main().catch((error) => {
