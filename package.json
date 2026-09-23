@@ -39,6 +39,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.16.0",
     "hardhat": "^2.27.2",
+    "hardhat-gas-reporter": "^2.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "solidity-coverage": "^0.8.17"
