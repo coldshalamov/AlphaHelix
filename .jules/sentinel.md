@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2024-05-24 - Remove User-Controllable Entropy from Randomness
+**Vulnerability:** The entropy pool for random market closures (`_checkRandomClose`) included `msg.sender`.
+**Learning:** Including user-controllable variables like `msg.sender` or `tx.origin` allows attackers to grind the randomness via proxy contracts or `CREATE2`, forcing desired outcomes and bypassing fairness.
+**Prevention:** Only use non-controllable global variables (like `block.timestamp`, `blockhash`, and `block.prevrandao`) or secure oracles for randomness generation.
