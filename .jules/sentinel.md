@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2024-05-18 - Resolve EOL Node Environments in CI
+**Vulnerability:** GitHub Actions workflows were using deprecated v3 actions (e.g., actions/checkout@v3, actions/setup-node@v3) that rely on End-Of-Life Node.js 16 environments.
+**Learning:** CI/CD pipeline dependencies must be actively audited just like application dependencies. Legacy build environments can silently become supply chain attack vectors when their underlying runtimes expire.
+**Prevention:** Regularly upgrade GitHub Actions to modern versions (e.g., v4 running on Node.js 20) while carefully verifying breaking changes, such as token requirements in third-party actions.
