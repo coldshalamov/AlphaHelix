@@ -9,7 +9,7 @@ import {
   useReadContract,
   useSwitchChain,
 } from 'wagmi';
-import { encodePacked, keccak256, parseEther, formatEther, bytesToHex } from 'viem';
+import { encodePacked, keccak256, parseEther, formatEther } from 'viem';
 import contracts from '@/config/contracts.json';
 import { marketAbi, tokenAbi } from '@/abis';
 import Spinner from './Spinner';
@@ -239,8 +239,9 @@ function BettingWidget({
       // Create salt + commitment hash
       const randomBuffer = new Uint8Array(32);
       window.crypto.getRandomValues(randomBuffer);
-      // ⚡ Bolt: Use bytesToHex to prevent intermediate allocations and GC pressure
-      const salt = BigInt(bytesToHex(randomBuffer));
+      const salt = BigInt(
+        '0x' + Array.from(randomBuffer).map((b) => b.toString(16).padStart(2, '0')).join(''),
+      );
       const hash = keccak256(encodePacked(['uint8', 'uint256', 'address'], [Number(choice), salt, address]));
       // BOLT: Convert marketId (BigInt) to string to avoid JSON.stringify crash in persistBet
       const betData = { marketId: marketId.toString(), salt: salt.toString(), choice: Number(choice), amount, hash };
@@ -345,7 +346,7 @@ function BettingWidget({
         >
           {isSwitching ? (
             <>
-                  <Spinner ariaHidden={true} />
+              <Spinner />
               Switching...
             </>
           ) : (
@@ -372,7 +373,7 @@ function BettingWidget({
             <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
               {isLocked ? (
                 <>
-                    <Spinner ariaHidden={true} />
+                  <Spinner />
                   Revealing...
                 </>
               ) : (
@@ -444,7 +445,7 @@ function BettingWidget({
       <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
 
-      <form className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }} onSubmit={(e) => { e.preventDefault(); handleCommit(); }}>
+      <div className="grid" style={{ marginTop: '0.75rem', gap: '0.5rem' }}>
         <Choices choice={choice} isLocked={isLocked} onChange={handleChoiceChange} />
 
         <div>
@@ -507,17 +508,17 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
           {isLocked ? (
             <>
-                  <Spinner ariaHidden={true} />
+              <Spinner />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
           ) : (
             'Commit bet'
           )}
         </button>
-      </form>
+      </div>
 
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
 
