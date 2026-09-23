@@ -16,3 +16,8 @@
 **Vulnerability:** withdrawUnrevealed relied on block.timestamp > s.revealEndTime while s.revealEndTime could still be 0 (uninitialized in random-close markets). This bypassed the intended timeline checks.
 **Learning:** Variables representing dynamically set phase boundaries initialize to 0. Timestamp comparisons against 0 always pass in EVM, creating critical phase bypass vulnerabilities if uninitialized state isn't explicitly handled.
 **Prevention:** Always explicitly check that dynamically set timestamp variables are initialized (e.g., require(s.revealEndTime != 0)) before using them in access control or timeline comparisons.
+
+## 2024-08-05 - Missing GitHub Actions Permissions
+**Vulnerability:** A GitHub Action workflow (`ci-cd.yml`) used `actions/github-script` to post a comment on a PR but lacked the necessary permissions (`permissions: { pull-requests: write }`).
+**Learning:** GitHub Actions workflows running scripts that interact with PRs or issues will fail with a `403 Resource not accessible by integration` error if explicit write permissions are not granted.
+**Prevention:** Always ensure that jobs requiring write access to repository resources explicitly declare the required permissions in the workflow file.
