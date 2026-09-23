@@ -1,0 +1,3 @@
+## 2024-05-18 - Native Keyboard Form Submission Edge Cases
+**Learning:** When converting <div> wrappers to semantic <form> wrappers to enable native keyboard submission (like pressing 'Enter'), users can bypass disabled <button type="submit"> states by submitting via the keyboard while focused on an input field. Simply disabling the submit button is insufficient for form-level accessibility.
+**Action:** Always enforce disabled/locked state checks directly within the form's onSubmit handler (e.g., if (!isLocked) handleCommit()) in addition to disabling the submit button to ensure full protection against unintended submissions.
