@@ -11,3 +11,6 @@
 ## 2026-04-17 - Wagmi useReadContracts Pagination
 **Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to dynamic contract counters (like `marketCount`) cause O(N) payload explosions and hit RPC limits.
 **Action:** Always implement offset pagination (e.g., `PAGE_SIZE`) for dynamic list rendering.
+## 2024-05-18 - FCP Delay from JS-Hydrated Initial Animations
+**Learning:** Initializing components as hidden (`opacity: 0`) and revealing them via a `useEffect` hook causes a double-render on mount and forces the browser to wait for React hydration before First Contentful Paint (FCP) can occur. It also means the site is broken for non-JS users.
+**Action:** Always prefer static CSS keyframe animations for initial load transitions. Apply animation classes directly in the JSX and ensure the base CSS does not hide the element.
