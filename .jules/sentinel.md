@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2024-05-24 - Fix Randomness Grinding Vulnerability
+**Vulnerability:** `msg.sender` was used in `keccak256` entropy generation for pseudo-random market closure.
+**Learning:** Including user-controllable variables like `msg.sender` in an entropy pool allows attackers to grind randomness. They can rapidly create proxy contracts until they hit a hash that favors their desired outcome.
+**Prevention:** Never include user-controllable parameters (`msg.sender`, `tx.origin`) in global on-chain randomness calculation. Stick to block properties (e.g., `prevrandao`, `blockhash`).
