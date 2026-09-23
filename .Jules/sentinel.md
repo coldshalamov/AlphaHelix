@@ -16,3 +16,7 @@
 **Vulnerability:** withdrawUnrevealed relied on block.timestamp > s.revealEndTime while s.revealEndTime could still be 0 (uninitialized in random-close markets). This bypassed the intended timeline checks.
 **Learning:** Variables representing dynamically set phase boundaries initialize to 0. Timestamp comparisons against 0 always pass in EVM, creating critical phase bypass vulnerabilities if uninitialized state isn't explicitly handled.
 **Prevention:** Always explicitly check that dynamically set timestamp variables are initialized (e.g., require(s.revealEndTime != 0)) before using them in access control or timeline comparisons.
+## 2026-08-03 - GitHub Actions EOL Node Environment & Permission Gap
+**Vulnerability:** GitHub Actions using v3 run on EOL Node 16 environments, and the `gas-report` job lacks explicit write permissions to post PR comments.
+**Learning:** Older action versions use deprecated Node environments missing security patches, and default GITHUB_TOKEN permissions restrict `github.rest.issues.createComment` without explicit `pull-requests: write` or `issues: write` configuration.
+**Prevention:** Consistently audit and bump GitHub Actions versions (e.g., to v4) to ensure they run on supported Node runtimes, and explicitly declare required write permissions for jobs using `actions/github-script`.
