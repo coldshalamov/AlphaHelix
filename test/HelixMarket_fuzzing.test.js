@@ -362,6 +362,7 @@ describe("HelixMarket - Fuzzing & Invariant Tests", function () {
             const { market, userA, userB } = await loadFixture(deployHelixMarketFixture);
 
             const minDuration = 3600;
+            await ethers.provider.send("evm_mine", []);
             const avgDuration = 86400; // 24 hours - lower probability
 
             await market.connect(userA).submitStatementWithRandomClose(
