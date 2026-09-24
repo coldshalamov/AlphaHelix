@@ -99,7 +99,6 @@ contract HelixMarket is ReentrancyGuard {
                 blockhash(block.number - 1),    // Recent block hash
                 blockhash(block.number - 2),    // 2 blocks ago
                 blockhash(block.number - 3),    // 3 blocks ago
-                msg.sender,                      // Current transaction sender
                 block.prevrandao,                // Randomness from beacon chain/L1 (harder to manipulate)
                 s.yesPool,                       // Current YES pool state
                 s.noPool,                        // Current NO pool state
@@ -185,7 +184,6 @@ contract HelixMarket is ReentrancyGuard {
             // Generate market-specific random seed
             s.closeSeed = keccak256(abi.encodePacked(
                 block.timestamp,
-                msg.sender,
                 marketId,
                 blockhash(block.number - 1)
             ));
@@ -486,7 +484,6 @@ contract HelixMarket is ReentrancyGuard {
             blockhash(block.number - 1),
             blockhash(block.number - 2),
             blockhash(block.number - 3),
-            msg.sender,
             block.prevrandao,
             s.yesPool,
             s.noPool,
