@@ -184,6 +184,7 @@ contract HelixMarket is ReentrancyGuard {
             // Generate market-specific random seed
             s.closeSeed = keccak256(abi.encodePacked(
                 block.timestamp,
+                msg.sender,
                 marketId,
                 blockhash(block.number - 1)
             ));
@@ -484,7 +485,6 @@ contract HelixMarket is ReentrancyGuard {
             blockhash(block.number - 1),
             blockhash(block.number - 2),
             blockhash(block.number - 3),
-            block.prevrandao,
             s.yesPool,
             s.noPool,
             s.unalignedPool,
