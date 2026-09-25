@@ -338,6 +338,7 @@ function BettingWidget({
         <h3 className="font-semibold">Wrong network</h3>
         <p className="helper">Switch to the configured Helix chain to continue.</p>
         <button
+          type="button"
           className="button primary"
           onClick={() => switchChain({ chainId: expectedChainId })}
           disabled={isSwitching}
@@ -369,7 +370,7 @@ function BettingWidget({
               {CHOICES.find((c) => c.value === storedBet.choice)?.label || 'Unknown'} ({storedBet.amount} HLX)
             </div>
 
-            <button className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
+            <button type="button" className="button secondary" style={{ marginTop: '0.75rem' }} onClick={handleReveal} disabled={isLocked}>
               {isLocked ? (
                 <>
                     <Spinner ariaHidden={true} />
@@ -439,7 +440,7 @@ function BettingWidget({
   }
 
   return (
-    <div className="card">
+    <form className="card" onSubmit={(e) => { e.preventDefault(); if (!isLocked) handleCommit(); }}>
       <h3 className="font-semibold">Commit phase</h3>
       <Countdown targetSeconds={commitEndSeconds} render={renderCountdown} />
       <p className="helper">Choose a side and commit HLX before the commit window closes.</p>
@@ -507,7 +508,7 @@ function BettingWidget({
           </div>
         </div>
 
-        <button className="button primary" onClick={handleCommit} disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
@@ -526,7 +527,7 @@ function BettingWidget({
           {status}
         </div>
       )}
-    </div>
+    </form>
   );
 }
 
