@@ -457,6 +457,7 @@ describe("HelixMarket", function () {
 
         // Advance block to get new hash
         await time.increase(1);
+        await ethers.provider.send("evm_mine", []);
       }
 
       statement = await market.markets(marketId);
@@ -500,6 +501,7 @@ describe("HelixMarket", function () {
         statement = await market.markets(marketId);
         attempts++;
         await time.increase(1);
+        await ethers.provider.send("evm_mine", []);
       }
 
       // Verify market is closed
@@ -551,6 +553,7 @@ describe("HelixMarket", function () {
         statement = await market.markets(marketId);
         attempts++;
         await time.increase(1);
+        await ethers.provider.send("evm_mine", []);
       }
 
       // If market closed, verify we can reveal
@@ -653,6 +656,7 @@ describe("HelixMarket", function () {
 
         attempts++;
         await time.increase(1);
+        await ethers.provider.send("evm_mine", []);
       }
 
       // Log result

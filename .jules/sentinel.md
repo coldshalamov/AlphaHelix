@@ -17,3 +17,7 @@
 **Vulnerability:** The `checkRandomClose` modifier performed an external call (`token.transfer`) before the function body. If the external call failed (e.g., due to insufficient balance or token logic), the entire transaction would revert, permanently blocking core functionalities (`commitBet`, `revealBet`) from executing. This is a severe Denial-of-Service (DoS) vector.
 **Learning:** External calls inside `modifier`s violate the Checks-Effects-Interactions (CEI) pattern and create brittle pre-conditions that can brick a contract if the external call reverts.
 **Prevention:** Always refactor state-changing or external-calling modifiers into internal functions. Return a boolean flag (e.g., `triggerPingReward`) and handle the external call at the very end of the main function body to ensure core logic executes first and safely.
+## 2025-05-27 - [PRNG Grinding Vulnerability Fix]
+**Vulnerability:** The `msg.sender` was used as an entropy source in the generation of `closeHash` in `_checkRandomClose` and `previewCloseCheck` in `HelixMarket.sol`.
+**Learning:** Using `msg.sender` in global pseudo-random number generator outcomes allows attackers to use "address grinding" (iteratively finding an address that yields the desired pseudo-random result) to easily manipulate the outcome.
+**Prevention:** Avoid user-controllable variables like `msg.sender` or `tx.gasprice` when generating critical pseudo-random outcomes. Rely on block-dependent states (`block.prevrandao`, `blockhash`, etc.) or robust VRF services.
