@@ -382,6 +382,7 @@ describe("HelixMarket - Fuzzing & Invariant Tests", function () {
                 try {
                     await market.connect(userB).commitBet(marketId, buildCommit(1, 1000 + i, userB), ethers.parseEther("1"));
                     commitCount++;
+                    await ethers.provider.send("evm_mine", []);
                     await time.increase(1);
                 } catch (e) {
                     if (e.message.includes("Commit phase closed")) {
