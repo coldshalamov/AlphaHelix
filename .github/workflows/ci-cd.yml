@@ -101,6 +101,8 @@ jobs:
       - name: Comment gas report on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
             const fs = require('fs');
