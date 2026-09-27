@@ -2,11 +2,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import bannerHelix from '../assets/banner_helix.jpg';
 
 export default function Layout({ children, className = '' }) {
   const { address, isConnected } = useAccount();
+  const { connectors, connect, status } = useConnect();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected';
@@ -77,9 +78,20 @@ export default function Layout({ children, className = '' }) {
               <span>{copied ? '✓ Copied!' : shortAddress}</span>
             </button>
           ) : (
-            <div className="badge">
-              <span>Connect Wallet</span>
-            </div>
+            <button
+              className="badge"
+              onClick={() => connect({ connector: connectors[0] })}
+              type="button"
+              disabled={status === 'pending'}
+              aria-label={status === 'pending' ? 'Connecting wallet' : 'Connect wallet'}
+              style={{
+                border: 'none',
+                cursor: status === 'pending' ? 'not-allowed' : 'pointer',
+                opacity: status === 'pending' ? 0.7 : 1,
+              }}
+            >
+              <span>{status === 'pending' ? 'Connecting...' : 'Connect Wallet'}</span>
+            </button>
           )}
         </div>
       </header>
