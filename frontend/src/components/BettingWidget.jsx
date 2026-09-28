@@ -126,6 +126,15 @@ function BettingWidget({
     return int;
   }, [hlxBalance]);
 
+
+  const hasInsufficientHlx = useMemo(() => {
+    try {
+      return Boolean(amount && hlxBalance && parseEther(amount) > hlxBalance);
+    } catch {
+      return false;
+    }
+  }, [amount, hlxBalance]);
+
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
@@ -507,13 +516,20 @@ function BettingWidget({
             </span>
           </div>
         </div>
+        {hasInsufficientHlx && (
+          <div className="helper text-crimson" style={{ marginTop: '-0.25rem', fontSize: '0.85em' }} role="alert">
+            Amount exceeds available HLX balance
+          </div>
+        )}
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked || hasInsufficientHlx}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : hasInsufficientHlx ? (
+            'Insufficient HLX'
           ) : (
             'Commit bet'
           )}
