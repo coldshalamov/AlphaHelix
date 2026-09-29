@@ -179,8 +179,6 @@ contract HelixMarket is ReentrancyGuard {
         s.randomCloseEnabled = enableRandomClose;
         s.revealDuration = revealDuration;
 
-        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
-
         if (enableRandomClose) {
             // Generate market-specific random seed
             s.closeSeed = keccak256(abi.encodePacked(
@@ -200,9 +198,6 @@ contract HelixMarket is ReentrancyGuard {
             s.revealEndTime = 0; // Placeholder, set when commit phase closes
 
             // Burn statement fee minus the reserved ping reward.
-            require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
-            token.burn(STATEMENT_FEE - PING_REWARD);
-
             emit MarketCreatedWithRandomClose(marketId, s.difficultyTarget, avgCommitDuration);
         } else {
             // Fixed-time market (backwards compatible)
@@ -210,6 +205,14 @@ contract HelixMarket is ReentrancyGuard {
             s.difficultyTarget = 0; // Not used
             s.commitPhaseClosed = 0; // Not used for fixed-time markets
             s.hardCommitEndTime = s.commitEndTime;
+        }
+
+        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
+
+        if (enableRandomClose) {
+            require(STATEMENT_FEE >= PING_REWARD, "Fee < ping reward");
+            token.burn(STATEMENT_FEE - PING_REWARD);
+        } else {
             token.burn(STATEMENT_FEE);
         }
 
