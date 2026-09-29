@@ -308,7 +308,7 @@ export default function MarketDetailPage() {
             {chainId && chainId !== expectedChainId && (
               <div className="helper">Wrong network detected. Switch chains to claim.</div>
             )}
-            {status && <div className="status">{status}</div>}
+            {status && <div className="status" aria-live="polite">{status}</div>}
           </div>
         )}
       </div>
