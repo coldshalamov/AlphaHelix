@@ -171,6 +171,9 @@ contract HelixMarket is ReentrancyGuard {
             require(avgCommitDuration <= MAX_COMMIT_DURATION, "Avg duration too long");
         }
 
+        // Move external call before state changes (Checks-Effects-Interactions)
+        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
+
         uint256 marketId = marketCount++;
         Statement storage s = markets[marketId];
         s.ipfsCid = ipfsCid;
@@ -178,8 +181,6 @@ contract HelixMarket is ReentrancyGuard {
         s.originator = msg.sender;
         s.randomCloseEnabled = enableRandomClose;
         s.revealDuration = revealDuration;
-
-        require(token.transferFrom(msg.sender, address(this), STATEMENT_FEE), "Fee transfer failed");
 
         if (enableRandomClose) {
             // Generate market-specific random seed
@@ -240,13 +241,14 @@ contract HelixMarket is ReentrancyGuard {
         require(!hasCommitted[marketId][msg.sender], "Already committed");
         require(commitHash != bytes32(0), "Invalid hash");
 
+        // Move external call before state changes (Checks-Effects-Interactions)
+        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+
         commits[marketId][msg.sender] = commitHash;
         hasCommitted[marketId][msg.sender] = true;
 
         // Accumulate committed amount.
         committedAmount[marketId][msg.sender] += amount;
-
-        require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         emit BetCommitted(marketId, msg.sender, commitHash, amount);
 
@@ -456,9 +458,11 @@ contract HelixMarket is ReentrancyGuard {
     /// @dev Useful for low-activity markets where no one is committing
     /// @param marketId Market to ping
     function pingMarket(uint256 marketId) external nonReentrant validMarket(marketId) {
+        Statement storage s = markets[marketId];
+        bool wasCommitPhaseOpen = s.randomCloseEnabled && s.commitPhaseClosed == 0;
         bool triggerPingReward = _checkRandomClose(marketId);
 
-        if (triggerPingReward) {
+        if (triggerPingReward && wasCommitPhaseOpen && s.commitPhaseClosed > 0) {
             require(token.transfer(msg.sender, PING_REWARD), "Reward transfer failed");
             // PingReward event emitting isn't necessary because pingMarket relies on triggerPingReward
         }
