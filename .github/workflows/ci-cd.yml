@@ -105,12 +105,16 @@ jobs:
           script: |
             const fs = require('fs');
             const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
-            });
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``
+              });
+            } catch (error) {
+              console.log('Error creating comment:', error);
+            }
 
   lint:
     name: Code Linting
