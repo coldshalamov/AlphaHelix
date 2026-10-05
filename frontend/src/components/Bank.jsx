@@ -12,6 +12,7 @@ const BuyCard = memo(function BuyCard({
   isBuyError,
   activeAction,
   ethBalance,
+  isInsufficient,
   handleMaxBuy,
   handleBuy,
   inputRef
@@ -74,13 +75,15 @@ const BuyCard = memo(function BuyCard({
         type="submit"
         className="button primary"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficient}
       >
         {activeAction === 'buy' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isInsufficient ? (
+          'Insufficient ETH'
         ) : (
           'Buy HLX'
         )}
@@ -95,6 +98,7 @@ const SellCard = memo(function SellCard({
   handleSellAmountChange,
   isSellError,
   activeAction,
+  isInsufficient,
   handleMaxSell,
   handleSell,
   inputRef
@@ -157,13 +161,15 @@ const SellCard = memo(function SellCard({
         type="submit"
         className="button danger"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficient}
       >
         {activeAction === 'sell' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isInsufficient ? (
+          'Insufficient HLX'
         ) : (
           'Approve & Sell'
         )}
@@ -233,6 +239,21 @@ function Bank() {
     if (!status) return false;
     return ['Enter an amount of ETH to spend.', 'Buy failed'].some(msg => status.includes(msg));
   }, [status]);
+
+
+  const isBuyInsufficient = useMemo(() => {
+    if (!ethBalance || ethBalance.value === undefined || !buyAmount) return false;
+    try {
+      return parseEther(buyAmount) > ethBalance.value;
+    } catch { return false; }
+  }, [ethBalance, buyAmount]);
+
+  const isSellInsufficient = useMemo(() => {
+    if (hlxBalance === undefined || hlxBalance === null || !sellAmount) return false;
+    try {
+      return parseEther(sellAmount) > hlxBalance;
+    } catch { return false; }
+  }, [hlxBalance, sellAmount]);
 
   const isSellError = useMemo(() => {
     if (!status) return false;
@@ -421,6 +442,7 @@ function Bank() {
             isBuyError={isBuyError}
             activeAction={activeAction}
             ethBalance={ethBalance}
+            isInsufficient={isBuyInsufficient}
             handleMaxBuy={handleMaxBuy}
             handleBuy={handleBuy}
             inputRef={buyInputRef}
@@ -430,6 +452,7 @@ function Bank() {
             handleSellAmountChange={handleSellAmountChange}
             isSellError={isSellError}
             activeAction={activeAction}
+            isInsufficient={isSellInsufficient}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
             inputRef={sellInputRef}
