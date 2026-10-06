@@ -16,6 +16,15 @@ const BuyCard = memo(function BuyCard({
   handleBuy,
   inputRef
 }) {
+  const hasInsufficientEth = useMemo(() => {
+    if (!buyAmount || !ethBalance || ethBalance.value === undefined) return false;
+    try {
+      return parseEther(buyAmount) > ethBalance.value;
+    } catch {
+      return false;
+    }
+  }, [buyAmount, ethBalance]);
+
   return (
     <form className="card" style={{ borderColor: '#dbeafe' }} onSubmit={(e) => { e.preventDefault(); handleBuy(); }}>
       <h3 className="font-semibold">Buy HLX</h3>
@@ -74,17 +83,25 @@ const BuyCard = memo(function BuyCard({
         type="submit"
         className="button primary"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || hasInsufficientEth}
+        aria-describedby={hasInsufficientEth ? "insufficient-eth-helper" : undefined}
       >
         {activeAction === 'buy' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : hasInsufficientEth ? (
+          'Insufficient ETH'
         ) : (
           'Buy HLX'
         )}
       </button>
+      {hasInsufficientEth && (
+        <div id="insufficient-eth-helper" className="helper text-crimson" style={{ marginTop: '0.25rem', marginBottom: 0 }}>
+          Amount exceeds available ETH.
+        </div>
+      )}
     </form>
   );
 });
@@ -97,8 +114,18 @@ const SellCard = memo(function SellCard({
   activeAction,
   handleMaxSell,
   handleSell,
-  inputRef
+  inputRef,
+  hlxBalance
 }) {
+  const hasInsufficientHlx = useMemo(() => {
+    if (!sellAmount || hlxBalance === undefined || hlxBalance === null) return false;
+    try {
+      return parseEther(sellAmount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [sellAmount, hlxBalance]);
+
   return (
     <form className="card" style={{ borderColor: '#ffe4e6' }} onSubmit={(e) => { e.preventDefault(); handleSell(); }}>
       <h3 className="font-semibold">Sell HLX</h3>
@@ -157,17 +184,25 @@ const SellCard = memo(function SellCard({
         type="submit"
         className="button danger"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || hasInsufficientHlx}
+        aria-describedby={hasInsufficientHlx ? "insufficient-hlx-helper" : undefined}
       >
         {activeAction === 'sell' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : hasInsufficientHlx ? (
+          'Insufficient HLX'
         ) : (
           'Approve & Sell'
         )}
       </button>
+      {hasInsufficientHlx && (
+        <div id="insufficient-hlx-helper" className="helper text-crimson" style={{ marginTop: '0.25rem', marginBottom: 0 }}>
+          Amount exceeds available HLX.
+        </div>
+      )}
       <p className="helper">Allowances reset each time for simplicity.</p>
     </form>
   );
@@ -433,6 +468,7 @@ function Bank() {
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
             inputRef={sellInputRef}
+            hlxBalance={hlxBalance}
           />
         </div>
 
