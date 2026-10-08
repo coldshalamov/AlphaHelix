@@ -28,6 +28,7 @@ const BuyCard = memo(function BuyCard({
           onClick={handleMaxBuy}
           className="badge"
           aria-label="Buy with maximum safe ETH"
+          title="Buy with maximum safe ETH"
           disabled={!ethBalance || Boolean(activeAction)}
         >
           Max
@@ -111,6 +112,7 @@ const SellCard = memo(function SellCard({
           onClick={handleMaxSell}
           className="badge"
           aria-label="Sell maximum available HLX"
+          title="Sell maximum available HLX"
           disabled={Boolean(activeAction)}
         >
           Max
@@ -374,7 +376,8 @@ function Bank() {
               className="badge"
               onClick={handleCopy}
               type="button"
-              aria-label="Copy wallet address"
+              aria-label={copied ? 'Wallet address copied' : 'Copy wallet address'}
+              title={copied ? 'Wallet address copied' : 'Copy wallet address'}
             >
               <span>{copied ? 'Copied!' : shortAddress}</span>
             </button>
