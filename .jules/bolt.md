@@ -7,3 +7,6 @@
 ## 2025-02-12 - Hex Generation Performance Anti-Pattern
 **Learning:** Manual byte-array to hex string conversion (`Array.from(buffer).map(...).join('')`) is an anti-pattern on the frontend. It causes excessive intermediate allocations (creating a new array, multiple strings per byte) leading to GC pressure, especially when generating secure randomness.
 **Action:** Use native utilities like `bytesToHex` from `viem` for optimal memory and CPU performance. Note that `bytesToHex` natively returns a `0x`-prefixed string, so do not manually prepend `'0x' +`.
+## 2025-03-01 - Wagmi JSON-RPC Batching
+**Learning:** By default, Wagmi `http()` transports execute concurrent `useReadContract` and `useBalance` calls as separate JSON-RPC network requests, which can lead to rapid RPC exhaustion, UI waterfall delays, and rate limiting during initial mounts (like the Bank page).
+**Action:** Always enable `batch: true` within `http({ batch: true })` transports when configuring the Wagmi client. This aggregates independent calls made within the same tick into a single `eth_call` multicall request, significantly reducing network overhead and improving performance.
