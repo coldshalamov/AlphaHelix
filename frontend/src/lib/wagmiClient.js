@@ -4,9 +4,10 @@ import { arbitrumSepolia, hardhat } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 
 const transports = {
-  [hardhat.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL || 'http://127.0.0.1:8545'),
+  [hardhat.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL || 'http://127.0.0.1:8545', { batch: true }),
   [arbitrumSepolia.id]: http(
-    process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc'
+    process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+    { batch: true }
   ),
 };
 
