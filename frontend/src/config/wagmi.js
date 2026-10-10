@@ -14,6 +14,6 @@ export const config = createConfig({
   ],
   ssr: true, // If your dApp uses server side rendering (SSR)
   transports: {
-    [arbitrumSepolia.id]: http(),
+    [arbitrumSepolia.id]: http(undefined, { batch: true }), // BOLT: Enabled JSON-RPC batching
   },
 });
