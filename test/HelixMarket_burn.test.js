@@ -1,8 +1,5 @@
 const { expect } = require("chai");
-const {
-  loadFixture,
-  time,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const { loadFixture, time } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { ethers } = require("hardhat");
 
 describe("HelixMarket Token Burn", function () {
@@ -65,9 +62,7 @@ describe("HelixMarket Token Burn", function () {
     const deadBalance2 = await token.balanceOf(BURN_ADDRESS);
 
     // New behavior: Supply decreased further by betAmount, dEaD still 0
-    expect(supplyAfterPenalty).to.equal(
-      initialSupply - STATEMENT_FEE - betAmount
-    );
+    expect(supplyAfterPenalty).to.equal(initialSupply - STATEMENT_FEE - betAmount);
     expect(deadBalance2).to.equal(0);
 
     console.log("Verified: Supply decreased after penalty.");
