@@ -224,16 +224,20 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
-        // Check commit phase is still open
+        // Cache the phase state before checking random close conditions
+        // to prevent reverting valid transactions that trigger the close.
+        bool wasCommitPhaseOpen;
         if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed == 0, "Commit phase closed");
+            wasCommitPhaseOpen = (s.commitPhaseClosed == 0);
         } else {
-            require(block.timestamp < s.commitEndTime, "Commit phase over");
+            wasCommitPhaseOpen = (block.timestamp < s.commitEndTime);
         }
+        require(wasCommitPhaseOpen, "Commit phase closed");
+
+        bool triggerPingReward = _checkRandomClose(marketId);
 
         require(amount > 0, "Amount must be > 0");
         require(!hasCommitted[marketId][msg.sender], "Already committed");
