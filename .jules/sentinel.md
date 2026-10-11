@@ -22,3 +22,8 @@
 **Vulnerability:** `HelixMarket.sol` included `msg.sender` in the `closeHash` entropy pool, which allowed users to manipulate market closure probability by transacting from different addresses.
 **Learning:** `msg.sender` is user-controllable and should be omitted from dynamic randomness generation tied to market closures to prevent off-chain randomness grinding.
 **Prevention:** Rely strictly on block-level values such as `block.prevrandao` and `blockhash` for random closure entropy.
+
+## 2024-05-24 - DoS Vulnerability in conditional state changes within state-altering functions
+**Vulnerability:** A Denial of Service (DoS) vulnerability existed in `HelixMarket.commitBet` due to order of operations. The function called `_checkRandomClose()` which could mutate `s.commitPhaseClosed`. Subsequent validations checked `s.commitPhaseClosed == 0`, causing the transaction to revert if the close was triggered.
+**Learning:** When evaluating conditional state changes within state-altering functions, modifying state before validating prerequisites can lead to self-reverting transactions (DoS).
+**Prevention:** Always cache prerequisite states before executing internal functions that may mutate those same states, or reorder the operations so that validations occur prior to possible mutations.
