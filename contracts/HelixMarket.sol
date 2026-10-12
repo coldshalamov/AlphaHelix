@@ -224,16 +224,15 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
-        // Check commit phase is still open
-        if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed == 0, "Commit phase closed");
-        } else {
-            require(block.timestamp < s.commitEndTime, "Commit phase over");
-        }
+        // Cache phase state before potentially triggering a random close to prevent DoS
+        bool commitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
+
+        bool triggerPingReward = _checkRandomClose(marketId);
+
+        require(commitPhaseOpen, "Commit phase closed");
 
         require(amount > 0, "Amount must be > 0");
         require(!hasCommitted[marketId][msg.sender], "Already committed");
@@ -263,15 +262,19 @@ contract HelixMarket is ReentrancyGuard {
         nonReentrant
         validMarket(marketId)
     {
-        bool triggerPingReward = _checkRandomClose(marketId);
         Statement storage s = markets[marketId];
         require(!s.resolved, "Resolved");
 
-        // Check commit phase is closed
+        // Cache phase state before checking random close conditions
+        bool commitPhaseClosedBeforeCheck = s.randomCloseEnabled ? (s.commitPhaseClosed > 0) : (block.timestamp >= s.commitEndTime);
+
+        bool triggerPingReward = _checkRandomClose(marketId);
+
         if (s.randomCloseEnabled) {
-            require(s.commitPhaseClosed > 0, "Commit phase still open");
+            // It could be closed either before the check OR by the check itself
+            require(commitPhaseClosedBeforeCheck || s.commitPhaseClosed > 0, "Commit phase still open");
         } else {
-            require(block.timestamp >= s.commitEndTime, "Commit phase not over");
+            require(commitPhaseClosedBeforeCheck, "Commit phase not over");
         }
 
         require(block.timestamp < s.revealEndTime, "Reveal phase over");
