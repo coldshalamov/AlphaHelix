@@ -86,6 +86,16 @@ function BettingWidget({
 
   const amountInputRef = useRef(null);
 
+  const hasInsufficientBalance = useMemo(() => {
+    if (!amount || !hlxBalance) return false;
+    try {
+      return parseEther(amount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [amount, hlxBalance]);
+
+
   const isAmountError = useMemo(() => {
     if (!status) return false;
     return [
@@ -217,6 +227,8 @@ function BettingWidget({
     if (!isConnected) return setStatus('Connect your wallet to commit.');
     if (isWrongNetwork) return setStatus('Wrong network selected. Switch to the Helix deployment chain.');
     if (!amount) return setStatus('Enter an amount of HLX to stake.');
+    if (hasInsufficientBalance) return setStatus('Insufficient HLX balance.');
+
     if (typeof window === 'undefined' || !window.crypto) return setStatus('Secure random generator unavailable.');
 
     // Validate format before parsing to ensure it's a valid decimal number
@@ -483,13 +495,13 @@ function BettingWidget({
               className="input"
               style={{
                 paddingRight: '3.5rem',
-                ...(isAmountError ? { borderColor: 'var(--danger)' } : {})
+                ...(isAmountError || hasInsufficientBalance ? { borderColor: 'var(--danger)' } : {})
               }}
               placeholder="Amount of HLX"
               value={amount}
               onChange={handleAmountChange}
               aria-describedby="status-message"
-              aria-invalid={isAmountError}
+              aria-invalid={isAmountError || hasInsufficientBalance}
               disabled={isLocked}
             />
             <span
@@ -508,12 +520,14 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked || hasInsufficientBalance}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : hasInsufficientBalance ? (
+            'Insufficient balance'
           ) : (
             'Commit bet'
           )}
