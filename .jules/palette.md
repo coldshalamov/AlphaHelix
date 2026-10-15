@@ -4,3 +4,6 @@
 ## 2024-05-20 - Add aria-live to dynamic transaction statuses
 **Learning:** Dynamic transaction status messages (like claim confirmations or errors) must include `aria-live="polite"` so screen reader users are notified when the state changes without needing to manually move focus to the status element.
 **Action:** When adding transaction flows or dynamic feedback messages, ensure the container rendering the message includes the appropriate `aria-live` attribute.
+## 2024-05-20 - Add dynamic tooltips and aria-labels to stateful utility buttons
+**Learning:** Utility buttons with static `aria-label` properties (like a "Copy" button) fail to announce state changes (e.g., when the text becomes "Copied!") to screen readers because the static aria-label overrides the dynamic inner text. Additionally, mouse users miss out on helper context if `title` attributes are missing on icon/badge buttons.
+**Action:** When creating utility buttons that change state (like copy buttons), use dynamic `aria-label` attributes to reflect the current state (e.g., `aria-label={copied ? 'Copied' : 'Copy'}`), and always add `title` attributes matching the label to provide hover tooltips for mouse users.
