@@ -439,6 +439,10 @@ function BettingWidget({
     );
   }
 
+  const isInsufficientHlx = amount && hlxBalance !== undefined && hlxBalance !== null && (() => {
+    try { return parseEther(amount) > hlxBalance; } catch { return false; }
+  })();
+
   return (
     <form className="card" onSubmit={(e) => { e.preventDefault(); if (!isLocked) handleCommit(); }}>
       <h3 className="font-semibold">Commit phase</h3>
@@ -508,12 +512,14 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked || isInsufficientHlx} title={isInsufficientHlx ? 'Insufficient HLX balance' : ''}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : isInsufficientHlx ? (
+            'Insufficient HLX'
           ) : (
             'Commit bet'
           )}
