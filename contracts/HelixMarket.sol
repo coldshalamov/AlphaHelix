@@ -228,7 +228,7 @@ contract HelixMarket is ReentrancyGuard {
         require(!s.resolved, "Resolved");
 
         // Cache phase state before potentially triggering a random close to prevent DoS
-        bool commitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
+        bool commitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0 && block.timestamp < s.hardCommitEndTime) : (block.timestamp < s.commitEndTime);
 
         bool triggerPingReward = _checkRandomClose(marketId);
 
@@ -266,7 +266,7 @@ contract HelixMarket is ReentrancyGuard {
         require(!s.resolved, "Resolved");
 
         // Cache phase state before checking random close conditions
-        bool commitPhaseClosedBeforeCheck = s.randomCloseEnabled ? (s.commitPhaseClosed > 0) : (block.timestamp >= s.commitEndTime);
+        bool commitPhaseClosedBeforeCheck = s.randomCloseEnabled ? (s.commitPhaseClosed > 0 || block.timestamp >= s.hardCommitEndTime) : (block.timestamp >= s.commitEndTime);
 
         bool triggerPingReward = _checkRandomClose(marketId);
 
@@ -482,7 +482,7 @@ contract HelixMarket is ReentrancyGuard {
         Statement storage s = markets[marketId];
 
         isRandomCloseEnabled = s.randomCloseEnabled;
-        isCommitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0) : (block.timestamp < s.commitEndTime);
+        isCommitPhaseOpen = s.randomCloseEnabled ? (s.commitPhaseClosed == 0 && block.timestamp < s.hardCommitEndTime) : (block.timestamp < s.commitEndTime);
 
         closeHash = keccak256(abi.encodePacked(
             blockhash(block.number - 1),
