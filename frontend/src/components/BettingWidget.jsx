@@ -117,6 +117,15 @@ function BettingWidget({
 
   const isWrongNetwork = chainId && expectedChainId && chainId !== expectedChainId;
 
+  const hasInsufficientBalance = useMemo(() => {
+    if (!amount || hlxBalance === undefined || hlxBalance === null) return false;
+    try {
+      return parseEther(amount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [amount, hlxBalance]);
+
   const formattedBalance = useMemo(() => {
     if (!hlxBalance) return '0';
     const val = formatEther(hlxBalance);
@@ -508,16 +517,28 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button
+          type="submit"
+          className="button primary"
+          disabled={isLocked || hasInsufficientBalance}
+          aria-describedby={hasInsufficientBalance ? "insufficient-balance-helper" : undefined}
+        >
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : hasInsufficientBalance ? (
+            'Insufficient Balance'
           ) : (
             'Commit bet'
           )}
         </button>
+        {hasInsufficientBalance && (
+          <div id="insufficient-balance-helper" className="helper text-crimson" style={{ marginTop: '0.25rem', marginBottom: 0 }}>
+            Amount exceeds available balance.
+          </div>
+        )}
       </div>
 
       {storedBet && <div className="status" role="status">Commit saved locally. Keep this device for reveal.</div>}
