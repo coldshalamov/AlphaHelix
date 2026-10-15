@@ -28,3 +28,7 @@
 ## 2023-10-27 - Decorative Spinners Accessibility
 **Learning:** When a visual loading indicator (like an SVG spinner) is used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...'), it must use `aria-hidden="true"` instead of `role="status"` and `aria-label="Loading"` to prevent redundant screen reader announcements. Adding configurable accessibility props (like `ariaHidden={true}`) ensures flexibility without breaking standalone usages.
 **Action:** Expose an `ariaHidden` prop defaulting to `false` for Spinner components. When the Spinner is rendered next to descriptive text, set it to `true` to silence screen readers to prevent duplicated verbosity.
+
+## 2025-01-22 - [Stateful Utility Buttons Accessibility]
+**Learning:** Static `aria-label`s on utility buttons that change state (e.g., 'Copy' becoming 'Copied!') override the dynamic inner text for screen readers, leading to confusing or missing feedback.
+**Action:** Always use dynamic `aria-label` attributes (e.g., `aria-label={copied ? 'Copied' : 'Copy'}`) on stateful icon/utility buttons. Additionally, include native `title` attributes to provide equivalent feedback via hover tooltips for mouse users.
