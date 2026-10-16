@@ -6,3 +6,7 @@
 **Vulnerability:** In `HelixMarket.sol`, random close markets allowed commits to remain open indefinitely if `s.commitPhaseClosed == 0`, failing to enforce a strict temporal boundary when the random close check didn't trigger.
 **Learning:** Logic that relies on probabilistic or interactive triggers (like random closes) to advance state phases must include deterministic, time-based fallbacks to prevent indefinite phase extension and subsequent logic bypasses (like late betting).
 **Prevention:** Always logically combine dynamic state flags (like `commitPhaseClosed == 0`) with hard bounds (`block.timestamp < s.hardCommitEndTime`) when evaluating the openness of critical, time-sensitive phases.
+## 2024-05-26 - Node and Action versions
+**Vulnerability:** CI workflow used deprecated `actions/checkout@v3` and Node.js v18.
+**Learning:** CI failures can occur due to unmaintained workflow dependency versions.
+**Prevention:** Keep github workflow versions and Node versions up to date.
