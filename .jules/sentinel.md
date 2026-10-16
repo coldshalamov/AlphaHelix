@@ -10,3 +10,7 @@
 **Vulnerability:** CI workflow used deprecated `actions/checkout@v3` and Node.js v18.
 **Learning:** CI failures can occur due to unmaintained workflow dependency versions.
 **Prevention:** Keep github workflow versions and Node versions up to date.
+## 2024-05-26 - Action Permissions
+**Vulnerability:** Github Actions script using `github.rest.issues.createComment` failed with 403 Forbidden.
+**Learning:** Workflows require explicit `permissions` block to write comments to PRs.
+**Prevention:** Add `permissions: { pull-requests: write, issues: write }` to jobs utilizing `github-script` to post comments.
