@@ -428,7 +428,8 @@ function BettingWidget({
               className="badge"
               onClick={handleCopySecret}
               type="button"
-              aria-label="Copy bet secret to clipboard"
+              aria-label={secretCopied ? 'Bet secret copied' : 'Copy bet secret to clipboard'}
+              title={secretCopied ? 'Bet secret copied' : 'Copy bet secret to clipboard'}
               style={{ marginTop: '0.5rem', cursor: 'pointer' }}
             >
               {secretCopied ? '✓ Copied!' : '📋 Backup Secret'}
@@ -464,6 +465,7 @@ function BettingWidget({
                 onClick={handleMax}
                 className="badge"
                 aria-label="Stake maximum available HLX"
+                title="Stake maximum available HLX"
                 disabled={isLocked}
               >
                 Max
