@@ -428,7 +428,8 @@ function BettingWidget({
               className="badge"
               onClick={handleCopySecret}
               type="button"
-              aria-label="Copy bet secret to clipboard"
+              aria-label={secretCopied ? 'Copied bet secret' : 'Copy bet secret to clipboard'}
+              title={secretCopied ? 'Copied!' : 'Copy bet secret'}
               style={{ marginTop: '0.5rem', cursor: 'pointer' }}
             >
               {secretCopied ? '✓ Copied!' : '📋 Backup Secret'}
