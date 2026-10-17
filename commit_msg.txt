@@ -1,0 +1,7 @@
+🛡️ Sentinel: [HIGH] Fix DoS vulnerability in commitPhase validation
+
+🚨 Severity: HIGH
+💡 Vulnerability: State-altering functionality like `commitBet` and `revealBet` checked `require(s.commitPhaseClosed == 0)` after allowing `_checkRandomClose` to potentially mutate `s.commitPhaseClosed`. It also allowed users to bypass `hardCommitEndTime` since `s.hardCommitEndTime` was not checked when caching the `commitPhaseOpen` logic.
+🎯 Impact: This could cause transactions to unexpectedly revert, leading to a Denial of Service. It could also allow users to bet after `hardCommitEndTime`.
+🔧 Fix: Cached state evaluations that require validations *before* invoking functions that could potentially alter that same state (`_checkRandomClose`) and properly enforced `hardCommitEndTime` in the cached logic.
+✅ Verification: `pnpm test` and `pnpm lint` pass successfully.
