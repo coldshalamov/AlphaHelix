@@ -11,3 +11,7 @@
 ## 2024-05-24 - Wagmi JSON-RPC Batching
 **Learning:** Concurrent independent calls (like useReadContract and useBalance) can cause RPC exhaustion and rate limiting if not batched. Wagmi http() transports must be configured with { batch: true } to enable JSON-RPC multicall batching.
 **Action:** Always configure Wagmi http() transports with { batch: true } (e.g., http(url, { batch: true })) when initializing the config to prevent RPC rate limiting.
+
+## 2024-05-24 - CI Failures (GitHub Actions Deprecations & Gas Reporter)
+**Learning:** CI failed due to deprecated GitHub Actions (v3 to v4) and Node versions. Also, gas-report.txt was not generated because `hardhat-gas-reporter` wasn't explicitly added to `hardhat.config.js` or installed.
+**Action:** Always verify GitHub Actions run on non-deprecated node versions (Node 20+) using v4 actions. Ensure `hardhat-gas-reporter` is installed and required in the config when CI expects a gas report artifact.
