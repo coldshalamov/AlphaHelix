@@ -3,10 +3,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { arbitrumSepolia, hardhat } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 
+// BOLT: Enabled JSON-RPC batching to prevent RPC exhaustion and rate limiting.
+// Groups independent concurrent multicall-compatible read operations (like useBalance and useReadContract)
+// into single HTTP requests, significantly reducing network round trips and improving time-to-interactive.
 const transports = {
-  [hardhat.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL || 'http://127.0.0.1:8545'),
+  [hardhat.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL || 'http://127.0.0.1:8545', { batch: true }),
   [arbitrumSepolia.id]: http(
-    process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc'
+    process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+    { batch: true }
   ),
 };
 
