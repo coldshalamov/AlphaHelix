@@ -14,6 +14,8 @@ export const config = createConfig({
   ],
   ssr: true, // If your dApp uses server side rendering (SSR)
   transports: {
+    // BOLT: Batch multicall-compatible read operations (like useBalance and useReadContract)
+    // into a single HTTP request to significantly reduce RPC calls.
     [arbitrumSepolia.id]: http(undefined, { batch: true }),
   },
 });
