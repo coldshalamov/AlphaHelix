@@ -83,6 +83,7 @@ function BettingWidget({
   const [status, setStatus] = useState('');
   const [txHash, setTxHash] = useState(undefined);
   const [secretCopied, setSecretCopied] = useState(false);
+  const [maxClicked, setMaxClicked] = useState(false);
 
   const amountInputRef = useRef(null);
 
@@ -129,6 +130,8 @@ function BettingWidget({
   const handleMax = () => {
     if (hlxBalance) {
       setAmount(formatEther(hlxBalance));
+      setMaxClicked(true);
+      setTimeout(() => setMaxClicked(false), 2000);
       setTimeout(() => amountInputRef.current?.focus(), 0);
     }
   };
@@ -464,11 +467,11 @@ function BettingWidget({
                 type="button"
                 onClick={handleMax}
                 className="badge"
-                aria-label="Stake maximum available HLX"
-                title="Stake maximum available HLX"
+                aria-label={maxClicked ? 'Max amount applied!' : 'Stake maximum available HLX'}
+                title={maxClicked ? 'Max amount applied!' : 'Stake maximum available HLX'}
                 disabled={isLocked}
               >
-                Max
+                {maxClicked ? 'Maxed!' : 'Max'}
               </button>
             </div>
           </div>
