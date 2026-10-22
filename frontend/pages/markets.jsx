@@ -168,6 +168,7 @@ export default function MarketsPage() {
             className="button secondary"
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
+            aria-label="Previous page"
           >
             Previous
           </button>
@@ -176,6 +177,7 @@ export default function MarketsPage() {
             className="button secondary"
             onClick={() => setPage(p => Math.min(Math.ceil(numericCount / PAGE_SIZE) - 1, p + 1))}
             disabled={page >= Math.ceil(numericCount / PAGE_SIZE) - 1}
+            aria-label="Next page"
           >
             Next
           </button>
