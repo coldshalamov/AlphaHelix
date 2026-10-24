@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("@nomicfoundation/hardhat-toolbox");
 require("solidity-coverage");
+require("hardhat-gas-reporter");
 
 const { ARBITRUM_SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ARBISCAN_API_KEY } = process.env;
 
@@ -20,6 +21,11 @@ module.exports = {
       url: ARBITRUM_SEPOLIA_RPC_URL || "",
       accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
     },
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS !== undefined,
+    outputFile: "gas-report.txt",
+    noColors: true
   },
   etherscan: {
     apiKey: {
