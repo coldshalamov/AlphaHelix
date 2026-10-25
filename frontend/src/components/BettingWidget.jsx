@@ -87,6 +87,14 @@ function BettingWidget({
 
   const amountInputRef = useRef(null);
 
+
+  const isInsufficient = useMemo(() => {
+    if (hlxBalance === undefined || hlxBalance === null || !amount) return false;
+    try {
+      return parseEther(amount) > hlxBalance;
+    } catch { return false; }
+  }, [hlxBalance, amount]);
+
   const isAmountError = useMemo(() => {
     if (!status) return false;
     return [
@@ -513,12 +521,14 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked || isInsufficient}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : isInsufficient ? (
+            'Insufficient HLX'
           ) : (
             'Commit bet'
           )}
