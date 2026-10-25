@@ -28,3 +28,7 @@
 ## 2023-10-27 - Decorative Spinners Accessibility
 **Learning:** When a visual loading indicator (like an SVG spinner) is used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...'), it must use `aria-hidden="true"` instead of `role="status"` and `aria-label="Loading"` to prevent redundant screen reader announcements. Adding configurable accessibility props (like `ariaHidden={true}`) ensures flexibility without breaking standalone usages.
 **Action:** Expose an `ariaHidden` prop defaulting to `false` for Spinner components. When the Spinner is rendered next to descriptive text, set it to `true` to silence screen readers to prevent duplicated verbosity.
+
+## 2024-11-20 - [Form Submission Accessibility]
+**Learning:** Using `<div>` wrappers and `onClick` handlers for financial inputs prevents users from submitting forms natively using the 'Enter' key.
+**Action:** Always use semantic `<form onSubmit={...}>` wrappers and `<button type="submit">` for input-heavy widgets to ensure native keyboard accessibility.
