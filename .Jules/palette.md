@@ -28,3 +28,6 @@
 ## 2023-10-27 - Decorative Spinners Accessibility
 **Learning:** When a visual loading indicator (like an SVG spinner) is used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...'), it must use `aria-hidden="true"` instead of `role="status"` and `aria-label="Loading"` to prevent redundant screen reader announcements. Adding configurable accessibility props (like `ariaHidden={true}`) ensures flexibility without breaking standalone usages.
 **Action:** Expose an `ariaHidden` prop defaulting to `false` for Spinner components. When the Spinner is rendered next to descriptive text, set it to `true` to silence screen readers to prevent duplicated verbosity.
+## 2024-10-26 - [Web3 Inline Validation]
+**Learning:** Users experience high friction when they submit a form only to have their wallet (e.g. MetaMask) reject the transaction due to insufficient funds.
+**Action:** Always implement inline validation for Web3 forms. Compare input amounts directly against available balances (using `parseEther(amount) > balance`) and proactively disable submit buttons with clear helper text (e.g., 'Insufficient HLX') before wallet interaction.
