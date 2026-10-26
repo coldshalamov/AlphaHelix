@@ -75,13 +75,15 @@ const BuyCard = memo(function BuyCard({
         type="submit"
         className="button primary"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isBuyError}
       >
         {activeAction === 'buy' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isBuyError ? (
+          'Insufficient ETH'
         ) : (
           'Buy HLX'
         )}
@@ -159,13 +161,15 @@ const SellCard = memo(function SellCard({
         type="submit"
         className="button danger"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isSellError}
       >
         {activeAction === 'sell' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isSellError ? (
+          'Insufficient HLX'
         ) : (
           'Approve & Sell'
         )}
@@ -232,14 +236,30 @@ function Bank() {
   }, [isConfirming, isSuccess, status]);
 
   const isBuyError = useMemo(() => {
+    if (buyAmount && ethBalance && ethBalance.value !== undefined) {
+      try {
+        const val = parseEther(buyAmount);
+        if (val > ethBalance.value) return true;
+      } catch {
+        return false;
+      }
+    }
     if (!status) return false;
     return ['Enter an amount of ETH to spend.', 'Buy failed'].some(msg => status.includes(msg));
-  }, [status]);
+  }, [status, buyAmount, ethBalance]);
 
   const isSellError = useMemo(() => {
+    if (sellAmount && hlxBalance) {
+      try {
+        const val = parseEther(sellAmount);
+        if (val > hlxBalance) return true;
+      } catch {
+        return false;
+      }
+    }
     if (!status) return false;
     return ['Enter an amount of HLX to sell.', 'Sell failed', 'Invalid amount format'].some(msg => status.includes(msg));
-  }, [status]);
+  }, [status, sellAmount, hlxBalance]);
 
   // BOLT: Memoized to prevent function recreation on every render,
   // ensuring stable props for child inputs.
