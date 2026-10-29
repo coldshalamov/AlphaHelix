@@ -289,6 +289,7 @@ export default function MarketDetailPage() {
                 : 'Claims open after resolution.'}
             </div>
             <button
+              type="button"
               className="button primary"
               style={{ marginTop: '0.5rem' }}
               onClick={handleClaim}
