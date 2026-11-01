@@ -28,3 +28,11 @@
 ## 2023-10-27 - Decorative Spinners Accessibility
 **Learning:** When a visual loading indicator (like an SVG spinner) is used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...'), it must use `aria-hidden="true"` instead of `role="status"` and `aria-label="Loading"` to prevent redundant screen reader announcements. Adding configurable accessibility props (like `ariaHidden={true}`) ensures flexibility without breaking standalone usages.
 **Action:** Expose an `ariaHidden` prop defaulting to `false` for Spinner components. When the Spinner is rendered next to descriptive text, set it to `true` to silence screen readers to prevent duplicated verbosity.
+
+## 2026-03-31 - [Semantic Pagination Controls]
+**Learning:** Generic pagination blocks using `<div>` lack semantic meaning for screen readers, and buttons lacking `type="button"` can unintentionally submit wrapping forms. Page counters that change dynamically must notify assistive technology.
+**Action:** Always wrap pagination controls in a `<nav aria-label="Pagination">`, ensure page counters have `aria-live="polite"`, and explicitly add `type="button"` to control buttons.
+
+## 2026-11-01 - [GitHub Actions Comment Permissions]
+**Learning:** GitHub Actions using `actions/github-script` to create PR comments will fail with `HttpError: Resource not accessible by integration` (403) unless they explicitly have `issues: write` and `pull-requests: write` permissions.
+**Action:** When a workflow requires commenting on a PR, ensure the specific job block defines the necessary permissions to override the read-only defaults.
