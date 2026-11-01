@@ -400,6 +400,7 @@ function Bank() {
             <h3 className="font-semibold">Wrong network</h3>
             <p className="helper">Switch to the configured Helix chain to continue.</p>
             <button
+              type="button"
               className="button primary"
               onClick={() => switchChain({ chainId: expectedChainId })}
               disabled={isSwitching}
