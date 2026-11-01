@@ -32,3 +32,7 @@
 ## 2026-03-31 - [Semantic Pagination Controls]
 **Learning:** Generic pagination blocks using `<div>` lack semantic meaning for screen readers, and buttons lacking `type="button"` can unintentionally submit wrapping forms. Page counters that change dynamically must notify assistive technology.
 **Action:** Always wrap pagination controls in a `<nav aria-label="Pagination">`, ensure page counters have `aria-live="polite"`, and explicitly add `type="button"` to control buttons.
+
+## 2026-11-01 - [GitHub Actions Comment Permissions]
+**Learning:** GitHub Actions using `actions/github-script` to create PR comments will fail with `HttpError: Resource not accessible by integration` (403) unless they explicitly have `issues: write` and `pull-requests: write` permissions.
+**Action:** When a workflow requires commenting on a PR, ensure the specific job block defines the necessary permissions to override the read-only defaults.
