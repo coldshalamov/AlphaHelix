@@ -401,6 +401,7 @@ function Bank() {
             <p className="helper">Switch to the configured Helix chain to continue.</p>
             <button
               className="button primary"
+              type="button"
               onClick={() => switchChain({ chainId: expectedChainId })}
               disabled={isSwitching}
               style={{ marginTop: '0.75rem' }}
