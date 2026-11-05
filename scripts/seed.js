@@ -128,6 +128,7 @@ async function main() {
 
   // Market 3: "Did we land on the moon?" (Phase: Reveal)
   // Short commit duration so we can travel past it.
+
   const shortDuration = 60 * 60 + 60; // 1 hour + 60s. (Min duration is 1 hour = 3600s)
   const longReveal = fiftyWeeks;
   await (
@@ -140,6 +141,152 @@ async function main() {
       )
   ).wait();
   console.log("Market 3 created: 'Did we land on the moon?' (Reveal target)");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket4_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 4 created: 'Dummy Market 4'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket5_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 5 created: 'Dummy Market 5'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket6_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 6 created: 'Dummy Market 6'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket7_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 7 created: 'Dummy Market 7'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket8_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 8 created: 'Dummy Market 8'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket9_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 9 created: 'Dummy Market 9'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket10_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 10 created: 'Dummy Market 10'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket11_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 11 created: 'Dummy Market 11'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket12_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 12 created: 'Dummy Market 12'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket13_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 13 created: 'Dummy Market 13'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket14_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 14 created: 'Dummy Market 14'");
+
+
+  await (
+    await market
+      .connect(deployer)
+      .submitStatement(
+        "ipfs://QmMarket15_Dummy",
+        fiftyWeeks,
+        fiftyWeeks
+      )
+  ).wait();
+  console.log("Market 15 created: 'Dummy Market 15'");
+
+
 
   // Bets for Market 3 (Must happen BEFORE time travel)
   // User 1 bets YES
