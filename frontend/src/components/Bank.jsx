@@ -30,6 +30,7 @@ const BuyCard = memo(function BuyCard({
           aria-label="Buy with maximum safe ETH"
           title="Buy with maximum safe ETH"
           disabled={!ethBalance || Boolean(activeAction)}
+          title={!ethBalance ? "No ETH available" : Boolean(activeAction) ? "Action in progress" : undefined}
         >
           Max
         </button>
@@ -76,6 +77,7 @@ const BuyCard = memo(function BuyCard({
         className="button primary"
         style={{ marginTop: '0.75rem' }}
         disabled={Boolean(activeAction)}
+        title={Boolean(activeAction) ? "Action in progress" : undefined}
       >
         {activeAction === 'buy' ? (
           <>
@@ -114,6 +116,7 @@ const SellCard = memo(function SellCard({
           aria-label="Sell maximum available HLX"
           title="Sell maximum available HLX"
           disabled={Boolean(activeAction)}
+          title={Boolean(activeAction) ? "Action in progress" : undefined}
         >
           Max
         </button>
@@ -160,6 +163,7 @@ const SellCard = memo(function SellCard({
         className="button danger"
         style={{ marginTop: '0.75rem' }}
         disabled={Boolean(activeAction)}
+        title={Boolean(activeAction) ? "Action in progress" : undefined}
       >
         {activeAction === 'sell' ? (
           <>
