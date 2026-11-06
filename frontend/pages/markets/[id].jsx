@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { formatEther } from 'viem';
 import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
@@ -207,6 +208,17 @@ export default function MarketDetailPage() {
 
   return (
     <div className="grid section">
+      <nav aria-label="Breadcrumb" style={{ marginBottom: '-1rem' }}>
+        <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: 'var(--text-sm)' }}>
+          <li>
+            <Link href="/markets" className="text-secondary" style={{ textDecoration: 'underline' }}>
+              Markets
+            </Link>
+          </li>
+          <li className="text-tertiary" aria-hidden="true">/</li>
+          <li className="text-primary" aria-current="page">Market #{id}</li>
+        </ol>
+      </nav>
       <div className="card">
         <div className="label">Market #{id}</div>
         <h2 className="text-xl font-bold" style={{ marginTop: '0.25rem' }}>
