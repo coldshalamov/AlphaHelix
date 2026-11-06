@@ -171,7 +171,7 @@ export default function MarketsPage() {
           >
             Previous
           </button>
-          <span className="helper">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
+          <span className="helper" aria-live="polite">Page {page + 1} of {Math.ceil(numericCount / PAGE_SIZE)}</span>
           <button
             className="button secondary"
             onClick={() => setPage(p => Math.min(Math.ceil(numericCount / PAGE_SIZE) - 1, p + 1))}
