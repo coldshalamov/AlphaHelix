@@ -16,6 +16,14 @@ const BuyCard = memo(function BuyCard({
   handleBuy,
   inputRef
 }) {
+  const isInsufficientEth = useMemo(() => {
+    if (!buyAmount || !ethBalance || ethBalance.value === undefined) return false;
+    try {
+      return parseEther(buyAmount) > ethBalance.value;
+    } catch {
+      return false;
+    }
+  }, [buyAmount, ethBalance]);
   return (
     <form className="card" style={{ borderColor: '#dbeafe' }} onSubmit={(e) => { e.preventDefault(); handleBuy(); }}>
       <h3 className="font-semibold">Buy HLX</h3>
@@ -75,13 +83,15 @@ const BuyCard = memo(function BuyCard({
         type="submit"
         className="button primary"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficientEth}
       >
         {activeAction === 'buy' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isInsufficientEth ? (
+          'Insufficient ETH'
         ) : (
           'Buy HLX'
         )}
@@ -96,10 +106,19 @@ const SellCard = memo(function SellCard({
   handleSellAmountChange,
   isSellError,
   activeAction,
+  hlxBalance,
   handleMaxSell,
   handleSell,
   inputRef
 }) {
+  const isInsufficientHlx = useMemo(() => {
+    if (!sellAmount || hlxBalance === undefined || hlxBalance === null) return false;
+    try {
+      return parseEther(sellAmount) > hlxBalance;
+    } catch {
+      return false;
+    }
+  }, [sellAmount, hlxBalance]);
   return (
     <form className="card" style={{ borderColor: '#ffe4e6' }} onSubmit={(e) => { e.preventDefault(); handleSell(); }}>
       <h3 className="font-semibold">Sell HLX</h3>
@@ -159,13 +178,15 @@ const SellCard = memo(function SellCard({
         type="submit"
         className="button danger"
         style={{ marginTop: '0.75rem' }}
-        disabled={Boolean(activeAction)}
+        disabled={Boolean(activeAction) || isInsufficientHlx}
       >
         {activeAction === 'sell' ? (
           <>
             <Spinner ariaHidden={true} />
             Processing...
           </>
+        ) : isInsufficientHlx ? (
+          'Insufficient HLX'
         ) : (
           'Approve & Sell'
         )}
@@ -433,6 +454,7 @@ function Bank() {
             handleSellAmountChange={handleSellAmountChange}
             isSellError={isSellError}
             activeAction={activeAction}
+            hlxBalance={hlxBalance}
             handleMaxSell={handleMaxSell}
             handleSell={handleSell}
             inputRef={sellInputRef}
