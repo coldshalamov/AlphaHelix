@@ -11,3 +11,6 @@
 ## 2026-04-17 - Wagmi useReadContracts Pagination
 **Learning:** Unbounded Wagmi `useReadContracts` multicalls mapped to dynamic contract counters (like `marketCount`) cause O(N) payload explosions and hit RPC limits.
 **Action:** Always implement offset pagination (e.g., `PAGE_SIZE`) for dynamic list rendering.
+## 2026-07-28 - Static CSS Animations vs JS Hydration
+**Learning:** Using `useState` and `useEffect` to lazily apply CSS animation classes (like `isVisible ? 'animate-fade' : ''`) causes unnecessary re-renders and delays First Contentful Paint (FCP) waiting for JS hydration. When removing these, leftover static `opacity: 0` rules in `<style jsx>` will cause permanently invisible elements because the animation might complete or get overridden without the JS toggle.
+**Action:** Always apply CSS animation classes statically in JSX (e.g., `className="animate-fade-in-up"`) to allow server-rendered animations and explicitly remove associated base `opacity: 0` rules from the stylesheet.
