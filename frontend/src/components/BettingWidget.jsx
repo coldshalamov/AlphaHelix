@@ -88,13 +88,21 @@ function BettingWidget({
   const amountInputRef = useRef(null);
 
   const isAmountError = useMemo(() => {
+    if (amount && hlxBalance) {
+      try {
+        const val = parseEther(amount);
+        if (val > hlxBalance) return true;
+      } catch {
+        return false;
+      }
+    }
     if (!status) return false;
     return [
       'Enter an amount of HLX to stake.',
       'Invalid HLX amount.',
       'Enter an amount greater than zero.',
     ].includes(status);
-  }, [status]);
+  }, [status, amount, hlxBalance]);
 
   // Track what the current txHash actually represents
   const [pendingAction, setPendingAction] = useState(''); // 'approve' | 'commit' | 'reveal'
@@ -513,12 +521,14 @@ function BettingWidget({
           </div>
         </div>
 
-        <button type="submit" className="button primary" disabled={isLocked}>
+        <button type="submit" className="button primary" disabled={isLocked || isAmountError}>
           {isLocked ? (
             <>
                   <Spinner ariaHidden={true} />
               {pendingAction === 'approve' ? 'Approving HLX...' : 'Committing...'}
             </>
+          ) : isAmountError ? (
+            'Insufficient HLX'
           ) : (
             'Commit bet'
           )}
