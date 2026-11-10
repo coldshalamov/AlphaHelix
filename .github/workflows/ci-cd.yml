@@ -81,7 +81,9 @@ jobs:
   gas-report:
     name: Gas Usage Report
     runs-on: ubuntu-latest
-    
+    permissions:
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -157,7 +159,7 @@ jobs:
         run: npx hardhat compile
         
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: contract-artifacts
           path: |
