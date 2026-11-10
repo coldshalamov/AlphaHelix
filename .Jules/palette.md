@@ -28,3 +28,6 @@
 ## 2023-10-27 - Decorative Spinners Accessibility
 **Learning:** When a visual loading indicator (like an SVG spinner) is used exclusively alongside descriptive text (e.g., inside a button saying 'Committing...'), it must use `aria-hidden="true"` instead of `role="status"` and `aria-label="Loading"` to prevent redundant screen reader announcements. Adding configurable accessibility props (like `ariaHidden={true}`) ensures flexibility without breaking standalone usages.
 **Action:** Expose an `ariaHidden` prop defaulting to `false` for Spinner components. When the Spinner is rendered next to descriptive text, set it to `true` to silence screen readers to prevent duplicated verbosity.
+## 2024-11-10 - [Pagination Accessibility]
+**Learning:** Pagination controls built with basic `<div>` wrappers and without polite live regions fail to announce page changes or navigation context to screen reader users.
+**Action:** When implementing or improving pagination controls, always wrap the elements in a `<nav aria-label="Pagination">` container, add `type="button"` to buttons to prevent implicit form submissions, and add `aria-live="polite"` to the current page text or counter so screen readers are notified of updates.
